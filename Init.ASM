@@ -42,25 +42,16 @@ proc Init uses esi
         mov [vCount], eax
        ; mov [objTrianglesCount], eax
         mov [iCount], ecx
-       ; imul eax, eax , sizeof.Vertex
-       ; invoke  HeapAlloc, [hHeap], ebx, eax
 
-       ; mov [zhVertices], eax
-        ;imul ecx, ecx , sizeof.Vertex
-
-       ; invoke  HeapAlloc, [hHeap], ebx, ecx
-       ; mov [zhIndices], eax
-
-      ;  stdcall Testw, zwVertices
-
-       stdcall ParseVerticesOBJ, [buffer],  [bufferLength], eax;, [objVertices], [objIndices]
-        mov [addressV], eax
+       stdcall ParseVerticesOBJ, [buffer],  [bufferLength], [vCount];, [objVertices], [objIndices]
+       mov [addressV], eax
 
         stdcall Testw, zhIndices
 
 
         stdcall ParseIndicesOBJ, [buffer],  [bufferLength], [iCount] ;, [objVertices], [objIndices]
          mov [addressI], eax
+
 
        ; mov eax, zhIndices
 

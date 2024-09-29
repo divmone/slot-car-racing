@@ -2,16 +2,16 @@
 
         className       db              "OpenGLDemo", 0
         clientRect      RECT            0, 0, 0, 0
-        fileName        db              "zh1.obj",0
+        fileName        db              "car.obj",0
         hHeap           dd              ?
         hdcBack         dd              ?
         time            dd              ?
         hdc             dd              ?
         radian          GLfloat         57.32
         angle           GLfloat         0.0
-        angleY           GLfloat        0.0
-        angleX           GLfloat        0.0
-        angleZ           GLfloat        0.0
+        angleY          GLfloat         0.0
+        angleX          GLfloat         0.0
+        angleZ          GLfloat         0.0
         step            GLfloat         10.0
         length          GLfloat         5.0
         programTime     dd              ?
@@ -31,30 +31,18 @@
         scaleStep       GLfloat         0.05
         scale           GLfloat         2.0
 
+        drawingMode      dd              1
+
         addressV         dd              0
         addressI         dd              0
 
-        cubeMesh        PackedMesh      cubeVertices, cubeColors, cubeIndices, CUBE_TRIANGLES_COUNT
+      ;  cubeMesh        PackedMesh      cubeVertices, cubeColors, cubeIndices, CUBE_TRIANGLES_COUNT
         cube            Mesh            0, 0, 0, 0
 
         zhMesh          PackedMesh      0, zhColors, 0, 0
         zh              Mesh            0, 0, 0, 0
         plane           Mesh            planeVertices, planeColors, 0, PLANE_VERTICES_COUNT
 
-        cameraPosition1 Vector3         5.0, 5.0, 0.0
-        cameraDirPrev1  Vector3         5.0, 5.0, 6.66
-        cameraDirNext1  Vector3         5.0, 5.0, -6.66
-
-        cameraPosition2 Vector3         -5.0, 5.0, 0.0
-        cameraDirPrev2  Vector3         -5.0, 5.0, -6.66
-        cameraDirNext2  Vector3         -5.0, 5.0, 6.66
-
-
-
-        cameraPoints:   Spline.Point    cameraPosition1, cameraDirPrev1, cameraDirNext1, 5.0
-                        Spline.Point    cameraPosition2, cameraDirPrev2, cameraDirNext2, 5.0
-
-        cameraSpline    Spline          2, cameraPoints, true, 10.0
 
         fovY            GLfloat         60.0
         zNear           GLfloat         0.001
@@ -65,7 +53,7 @@
         nullVector      Vector3         0.0, 0.0, 0.0
         unitVector      Vector3         1.0, 1.0, 1.0
 
-        cameraPosition  Vector3         0.0, 15.0, 0.0
+        cameraPosition  Vector3         0.0, 50.0, 0.0
         targetPosition  Vector3         1.0, 0.0, 0.0
         upVector        Vector3         0.0, 1.0, 0.0
 
@@ -153,6 +141,9 @@ proc WindowProc uses ebx,\
         je      .MoveDown
           cmp     [wParam], 58h
           je      .RotateRight
+        cmp  [wParam], 31h
+        je .selectMode
+
 
        cmp     [wParam], VK_SPACE
        jne     @F
@@ -268,6 +259,18 @@ proc WindowProc uses ebx,\
         fsub [scaleStep]
         fstp [scale]
         jmp     .ReturnZero
+
+.selectMode:
+        cmp [drawingMode], 1
+        je  .setFour
+        mov [drawingMode], 1
+        jmp @F
+
+.setFour:
+        mov [drawingMode], 4
+
+@@:
+        jmp .ReturnZero
 
 .Destroy:
         invoke  ExitProcess, ebx
@@ -419,17 +422,20 @@ proc ParseIndicesOBJ uses ebx edi esi ,\
 
         locals
             resultIndices dd 0
+            iCount        dd 0
         endl
 
-
-
         xor edx, edx
-        mov ecx, 12
+        mov ecx, 20
         mov eax, [indicesCount]
         mul ecx
-        mov ebx, ecx
+
         invoke  HeapAlloc, [hHeap], HEAP_ZERO_MEMORY, eax  ; eax
         mov     [resultIndices], eax
+
+        mov eax, [indicesCount]
+        imul eax, eax, 3
+        mov [iCount], eax
 
         mov esi, [buffer]
         mov ecx, [length]
@@ -441,29 +447,39 @@ proc ParseIndicesOBJ uses ebx edi esi ,\
         cmp byte [esi + 1], ' '
         jne .skipLine
 
+
         add esi, 2
         dec ecx
         dec ecx
         stdcall StrToInt, esi
         mov [edi], eax
 
+        dec[iCount]
+
         stdcall SkipToSpace, esi
 
         inc esi
-         dec ecx
+        dec ecx
+
+
         stdcall StrToInt, esi
+
         mov [edi +  4], eax
 
+        dec[iCount]
+
+
         stdcall SkipToSpace, esi
+
         inc esi
-         dec ecx
+        dec ecx
+
         stdcall StrToInt, esi
         mov [edi + 8], eax
-
+        dec[iCount]
         add edi, 12
-        cmp ebx, 0
-        je .end
-        loop .cycle
+
+       jmp .ccc
 
 .skipLine:
 
@@ -478,6 +494,12 @@ proc ParseIndicesOBJ uses ebx edi esi ,\
 
 @@:
         inc esi
+
+
+
+.ccc:
+        cmp [iCount], 0
+        je .end
         loop .cycle
 
 .end:
@@ -493,6 +515,7 @@ proc SkipToSpace  pointer
         cmp byte[esi], ' '
         je @F
         inc esi
+        dec ecx
         jmp .cycle
 
 @@:
@@ -512,6 +535,8 @@ proc CountVerticesOBJ uses esi,\
 
 .countCycle:
         cmp byte[esi], 'v'
+        jne @F
+        cmp byte[esi + 1], ' '
         jne @F
         inc [verticesCount]
         jmp .newLine

@@ -37,7 +37,9 @@ proc Draw, v1
        ; stdcall DrawMesh, cube, [posX], [posY], [posZ],1
 
          invoke glScalef , [scale], [scale] , [scale]
-        stdcall DrawMesh, zh, [posX], [posY], [posZ],1
+
+        stdcall DrawMesh, zh, [drawingMode], [posX], [posY], [posZ]
+
         invoke  glPopMatrix
 
        ; stdcall DrawMesh2, plane, 0.0, 0.0, 0.0, 0
@@ -63,38 +65,8 @@ proc Tick
         ret
 endp
 
-proc DrawMesh2 uses esi,\
-     mesh,  v1, flag
-
-       ; cmp [flag], false
-       ; je @F
-
-       ; invoke  glRotatef, [angleY], 0.0, 1.0, 0.0 ;
-@@:
-        invoke glTranslatef, [v1 + Vector3.x],  [v1 + Vector3.y],  [v1 + Vector3.z]
-
-
-        mov     esi, [mesh]
-
-        invoke  glEnableClientState, GL_VERTEX_ARRAY
-        invoke  glEnableClientState, GL_COLOR_ARRAY
-        invoke  glEnableClientState, GL_NORMAL_ARRAY
-
-        invoke  glVertexPointer, 3, GL_FLOAT, ebx, [esi + Mesh.vertices]
-        invoke  glColorPointer, 3, GL_FLOAT, ebx, [esi + Mesh.colors]
-        invoke  glNormalPointer, GL_FLOAT, ebx, [esi + Mesh.normals]
-        invoke  glDrawArrays, GL_TRIANGLES, ebx, [esi + Mesh.verticesCount]
-
-        invoke  glDisableClientState, GL_VERTEX_ARRAY
-        invoke  glDisableClientState, GL_COLOR_ARRAY
-        invoke  glDisableClientState, GL_NORMAL_ARRAY
-
-
-        ret
-endp
-
 proc DrawMesh uses esi,\
-     mesh,  v1, flag
+     mesh, flag ,  v1
 
        ; cmp [flag], false
        ; je @F
@@ -114,7 +86,7 @@ proc DrawMesh uses esi,\
         invoke  glVertexPointer, 3, GL_FLOAT, ebx, [esi + Mesh.vertices]
         invoke  glColorPointer, 3, GL_FLOAT, ebx, [esi + Mesh.colors]
         invoke  glNormalPointer, GL_FLOAT, ebx, [esi + Mesh.normals]
-        invoke  glDrawArrays, GL_TRIANGLES, ebx, [esi + Mesh.verticesCount]
+        invoke  glDrawArrays, [flag], ebx, [esi + Mesh.verticesCount]
 
         invoke  glDisableClientState, GL_VERTEX_ARRAY
         invoke  glDisableClientState, GL_COLOR_ARRAY
