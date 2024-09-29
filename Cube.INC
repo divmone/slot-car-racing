@@ -8,9 +8,6 @@ cubeIndices     dd  9,10,11,3,6,2,1,7,3,0,5,1,6,0,2,11,6,7,9,7,5,4,9,5,6,8,4,12,
 CUBE_TRIANGLES_COUNT    =       2050
 CUBE_VERTICES_COUNT     =       CUBE_TRIANGLES_COUNT * 3
 
-objVertices     GLfloat ?
-objIndices      GLfloat ?
-
 
 
 

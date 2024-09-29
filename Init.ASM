@@ -31,7 +31,40 @@ proc Init uses esi
 
         fild    [clientRect.right]      ; width
         fidiv   [clientRect.bottom]     ; width / height
-        fstp    [aspect]                ;
+        fstp    [aspect]
+
+         stdcall File.LoadContent, fileName;, size
+        mov [buffer], eax
+        stdcall File.GetSize, fileName
+        mov [bufferLength], eax
+        ; stdcall  PrintToConsole, [buffer] , eax
+        stdcall CountVerticesOBJ,  [buffer], [bufferLength]
+        mov [vCount], eax
+       ; mov [objTrianglesCount], eax
+        mov [iCount], ecx
+       ; imul eax, eax , sizeof.Vertex
+       ; invoke  HeapAlloc, [hHeap], ebx, eax
+
+       ; mov [zhVertices], eax
+        ;imul ecx, ecx , sizeof.Vertex
+
+       ; invoke  HeapAlloc, [hHeap], ebx, ecx
+       ; mov [zhIndices], eax
+
+      ;  stdcall Testw, zwVertices
+
+       stdcall ParseVerticesOBJ, [buffer],  [bufferLength], eax;, [objVertices], [objIndices]
+        mov [addressV], eax
+
+        stdcall Testw, zhIndices
+
+
+        stdcall ParseIndicesOBJ, [buffer],  [bufferLength], [iCount] ;, [objVertices], [objIndices]
+         mov [addressI], eax
+
+       ; mov eax, zhIndices
+
+
 
         invoke  glMatrixMode, GL_PROJECTION
         invoke  glLoadIdentity
@@ -43,17 +76,13 @@ proc Init uses esi
         invoke  glEnable, GL_DEPTH_TEST
         invoke  glEnable, GL_COLOR_MATERIAL
 
-      ;  invoke  HeapAlloc, [hHeap], 8, sizeof.Vertex * 8
-      ;  mov     [cubeMesh.colors], eax
-
         invoke  HeapAlloc, [hHeap], ebx, sizeof.Vertex * 6
         mov     [plane.normals], eax
 
-        stdcall Mesh.Generate, cubeMesh, cube, true
-        stdcall Mesh.Generate, zhMesh, zh, true
+        stdcall Mesh.Generate, zhMesh, zh, true, [addressV], [addressI], [iCount]
 
         stdcall Mesh.CalculateNormals, zh
-        stdcall Mesh.CalculateNormals, cube
+
         stdcall Mesh.CalculateNormals, plane
 
         invoke  glEnable, GL_LIGHTING
@@ -67,12 +96,15 @@ proc Init uses esi
                              xAxis, yAxis, zAxis
 
 
-        stdcall File.LoadContent, fileName;, size
-        mov [buffer], eax
-        stdcall File.GetSize, fileName
-        ; stdcall  PrintToConsole, [buffer] , eax
-        stdcall ParseOBJ, [buffer], eax;, [objVertices], [objIndices]
-       ;
+
 
         ret
+endp
+
+
+proc Testw v1
+
+        nop
+
+ret
 endp

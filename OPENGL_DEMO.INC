@@ -51,9 +51,11 @@ macro malloc count, size
         invoke  HeapAlloc, [hHeap], 8, count * size
 }
 
-        include         "Cube.inc"
+
         include         "Plane.inc"
-        include         "zhiguli.inc"
+         include         "Cube.inc"
+         include         "zhiguli.inc"
+
 
         true            =       1
         false           =       0

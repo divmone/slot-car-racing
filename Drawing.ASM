@@ -28,6 +28,7 @@ proc Draw, v1
 
 
         stdcall Matrix.LookAt, cameraPosition, targetPosition, upVector
+       ; invoke glScalef , 4.0, 1.0 , 1.0
         invoke glRotatef, [angleX], 0.0, 0.0, 1.0
         invoke glRotatef, [angleZ], 0.0, 1.0, 0.0
 

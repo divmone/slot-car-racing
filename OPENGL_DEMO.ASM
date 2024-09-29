@@ -2,7 +2,7 @@
 
         className       db              "OpenGLDemo", 0
         clientRect      RECT            0, 0, 0, 0
-        fileName        db              "test.obj",0
+        fileName        db              "zh1.obj",0
         hHeap           dd              ?
         hdcBack         dd              ?
         time            dd              ?
@@ -15,21 +15,29 @@
         step            GLfloat         10.0
         length          GLfloat         5.0
         programTime     dd              ?
+        bufferLength    dd              0
+        two             dd              1.5
+
+        vCount          dd              0
+        iCount          dd              0
 
         posX            GLfloat         1.0
-        posY            GLfloat         10.0
+        posY            GLfloat         1.0
         posZ            GLfloat         1.0
         size            dd             1000
         fileSize        dd             0
         isTransform     dd              0
-        buffer          dd              ?
+        buffer          dd              0.0
         scaleStep       GLfloat         0.05
         scale           GLfloat         2.0
+
+        addressV         dd              0
+        addressI         dd              0
 
         cubeMesh        PackedMesh      cubeVertices, cubeColors, cubeIndices, CUBE_TRIANGLES_COUNT
         cube            Mesh            0, 0, 0, 0
 
-        zhMesh          PackedMesh      zhVertices, zhColors, zhIndices, ZH_TRIANGLES_COUNT
+        zhMesh          PackedMesh      0, zhColors, 0, 0
         zh              Mesh            0, 0, 0, 0
         plane           Mesh            planeVertices, planeColors, 0, PLANE_VERTICES_COUNT
 
@@ -55,9 +63,9 @@
         PI      dd       3.14
         mVector         Vector3         0.1, 0.1, 0.0
         nullVector      Vector3         0.0, 0.0, 0.0
-        unitVector      Vector3         10.0, 10.0, 10.0
+        unitVector      Vector3         1.0, 1.0, 1.0
 
-        cameraPosition  Vector3         0.0, 150.0, 0.0
+        cameraPosition  Vector3         0.0, 15.0, 0.0
         targetPosition  Vector3         1.0, 0.0, 0.0
         upVector        Vector3         0.0, 1.0, 0.0
 
@@ -337,31 +345,170 @@ proc PrintToConsole uses esi, buffer, length
         ret
 endp
 
-proc ParseOBJ uses edi esi,\
+
+proc ParseVerticesOBJ uses edi esi,\
+    buffer, length, verticesCount;, verticesBuff, indicesBuff
+
+        locals
+            resultVertices dd 0
+
+        endl
+
+
+        xor edx, edx
+        mov ecx, 12
+        mov eax, [verticesCount]
+        mul ecx
+        invoke  HeapAlloc, [hHeap], HEAP_ZERO_MEMORY, eax   ; eax
+        mov     [resultVertices], eax
+
+        mov esi, [buffer]
+        mov ecx, [length]
+        mov edi, [resultVertices]
+.cycle:
+        cmp byte[esi], 'v'
+        jne .skipLine
+
+        cmp byte [esi + 1], ' '
+        jne .skipLine
+
+        add esi, 2
+        sub ecx, 2
+        stdcall StrToFloat, esi
+        mov [edi], eax
+        add esi, 1
+        dec ecx
+        stdcall StrToFloat, esi
+        mov [edi + 4], eax
+
+        add esi, 1
+        dec ecx
+        stdcall StrToFloat, esi
+        mov [edi + 8], eax
+
+        add edi, 12
+        add esi, 1
+        dec ecx
+        loop .cycle
+
+.skipLine:
+
+        cmp byte [esi], 10
+        je @F
+        cmp byte [esi], 0
+        je @F
+         dec ecx
+         jz .end
+        inc esi
+        jmp .skipLine
+
+@@:
+        inc esi
+        loop .cycle
+
+.end:
+
+       mov eax, [resultVertices]
+    ret
+endp
+
+
+
+proc ParseIndicesOBJ uses ebx edi esi ,\
+    buffer, length, indicesCount
+
+        locals
+            resultIndices dd 0
+        endl
+
+
+
+        xor edx, edx
+        mov ecx, 12
+        mov eax, [indicesCount]
+        mul ecx
+        mov ebx, ecx
+        invoke  HeapAlloc, [hHeap], HEAP_ZERO_MEMORY, eax  ; eax
+        mov     [resultIndices], eax
+
+        mov esi, [buffer]
+        mov ecx, [length]
+        mov edi, [resultIndices]
+.cycle:
+        cmp byte[esi], 'f'
+        jne .skipLine
+
+        cmp byte [esi + 1], ' '
+        jne .skipLine
+
+        add esi, 2
+        dec ecx
+        dec ecx
+        stdcall StrToInt, esi
+        mov [edi], eax
+
+        stdcall SkipToSpace, esi
+
+        inc esi
+         dec ecx
+        stdcall StrToInt, esi
+        mov [edi +  4], eax
+
+        stdcall SkipToSpace, esi
+        inc esi
+         dec ecx
+        stdcall StrToInt, esi
+        mov [edi + 8], eax
+
+        add edi, 12
+        cmp ebx, 0
+        je .end
+        loop .cycle
+
+.skipLine:
+
+        cmp byte [esi], 10
+        je @F
+        cmp byte [esi], 0
+        je @F
+        dec ecx
+        jz .end
+        inc esi
+        jmp .skipLine
+
+@@:
+        inc esi
+        loop .cycle
+
+.end:
+       mov eax, [resultIndices]
+
+    ret
+endp
+
+proc SkipToSpace  pointer
+
+        mov esi, [pointer]
+.cycle:
+        cmp byte[esi], ' '
+        je @F
+        inc esi
+        jmp .cycle
+
+@@:
+        ret
+endp
+
+proc CountVerticesOBJ uses esi,\
     buffer, length;, verticesBuff, indicesBuff
 
         locals
-            index dd 0
-            sign db 0
-            number dd 0
-            buff dd 0
-            vertexX dd 0
-            vertexY dd 0
-            vertexZ dd 0
-            tmpVertex dd 0
             verticesCount dd 0
             indicesCount dd 0
-            resultVertices dd 0
-            resultIndices dd 0
-            vertex dd 0.0
-            vertexY dd 0.0
-            vertexZ dd 0.0
-
         endl
 
         mov esi, [buffer]
         mov ecx, [length]
-        mov dx, 10
 
 .countCycle:
         cmp byte[esi], 'v'
@@ -388,171 +535,63 @@ proc ParseOBJ uses edi esi,\
         inc esi
         loop .countCycle
 .endl:
-        mov eax, [verticesCount]
-        imul eax, 3
-        invoke  HeapAlloc, [hHeap], 8, eax    ; eax
-        mov     [objVertices], eax
-
-        mov eax, [indicesCount]
-        imul eax, 3
-        invoke  HeapAlloc, [hHeap], 8, eax    ; eax
-        mov     [objIndices], eax
-
-
-
-        mov esi, [buffer]
-        mov ecx, [length]
-        mov edi, [objVertices]
-.cycle:
-        cmp byte[esi], 'v'
-        jne .skipLine
-
-
-        cmp byte [esi + 1], ' '
-        jne .skipLine
-
-        add esi, 2
-
-        stdcall StrToFloat, esi
-        mov [edi], eax
-        add edi, 2
-
-        add esi, 2
-
-        stdcall StrToFloat, esi
-        mov [edi], eax
-        add edi, 2
-
-        stdcall StrToFloat, esi
-        mov [edi], eax
-        add edi, 2
-
-        jmp .skipLine
-
-.skipLine:
-
-        cmp byte [esi], 10
-        je @F
-         inc esi
-         dec ecx
-        jmp .skipLine
-
-
-@@:
-         inc esi
-        loop .cycle
-
-        mov esi, [buffer]
-        mov ecx, [length]
-        mov edi, [objIndices]
-
-.cycle2:
-        cmp byte[esi], 'f'
-        jne .skipLine2
-
-        cmp byte[esi], ' '
-        jne .skipLine2
-
-        add esi, 2
-
-        stdcall StrToInt, esi
-        mov [edi], eax
-        add edi,  sizeof.Vertex
-
-        add esi, 2
-
-        stdcall StrToInt, esi
-        mov [edi], eax
-        add edi, sizeof.Vertex
-
-        add esi, 2
-
-        stdcall StrToInt, esi
-        mov [edi], eax
-        add edi,  sizeof.Vertex
-
-.skipLine2:
-
-        cmp byte [esi], 10
-        je @F
-         inc esi
-        jmp .skipLine2
-
-
-@@:
-
-        loop .cycle2
-
-
-        mov eax, [resultVertices]
-        mov [objVertices], eax
-        mov eax, [resultIndices]
-        mov [objVertices], eax
-
+       mov eax, [verticesCount]
+       mov ecx, [indicesCount]
     ret
 endp
 
-proc StrToInt uses ecx edi esi,\
+proc StrToInt uses ebx edi,\
      pointer
-
-    locals
-            number dd 0.0
-            buffer dd 0.0
-            buff dd 0
-            precision dd 0
-            sign db 0
-
-        endl
 
         mov esi, [pointer]
 
         xor eax, eax
  @@:
-        inc esi
-        cmp byte[esi], '\'
+        cmp byte[esi], '/'
         je @F
-        cmp byte[esi], 10
-        je @F
-        mov ebx, [esi]
+        mov bl, byte[esi]
         sub ebx, '0'
-        dec ebx
-        imul eax, 10
+        imul eax,eax, 10
         add eax, ebx
+        inc esi
+        dec ecx
         jmp @B
 
 @@:
-
+        dec eax
     ret
 endp
 
-proc StrToFloat uses ecx edi,\
-      pointer
+proc StrToFloat  pointer
 
         locals
             number dd 0.0
-            buffer dd 0.0
-            buff dd 0
             precision dd 0
             sign db 0
+            ten dd 10.0
 
         endl
 
         mov esi, [pointer]
+        xor eax, eax
 
         cmp byte[esi], '-'
         jne @F
         mov [sign], 1
         xor eax, eax
         inc esi
+        dec ecx
 
 @@:
         xor ebx, ebx
         cmp byte[esi], '.'
         je @F
-        mov bl, byte[esi]  ;!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        mov bl, byte[esi]
         sub ebx, '0'
         imul eax, eax, 10
         add eax, ebx
+        inc esi
+        dec ecx
         jmp @B
 
 @@:
@@ -560,6 +599,7 @@ proc StrToFloat uses ecx edi,\
 
 @@:
         inc esi
+        dec ecx
         xor ebx, ebx
         cmp byte[esi], ' '
         je @F
@@ -574,26 +614,23 @@ proc StrToFloat uses ecx edi,\
 
 @@:
         mov [number], eax
-        mov eax, 10
-
-        mov ecx,  [precision]
-.cycle:
-        imul eax, eax, 10
-
-        loop .cycle
-
-
-        mov [buff], eax
-
-        fld [number]
-        fdiv [buff]
+        mov eax, [precision]
+        fild [number]
+@@:
+        cmp eax, 0
+        je @F
+        fdiv [ten]
+        dec eax
+        jmp @B
+@@:
         cmp [sign], 1
         jne @F
         fchs
 @@:
-        fstp [buffer]
+        fstp [number]
 
-        mov eax, [buffer]
+        mov eax, [number]
 
     ret
 endp
+

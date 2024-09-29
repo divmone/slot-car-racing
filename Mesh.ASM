@@ -1,8 +1,8 @@
 proc Mesh.Generate uses ebx esi edi,\
-     sourceMesh, resultMesh , copyColors
+     sourceMesh, resultMesh , copyColors, addressV, addressI, indicesCount
 
         locals
-                verticesCount   dd      ?
+                verticesCountz   dd      ?
                 vertices        dd      ?
                 colors          dd      ?
                 resultIndex     dd      ?
@@ -15,21 +15,25 @@ proc Mesh.Generate uses ebx esi edi,\
         mov     esi, [sourceMesh]
         mov     edi, [resultMesh]
 
-        mov     eax, [esi + PackedMesh.vertices]
+
+        mov     eax, [addressV]
+
         mov     [vertices], eax
         mov     eax, [esi + PackedMesh.colors]
         mov     [colors], eax
-        mov     eax, [esi + PackedMesh.indices]
+
+        mov     eax, [addressI]
+
         mov     [indices], eax
 
-        mov     [resultIndex], ebx
+        mov     [resultIndex], 0
 
-        mov     eax, [esi + PackedMesh.trianglesCount]
+        mov     eax, [indicesCount]
         ; mov     [edi + Mesh.trianglesCount], eax
         xor     edx, edx
         mov     ecx, 3
         mul     ecx
-        mov     [verticesCount], eax    ; verticesCount = trianglesCount * 3
+        mov     [verticesCountz], eax    ; verticesCount = trianglesCount * 3
         xor     edx, edx
         mov     ecx, sizeof.Vertex
         mul     ecx
@@ -44,7 +48,7 @@ proc Mesh.Generate uses ebx esi edi,\
         invoke  HeapAlloc, [hHeap], 8   ; eax
         mov     [resultNormals], eax
 
-        mov     ecx, [verticesCount]
+        mov     ecx, [verticesCountz]
 
 .CopyCycle:
         push    ecx
@@ -116,7 +120,7 @@ proc Mesh.Generate uses ebx esi edi,\
         mov     [edi + Mesh.colors], eax
         mov     eax, [resultNormals]
         mov     [edi + Mesh.normals], eax
-        mov     eax, [verticesCount]
+        mov     eax, [verticesCountz]
         mov     [edi + Mesh.verticesCount], eax
 
         ret
