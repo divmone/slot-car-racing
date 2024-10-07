@@ -2,7 +2,10 @@ proc Draw, v1
 
         locals
                 currentTime     dd      ?
-
+                speed     GLfloat 0.0  
+                mposX   GLfloat 0.0  
+                mposY   GLfloat 0.0  
+                mposZ   GLfloat 0.0  
         endl
 
         invoke  GetTickCount
@@ -16,37 +19,47 @@ proc Draw, v1
         mov     [time], eax
 
         stdcall Tick
+      ;  stdcall UpdateMovement
 
 .Skip:
         invoke  glClearColor, 0.6, 0.6, 1.0, 1.0
         invoke  glClear, GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT
 
-       ; stdcall Spline.GetPoint, cameraSpline, cameraPosition, [programTime]
-
         invoke  glMatrixMode, GL_MODELVIEW
         invoke  glLoadIdentity
 
-
         stdcall Matrix.LookAt, cameraPosition, targetPosition, upVector
-       ; invoke glScalef , 4.0, 1.0 , 1.0
-        invoke glRotatef, [angleX], 0.0, 0.0, 1.0
-        invoke glRotatef, [angleZ], 0.0, 1.0, 0.0
+        invoke glScalef , [scale], [scale] , [scale]
+        
+        stdcall DrawMesh, plane, [drawingMode], 1.0, 1.0, 1.0
 
-        invoke  glPushMatrix
+        invoke  glPushMatrix 
 
-       ; stdcall DrawMesh, cube, [posX], [posY], [posZ],1
+        invoke glTranslatef, [posX], 0.0, [posZ]
+        invoke glRotatef, [angleY], 0.0, 1.0, 0.0
+        stdcall DrawMesh, car, [drawingMode], 0.0, 0.0, 0.0
 
-         invoke glScalef , [scale], [scale] , [scale]
-
-        stdcall DrawMesh, zh, [drawingMode], [posX], [posY], [posZ]
-
-        invoke  glPopMatrix
-
-       ; stdcall DrawMesh2, plane, 0.0, 0.0, 0.0, 0
+        invoke  glPopMatrix   
 
         invoke  SwapBuffers, [hdc]
 
         ret
+endp
+
+proc UpdateMovement
+
+    fld [angleY]
+    fsin        
+    fadd [posX] 
+    fstp [posX]       
+
+    fld [angleY]
+    fcos
+
+    fadd [posZ]   
+    fstp [posZ]     
+
+    ret
 endp
 
 proc MoveCamera
@@ -67,15 +80,6 @@ endp
 
 proc DrawMesh uses esi,\
      mesh, flag ,  v1
-
-       ; cmp [flag], false
-       ; je @F
-
-        invoke  glRotatef, [angleY], 0.0, 1.0, 0.0 ;
-
-@@:
-        invoke glTranslatef, [v1 + Vector3.x],  [v1 + Vector3.y],  [v1 + Vector3.z]
-
 
         mov     esi, [mesh]
 

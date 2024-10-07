@@ -1,18 +1,19 @@
 format  PE GUI 5.0
 entry   WinMain
 
-        include         "win32a.inc"
+        include         "include\win32a.inc"
 
-        include         "api\kernel32.inc"
-        include         "api\user32.inc"
-        include         "api\gdi32.inc"
-        include         "api\opengl.inc"
+        include         "include\api\kernel32.inc"
+        include         "include\api\user32.inc"
+        include         "include\api\gdi32.inc"
+        include         "include\api\opengl.inc"
 
         include         "Mesh.inc"
         include         "Vector.inc"
         include         "Color.inc"
         include         "Matrix.inc"
         include         "Spline.inc"
+    
 
 macro switch value
 {

@@ -1,19 +1,35 @@
-        include "OPENGL_DEMO.inc"
+        include "../include/OPENGL_DEMO.inc"
 
         className       db              "OpenGLDemo", 0
         clientRect      RECT            0, 0, 0, 0
-        fileName        db              "car.obj",0
+        fileName        db              "models/car.obj",0
+        akFileName      db              "models/skull.obj", 0
         hHeap           dd              ?
         hdcBack         dd              ?
         time            dd              ?
         hdc             dd              ?
         radian          GLfloat         57.32
         angle           GLfloat         0.0
+;transform
         angleY          GLfloat         0.0
         angleX          GLfloat         0.0
         angleZ          GLfloat         0.0
-        step            GLfloat         10.0
+
+        posX            GLfloat         0.0
+        posY            GLfloat         0.0
+        posZ            GLfloat         0.0
+
+        velocity        GLfloat         2.0
+
+
+
+; 
+; fpu
+        toRadian        GLfloat         180.0
+
+        step            GLfloat         5.0
         length          GLfloat         5.0
+        pVector         Vector3         0.0, 0.0, 0.0
         programTime     dd              ?
         bufferLength    dd              0
         two             dd              1.5
@@ -21,9 +37,9 @@
         vCount          dd              0
         iCount          dd              0
 
-        posX            GLfloat         1.0
-        posY            GLfloat         1.0
-        posZ            GLfloat         1.0
+        matrixT         Matrix4x4       ?
+
+  
         size            dd             1000
         fileSize        dd             0
         isTransform     dd              0
@@ -39,8 +55,12 @@
       ;  cubeMesh        PackedMesh      cubeVertices, cubeColors, cubeIndices, CUBE_TRIANGLES_COUNT
         cube            Mesh            0, 0, 0, 0
 
-        zhMesh          PackedMesh      0, zhColors, 0, 0
-        zh              Mesh            0, 0, 0, 0
+        akMesh          PackedMesh       0, zhColors, 0, 0
+        ak              Mesh            0, 0, 0, 0
+
+        carMesh          PackedMesh      0, zhColors, 0, 0
+        car              Mesh            0, 0, 0, 0
+
         plane           Mesh            planeVertices, planeColors, 0, PLANE_VERTICES_COUNT
 
 
@@ -52,8 +72,10 @@
         mVector         Vector3         0.1, 0.1, 0.0
         nullVector      Vector3         0.0, 0.0, 0.0
         unitVector      Vector3         1.0, 1.0, 1.0
+        tPosition       Vector3         0,   0,    0
+        cPosition       Vector3         150.0, 150.0, 150.0
 
-        cameraPosition  Vector3         0.0, 50.0, 0.0
+        cameraPosition  Vector3         0.0, 100.0, 0.0
         targetPosition  Vector3         1.0, 0.0, 0.0
         upVector        Vector3         0.0, 1.0, 0.0
 
@@ -64,7 +86,7 @@
         light0Position  Vector4         5.0, 5.1, 5.0, 1.0
         light0Diffuse   ColorRGBA       1.0, 0.996, 0.839, 1.0
 
-        light1Position  Vector4         4.0, 3.5, 6.0, 1.0
+        light1Position  Vector4         10.0, 10.5, 10.0, 1.0
         light1Diffuse   ColorRGBA       1.0, 0.996, 0.839, 1.0
 
         directionVetcor  Vector4i       0, 0, 0, 0
@@ -83,6 +105,7 @@
         include         "Matrix.asm"
         include         "Drawing.asm"
         include         "Spline.asm"
+        include         "File.asm"
 
 proc WinMain
 
@@ -114,7 +137,6 @@ proc WindowProc uses ebx,\
         case    .KeyDown,       WM_KEYDOWN
         case    .MouseWheel,    WM_MOUSEWHEEL
 
-
         invoke  DefWindowProc, [hWnd], [uMsg], [wParam], [lParam]
         jmp     .Return
 
@@ -125,6 +147,7 @@ proc WindowProc uses ebx,\
         jmp     .ReturnZero
 
 .KeyDown:
+ 
         cmp     [wParam], VK_ESCAPE
         je      .Destroy
         cmp     [wParam], 41h
@@ -165,49 +188,81 @@ proc WindowProc uses ebx,\
 
         jmp     .ReturnZero
 .MoveUp:
-        fld     [posX]
-        fsub   [step]
-        fstp    [posX]
-        mov      [isTransform], true
+      
+        fldpi
+        fdiv [toRadian]
+        fmul [angleY]
+        fcos
+        fmul [velocity]
+        fadd [posX]
+        fstp [posX]
+
+        fldpi
+        fdiv [toRadian]
+        fmul [angleY]
+        fsin
+        fmul [velocity]
+        fadd [posZ]
+        fstp [posZ]
+
         jmp     .ReturnZero
 .MoveDown:
-        fld     [posX]
-        fadd  [step]
-        fstp    [posX]
-        mov      [isTransform], true
+
+        fldpi
+        fidiv [toRadian]
+        fmul [angleY]
+        fcos
+        fmul [velocity]
+        fsubr [posX]
+        fstp [posX]
+
+        fldpi
+        fidiv [toRadian]
+        fmul [angleY]
+        fsin
+        fmul [velocity]
+        fsubr[posZ]
+        fstp [posZ]
+
         jmp     .ReturnZero
 .MoveLeft:
         fld     [posZ]
         fsub    [step]
         fstp    [posZ]
-        mov      [isTransform], true
+        
+        fld [cPosition + Vector3.z]
+        fsub    [step]
+        fstp [cPosition + Vector3.z]
         jmp     .ReturnZero
 
 .MoveRight:
         fld     [posZ]
         fadd    [step]
         fstp    [posZ]
-        mov      [isTransform], true
+ 
         jmp     .ReturnZero
 
 .MoveFront:
         fld     [posY]
         fsub    [step]
         fstp    [posY]
-        mov      [isTransform], true
+
         jmp     .ReturnZero
 
 .MoveBack:
         fld     [posY]
         fadd    [step]
         fstp    [posY]
-        mov      [isTransform], true
+
         jmp     .ReturnZero
 
 .RotateLeft:
         fld     [angleY]
         fadd    [step]
+
         fstp    [angleY]
+
+
         jmp     .ReturnZero
 
 
@@ -221,18 +276,14 @@ proc WindowProc uses ebx,\
         fld     [angleZ]
         fsub    [step]
         fstp    [angleZ]
-        mov      [isTransform], false
+
         jmp     .ReturnZero
 .RotateLeftC:
         fld     [angleZ]
         fadd    [step]
         fstp    [angleZ]
-        mov      [isTransform], false
+
         jmp     .ReturnZero
-
-
-
-
 .RotateUp:
         fld     [angleX]
         fadd    [step]
@@ -282,56 +333,6 @@ proc WindowProc uses ebx,\
         ret
 endp
 
-proc File.LoadContent uses edi,\
-     fileName;, fileLength
-
-        locals
-                hFile   dd      ?
-                length  dd      ?
-                read    dd      ?
-                pBuffer dd      ?
-        endl
-
-        invoke  CreateFile, [fileName], GENERIC_READ, ebx, ebx, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, ebx
-        mov     [hFile], eax
-
-        invoke  GetFileSize, [hFile], ebx
-        inc     eax
-        mov     [length], eax
-        invoke  HeapAlloc, [hHeap], 8, [length]
-        mov     [pBuffer], eax
-
-        lea     edi, [read]
-        invoke  ReadFile, [hFile], [pBuffer], [length], edi, ebx
-
-        invoke  CloseHandle, [hFile]
-
-        mov     eax, [pBuffer]
-       ;  stdcall  PrintToConsole, [pBuffer], [length]
-
-        ret
-endp
-
-
-
-
-proc File.GetSize uses edi,\
-     fileName
-      locals
-                hFile   dd      ?
-                length  dd      ?
-                read    dd      ?
-                pBuffer dd      ?
-       endl
-
-        invoke  CreateFile, [fileName], GENERIC_READ, ebx, ebx, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, ebx
-        mov     [hFile], eax
-
-        invoke  GetFileSize, [hFile], ebx
-        inc     eax
-
-    ret
-endp
 
 proc PrintToConsole uses esi, buffer, length
 
@@ -414,7 +415,6 @@ proc ParseVerticesOBJ uses edi esi,\
        mov eax, [resultVertices]
     ret
 endp
-
 
 
 proc ParseIndicesOBJ uses ebx edi esi ,\

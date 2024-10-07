@@ -51,11 +51,28 @@ proc Init uses esi
 
         stdcall ParseIndicesOBJ, [buffer],  [bufferLength], [iCount] ;, [objVertices], [objIndices]
          mov [addressI], eax
+         stdcall Mesh.Generate, carMesh, car, true, [addressV], [addressI], [iCount]
+
+        stdcall File.LoadContent, akFileName;, size
+        mov [buffer], eax
+        stdcall File.GetSize, akFileName
+        mov [bufferLength], eax
+        ; stdcall  PrintToConsole, [buffer] , eax
+        stdcall CountVerticesOBJ,  [buffer], [bufferLength]
+        mov [vCount], eax
+
+        mov [iCount], ecx
+
+       stdcall ParseVerticesOBJ, [buffer],  [bufferLength], [vCount];, [objVertices], [objIndices]
+       mov [addressV], eax
+
+
+        stdcall ParseIndicesOBJ, [buffer],  [bufferLength], [iCount] ;, [objVertices], [objIndices]
+         mov [addressI], eax
+         stdcall Mesh.Generate, akMesh, ak, true, [addressV], [addressI], [iCount]
 
 
        ; mov eax, zhIndices
-
-
 
         invoke  glMatrixMode, GL_PROJECTION
         invoke  glLoadIdentity
@@ -70,11 +87,12 @@ proc Init uses esi
         invoke  HeapAlloc, [hHeap], ebx, sizeof.Vertex * 6
         mov     [plane.normals], eax
 
-        stdcall Mesh.Generate, zhMesh, zh, true, [addressV], [addressI], [iCount]
 
-        stdcall Mesh.CalculateNormals, zh
+       ; stdcall Mesh.Generate, akMesh, ak, true, [addressV], [addressI], [iCount]
 
+        stdcall Mesh.CalculateNormals, car
         stdcall Mesh.CalculateNormals, plane
+        stdcall Mesh.CalculateNormals, ak
 
         invoke  glEnable, GL_LIGHTING
         invoke  glEnable, GL_LIGHT0
@@ -82,12 +100,6 @@ proc Init uses esi
 
         invoke  glLightfv, GL_LIGHT0, GL_POSITION, light0Position
         invoke  glLightfv, GL_LIGHT1, GL_POSITION,  light1Position
-
-        stdcall  Matrix.GetAxis, cameraPosition, targetPosition, upVector,\
-                             xAxis, yAxis, zAxis
-
-
-
 
         ret
 endp

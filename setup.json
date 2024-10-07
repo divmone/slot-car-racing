@@ -1,0 +1,14 @@
+{
+    "debug": {
+        "input": "C:/Users/divmone/Documents/bsuir/coursework/src/OPENGL_DEMO.asm",
+        "output": "C:/Users/divmone/Documents/bsuir/coursework/debug/OPENGL_DEMO.exe"
+    },
+    "release": {
+        "input": "C:/Users/divmone/Documents/bsuir/coursework/src/OPENGL_DEMO.asm",
+        "output": "C:/Users/divmone/Documents/bsuir/coursework/realease/OPENGL_DEMO.exe"
+    },
+    "fasmPath": "C:/FASM/",
+    "projectDir": "C:/Users/divmone/Documents/bsuir/coursework/src/",
+    "ollyDbgPath": "C:/OLLYDBG/OLLYDBG.exe",
+    "debugExecutablePath": "C:/Users/divmone/Documents/bsuir/coursework/debug/OPENGL_DEMO.exe"
+}
