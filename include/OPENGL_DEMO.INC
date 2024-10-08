@@ -13,6 +13,7 @@ entry   WinMain
         include         "Color.inc"
         include         "Matrix.inc"
         include         "Spline.inc"
+        include         "GLext.inc"
     
 
 macro switch value

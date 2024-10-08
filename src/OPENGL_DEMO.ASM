@@ -55,7 +55,7 @@
       ;  cubeMesh        PackedMesh      cubeVertices, cubeColors, cubeIndices, CUBE_TRIANGLES_COUNT
         cube            Mesh            0, 0, 0, 0
 
-        akMesh          PackedMesh       0, zhColors, 0, 0
+        akMesh          PackedMesh       0, 0, 0, 0
         ak              Mesh            0, 0, 0, 0
 
         carMesh          PackedMesh      0, zhColors, 0, 0
@@ -91,6 +91,25 @@
 
         directionVetcor  Vector4i       0, 0, 0, 0
 
+        
+
+        timeLocation    GLint           0
+        sizeLocation    GLint           0
+        oneSecond       GLfloat         1000.0  
+        startTime       dd              ?      
+
+       
+        fragmentShader  GLuint          0
+        fshaderFile      db              "./shaders/fragment.glsl", 0
+
+        vertexShader    GLuint          0
+        vshaderFile      db              "./shaders/vertex.glsl", 0
+       
+        program         GLint           0
+        
+        timeName        db              "time", 0
+        sizeName        db              "size", 0
+
    prevMouseX      dd      ?
         prevMouseY      dd      ?
         mouseX          dd      ?
@@ -106,6 +125,7 @@
         include         "Drawing.asm"
         include         "Spline.asm"
         include         "File.asm"
+        include         "GLext.asm"
 
 proc WinMain
 
@@ -116,7 +136,6 @@ proc WinMain
         xor     ebx, ebx
 
         stdcall Init
-
         lea     esi, [msg]
 
 .cycle:

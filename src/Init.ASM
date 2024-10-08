@@ -69,7 +69,7 @@ proc Init uses esi
 
         stdcall ParseIndicesOBJ, [buffer],  [bufferLength], [iCount] ;, [objVertices], [objIndices]
          mov [addressI], eax
-         stdcall Mesh.Generate, akMesh, ak, true, [addressV], [addressI], [iCount]
+         stdcall Mesh.Generate, akMesh, ak, false, [addressV], [addressI], [iCount]
 
 
        ; mov eax, zhIndices
@@ -100,6 +100,9 @@ proc Init uses esi
 
         invoke  glLightfv, GL_LIGHT0, GL_POSITION, light0Position
         invoke  glLightfv, GL_LIGHT1, GL_POSITION,  light1Position
+
+        stdcall Glext.LoadFunctions
+        stdcall Glext.InitShaders  
 
         ret
 endp

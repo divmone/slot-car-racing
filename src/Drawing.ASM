@@ -2,6 +2,7 @@ proc Draw, v1
 
         locals
                 currentTime     dd      ?
+                 tempFloat       dd      ? 
                 speed     GLfloat 0.0  
                 mposX   GLfloat 0.0  
                 mposY   GLfloat 0.0  
@@ -29,17 +30,39 @@ proc Draw, v1
         invoke  glLoadIdentity
 
         stdcall Matrix.LookAt, cameraPosition, targetPosition, upVector
-        invoke glScalef , [scale], [scale] , [scale]
-        
-        stdcall DrawMesh, plane, [drawingMode], 1.0, 1.0, 1.0
 
-        invoke  glPushMatrix 
+        cmp     [program], ebx
+        je      @F
 
-        invoke glTranslatef, [posX], 0.0, [posZ]
+        invoke  glUseProgram, [program]
+
+        fild    [programTime]
+        fdiv    [oneSecond]
+        fstp    [tempFloat]
+        push    [tempFloat]
+
+       ; , (float)(programTime)
+
+        fild    [clientRect.bottom]
+        fstp    [tempFloat]
+        push    [tempFloat]
+
+        fild    [clientRect.right]
+        fstp    [tempFloat]
+        push    [tempFloat]
+
+        invoke  glUniform2f, [sizeLocation] 
+                           
+        ;stdcall DrawMesh, plane, [drawingMode], 1.0, 1.0, 1.0
+
+        invoke  glUseProgram, [program]
+
+@@:
         invoke glRotatef, [angleY], 0.0, 1.0, 0.0
-        stdcall DrawMesh, car, [drawingMode], 0.0, 0.0, 0.0
+        invoke glRotatef, [angleX], 1.0, 0.0, 0.0
+        invoke glRotatef, [angleZ], 0.0, 0.0, 1.0
 
-        invoke  glPopMatrix   
+        stdcall DrawMesh, car, [drawingMode], 0.0, 0.0, 0.0
 
         invoke  SwapBuffers, [hdc]
 
