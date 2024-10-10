@@ -1,7 +1,7 @@
 {
     "debug": {
         "input": "C:/Users/divmone/Documents/bsuir/coursework/src/OPENGL_DEMO.asm",
-        "output": "C:/Users/divmone/Documents/bsuir/coursework/debug/OPENGL_DEMO.exe"
+        "output": "C:/Users/divmone/Documents/bsuir/coursework/debug/OPENGL_DEMO1.exe"
     },
     "release": {
         "input": "C:/Users/divmone/Documents/bsuir/coursework/src/OPENGL_DEMO.asm",

@@ -2,10 +2,11 @@
 
         className       db              "OpenGLDemo", 0
         clientRect      RECT            0, 0, 0, 0
-        fileName        db              "models/car.obj",0
-        akFileName      db              "models/skull.obj", 0
+        fileName        db              "../models/car.obj",0
+        akFileName      db              "../models/skull.obj", 0
         hHeap           dd              ?
         hdcBack         dd              ?
+        hConsole        dd              ?
         time            dd              ?
         hdc             dd              ?
         radian          GLfloat         57.32
@@ -100,10 +101,10 @@
 
        
         fragmentShader  GLuint          0
-        fshaderFile      db              "./shaders/fragment.glsl", 0
+        fshaderFile      db              "../shaders/fragment.glsl", 0
 
         vertexShader    GLuint          0
-        vshaderFile      db              "./shaders/vertex.glsl", 0
+        vshaderFile      db              "../shaders/vertex.glsl", 0
        
         program         GLint           0
         
@@ -117,6 +118,8 @@
         mouseCaptured   dd      0
 
         okMessage       db      "parsing is ok",0
+        successMessage db 'Shaders loaded successfully', 0
+
 
         include         "Init.asm"
         include         "Mesh.asm"
@@ -353,7 +356,7 @@ proc WindowProc uses ebx,\
 endp
 
 
-proc PrintToConsole uses esi, buffer, length
+proc PrintToConsole uses esi ebx, buffer, length
 
         locals
                 hStdOut dd ?

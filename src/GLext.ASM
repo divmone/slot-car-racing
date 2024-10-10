@@ -38,7 +38,7 @@ proc Glext.InitShaders
 
 @@:
 
-        stdcall Glext.LoadShader, vshaderFile, GL_FRAGMENT_SHADER
+        ;stdcall Glext.LoadShader, vshaderFile, GL_FRAGMENT_SHADER
         mov     [vertexShader], eax
 
         cmp     eax, 0
@@ -61,13 +61,21 @@ proc Glext.InitShaders
         mov     [timeLocation], eax
         invoke  glGetUniformLocation, [program], sizeName
         mov     [sizeLocation], eax
+  
+              
+      
+      ;  invoke  WriteConsole, [hStdOut], okMessage, 20, 0, ebx
 
+  
         jmp     .Return
+
 
 .Error:
         mov     [program], ebx
 
 .Return:
+         
+                
         ret
 endp
 

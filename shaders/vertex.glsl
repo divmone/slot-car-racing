@@ -1,11 +1,10 @@
-uniform float time;
-uniform vec2 size;
-
-void main(void)
+#version 330 core
+layout (location = 0) in vec3 aPos; // координатные переменные в атрибуте идут первыми среди всех остальных данных, поэтому указываем для них location = 0
+  
+out vec4 vertexColor; // определяем выходную переменную, задающую цвет, которую затем отправим во фрагментный шейдер
+ 
+void main()
 {
-	vec2 uv = gl_FragCoord.xy / size;
-	float t = time / 300.0;
-	float f = 1.0 ;
-	vec3 col = vec3(0.0, 0.0, 0.5) * pow(f, 0.2);
-	gl_FragColor = vec4(col, 1.0);
+    gl_Position = vec4(aPos, 1.0); // обратите внимание, что в конструктор переменной типа vec4 мы напрямую передаем переменную типа vec3
+    vertexColor = vec4(0.5, 0.0, 0.0, 1.0); // задаем темно-красное значение цвета для выходной переменной
 }
