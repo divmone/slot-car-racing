@@ -2,8 +2,8 @@
 
         className       db              "OpenGLDemo", 0
         clientRect      RECT            0, 0, 0, 0
-        fileName        db              "../models/car.obj",0
-        akFileName      db              "../models/skull.obj", 0
+        fileName        db              "..\models\car.obj",0
+        akFileName      db              "..\models\skull.obj", 0
         hHeap           dd              ?
         hdcBack         dd              ?
         hConsole        dd              ?
@@ -76,7 +76,7 @@
         tPosition       Vector3         0,   0,    0
         cPosition       Vector3         150.0, 150.0, 150.0
 
-        cameraPosition  Vector3         0.0, 100.0, 0.0
+        cameraPosition  Vector3         0.0, 110.0, 0.0
         targetPosition  Vector3         1.0, 0.0, 0.0
         upVector        Vector3         0.0, 1.0, 0.0
 

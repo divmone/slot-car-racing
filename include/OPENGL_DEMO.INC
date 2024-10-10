@@ -1,12 +1,12 @@
 format  PE GUI 5.0
 entry   WinMain
 
-        include         "win32a.inc"
+        include         "C:\FASM\include\win32a.inc"
 
-        include         "api\kernel32.inc"
-        include         "api\user32.inc"
-        include         "api\gdi32.inc"
-        include         "api\opengl.inc"
+        include         "C:\FASM\include\api\kernel32.inc"
+        include         "C:\FASM\include\api\user32.inc"
+        include         "C:\FASM\include\api\gdi32.inc"
+        include         "C:\FASM\include\api\opengl.inc"
 
         include         "Mesh.inc"
         include         "Vector.inc"

@@ -1,0 +1,15 @@
+OUT_EXE = bin/game.exe
+
+FASM = fasm
+
+SRC = src/OPENGL_DEMO.asm
+
+all: $(OUT_EXE)
+
+$(OUT_EXE): $(SRC)
+	$(FASM) $(SRC) $(OUT_EXE)
+
+clean:
+	rm  $(OUT_EXE)
+
+.PHONY: clean
