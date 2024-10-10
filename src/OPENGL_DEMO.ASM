@@ -10,6 +10,7 @@
         time            dd              ?
         hdc             dd              ?
         radian          GLfloat         57.32
+
         angle           GLfloat         0.0
 ;transform
         angleY          GLfloat         0.0
