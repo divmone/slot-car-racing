@@ -2,21 +2,22 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build with FASM",
+            "label": "Build",
             "type": "shell",
             "command": "make",
             "problemMatcher": []
         },
         {
-            "label": "Run program",
-            "type": "shell",
-            "command": ".\\run.bat",  
+            "label": "Run",
+            "type": "process",
+            "command": ".vscode/run.bat",
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
             "problemMatcher": [],
-            "dependsOn": "Build with FASM"
+            "dependsOn": "Build"
         }
     ]
 }
+
