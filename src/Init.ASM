@@ -79,14 +79,14 @@ proc Init uses esi
       
        ; mov eax, zhIndices
 
-        invoke  glMatrixMode, GL_PROJECTION
-        invoke  glLoadIdentity
+       ; invoke  glMatrixMode, GL_PROJECTION
+       ; invoke  glLoadIdentity
 
-        stdcall Matrix.Projection, [aspect], [fovY], [zNear], [zFar]
+       ; stdcall Matrix.Projection, [aspect], [fovY], [zNear], [zFar]
 
         invoke  glShadeModel, GL_SMOOTH
         invoke  glHint, GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST
-        invoke  glEnable, GL_DEPTH_TEST
+       ; invoke  glEnable, GL_DEPTH_TEST
         invoke  glEnable, GL_COLOR_MATERIAL
 
         invoke  HeapAlloc, [hHeap], ebx, sizeof.Vertex * 6
@@ -110,8 +110,18 @@ proc Init uses esi
         invoke  glLightfv, GL_LIGHT1, GL_POSITION,  light1Position
 
         stdcall Glext.LoadFunctions
-        stdcall Glext.InitShaders  
 
+        stdcall Glext.InitShaders  
+       ; invoke  glCreateProgram
+       ; mov     [program], eax
+
+       ; stdcall CreateShader, vertexShader, GL_VERTEX_SHADER
+       ; invoke  glAttachShader, [program], eax
+       ; stdcall CreateShader, fragmentShader, GL_FRAGMENT_SHADER
+       ; invoke  glAttachShader, [program], eax
+
+       ; invoke  glLinkProgram, [program]
+       ; invoke  glUseProgram, [program] 
 
         ret
 endp

@@ -14,6 +14,8 @@ extensionAddresses:
         glGetUniformLocation    dd      ?
         glUniform1f             dd      ?
         glUniform2f             dd      ?
+        glUniform2i             dd      ?
+        
 
 extensionNames:
         db      "glUseProgram", 0
@@ -31,6 +33,7 @@ extensionNames:
         db      "glGetUniformLocation", 0
         db      "glUniform1f", 0
         db      "glUniform2f", 0
+        db      "glUniform2i", 0
         db      0
 
 define GL_FRAGMENT_SHADER                0x8B30

@@ -23,47 +23,48 @@ proc Draw, v1
       ;  stdcall UpdateMovement
 
 .Skip:
-        invoke  glClearColor, 0.6, 0.6, 1.0, 1.0
-        invoke  glClear, GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT
+        
+      ;  invoke  glMatrixMode, GL_MODELVIEW
+      ;  invoke  glLoadIdentity
 
-        invoke  glMatrixMode, GL_MODELVIEW
-        invoke  glLoadIdentity
-
-        stdcall Matrix.LookAt, cameraPosition, targetPosition, upVector
+      ;  stdcall Matrix.LookAt, cameraPosition, targetPosition, upVector
 
         cmp     [program], ebx
         je      @F
 
         invoke  glUseProgram, [program]
 
-        fild    [programTime]
-        fdiv    [oneSecond]
-        fstp    [tempFloat]
-        push    [tempFloat]
-
-       ; , (float)(programTime)
-
-        fild    [clientRect.bottom]
+          fild    [clientRect.bottom]
         fstp    [tempFloat]
         push    [tempFloat]
 
         fild    [clientRect.right]
         fstp    [tempFloat]
         push    [tempFloat]
-
-        invoke  glUniform2f, [sizeLocation] 
+        invoke  glUniform2f, 0
+   
+        invoke  glUniform1f, 1, [angle]
                            
         ;stdcall DrawMesh, plane, [drawingMode], 1.0, 1.0, 1.0
 
-        invoke  glUseProgram, [program]
+        
 
 @@:
-        invoke glRotatef, [angleY], 0.0, 1.0, 0.0
-        invoke glRotatef, [angleX], 1.0, 0.0, 0.0
-        invoke glRotatef, [angleZ], 0.0, 0.0, 1.0
+ invoke  glClearColor, 0.0, 0.69, 0.25, 1.0
+        invoke  glClear, GL_COLOR_BUFFER_BIT
+        invoke  glBegin, GL_QUADS
+        invoke  glVertex2i, 1, -1
+        invoke  glVertex2i, 1, 1
+        invoke  glVertex2i, -1, 1
+        invoke  glVertex2i, -1, -1
+        invoke  glEnd       
+        ;invoke glRotatef, [angleY], 0.0, 1.0, 0.0
+        ;invoke glRotatef, [angleX], 1.0, 0.0, 0.0
+        ;invoke glRotatef, [angleZ], 0.0, 0.0, 1.0
 
-        stdcall DrawMesh, car, [drawingMode], 0.0, 0.0, 0.0
-
+        ;        stdcall DrawMesh, car, [drawingMode], 0.0, 0.0, 0.0
+        
+      ;  invoke  glUseProgram, 0
         invoke  SwapBuffers, [hdc]
 
         ret

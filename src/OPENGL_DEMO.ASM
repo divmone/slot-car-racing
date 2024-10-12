@@ -29,7 +29,7 @@
 ; fpu
         toRadian        GLfloat         180.0
 
-        step            GLfloat         5.0
+        step            GLfloat         0.01
         length          GLfloat         5.0
         pVector         Vector3         0.0, 0.0, 0.0
         programTime     dd              ?
@@ -107,7 +107,17 @@
         vertexShader    GLuint          0
         vshaderFile      db              "../shaders/vertex.glsl", 0
        
-        program         GLint           0
+       vertexShaderText:
+                        file            "./shaders/vertex.glsl"
+                        db              0
+        ;vertexShader    dd              vertexShaderText
+
+fragmentShaderText:
+                        file            "./shaders/fragment.glsl"
+                        db              0
+        ;fragmentShader  dd              fragmentShaderText
+
+        program         dd           0
         
         timeName        db              "time", 0
         sizeName        db              "size", 0
@@ -118,7 +128,7 @@
         mouseY          dd      ?
         mouseCaptured   dd      0
 
-        okMessage  String 'OK'
+        okMessage  String 'OK', 10
         
         successMessage db       'shaders loaded successfully', 0
 
@@ -351,7 +361,7 @@ proc WindowProc uses ebx,\
 
 .Destroy:
         invoke CloseHandle, [logFile]
-        
+
         invoke  ExitProcess, ebx
 
 .ReturnZero:
