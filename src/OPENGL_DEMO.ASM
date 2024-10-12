@@ -112,14 +112,15 @@
         timeName        db              "time", 0
         sizeName        db              "size", 0
 
-   prevMouseX      dd      ?
+        prevMouseX      dd      ?
         prevMouseY      dd      ?
         mouseX          dd      ?
         mouseY          dd      ?
         mouseCaptured   dd      0
 
-        okMessage       db      "parsing is ok",0
-        successMessage db 'Shaders loaded successfully', 0
+        okMessage  String 'OK'
+        
+        successMessage db       'shaders loaded successfully', 0
 
 
         include         "Init.asm"
@@ -130,6 +131,8 @@
         include         "Spline.asm"
         include         "File.asm"
         include         "GLext.asm"
+        include         "Utils.asm"
+        include         "Logger.asm"
 
 proc WinMain
 
@@ -347,6 +350,8 @@ proc WindowProc uses ebx,\
         jmp .ReturnZero
 
 .Destroy:
+        invoke CloseHandle, [logFile]
+        
         invoke  ExitProcess, ebx
 
 .ReturnZero:
@@ -355,23 +360,6 @@ proc WindowProc uses ebx,\
 .Return:
         ret
 endp
-
-
-proc PrintToConsole uses esi ebx, buffer, length
-
-        locals
-                hStdOut dd ?
-                written dd ?
-        endl
-        invoke  AllocConsole
-        invoke  GetStdHandle, STD_OUTPUT_HANDLE
-        mov     [hStdOut], eax
-
-        invoke  WriteConsole, [hStdOut], [buffer], [length], [written], ebx
-
-        ret
-endp
-
 
 proc ParseVerticesOBJ uses edi esi,\
     buffer, length, verticesCount;, verticesBuff, indicesBuff
@@ -588,97 +576,5 @@ proc CountVerticesOBJ uses esi,\
     ret
 endp
 
-proc StrToInt uses ebx edi,\
-     pointer
 
-        mov esi, [pointer]
-
-        xor eax, eax
- @@:
-        cmp byte[esi], '/'
-        je @F
-        mov bl, byte[esi]
-        sub ebx, '0'
-        imul eax,eax, 10
-        add eax, ebx
-        inc esi
-        dec ecx
-        jmp @B
-
-@@:
-        dec eax
-    ret
-endp
-
-proc StrToFloat  pointer
-
-        locals
-            number dd 0.0
-            precision dd 0
-            sign db 0
-            ten dd 10.0
-
-        endl
-
-        mov esi, [pointer]
-        xor eax, eax
-
-        cmp byte[esi], '-'
-        jne @F
-        mov [sign], 1
-        xor eax, eax
-        inc esi
-        dec ecx
-
-@@:
-        xor ebx, ebx
-        cmp byte[esi], '.'
-        je @F
-        mov bl, byte[esi]
-        sub ebx, '0'
-        imul eax, eax, 10
-        add eax, ebx
-        inc esi
-        dec ecx
-        jmp @B
-
-@@:
-        add eax, ebx
-
-@@:
-        inc esi
-        dec ecx
-        xor ebx, ebx
-        cmp byte[esi], ' '
-        je @F
-        cmp byte[esi], 10
-        je @F
-        mov bl, byte[esi]
-        sub ebx, '0'
-        imul eax, eax, 10
-        add eax, ebx
-        inc [precision]
-        jmp @B
-
-@@:
-        mov [number], eax
-        mov eax, [precision]
-        fild [number]
-@@:
-        cmp eax, 0
-        je @F
-        fdiv [ten]
-        dec eax
-        jmp @B
-@@:
-        cmp [sign], 1
-        jne @F
-        fchs
-@@:
-        fstp [number]
-
-        mov eax, [number]
-
-    ret
-endp
 

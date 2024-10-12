@@ -14,6 +14,9 @@ entry   WinMain
         include         "Matrix.inc"
         include         "Spline.inc"
         include         "GLext.inc"
+        include         "String.inc"
+        include         "Utils.inc"
+        include         "Logger.inc"
     
 
 macro switch value
@@ -64,7 +67,7 @@ macro malloc count, size
 
         COLOR_DEPTH     =       24
         PFD_FLAGS       =       PFD_SUPPORT_OPENGL or PFD_DOUBLEBUFFER or PFD_DRAW_TO_WINDOW
-        WINDOW_STYLE    =       WS_VISIBLE or WS_MAXIMIZE or WS_POPUP
+        POP_IT          =       WS_VISIBLE or WS_MAXIMIZE or WS_POPUP
 
         wndClass        WNDCLASS                0, WindowProc, 0, 0, 0, 0, 0, 0, 0, className
         pfd             PIXELFORMATDESCRIPTOR   sizeof.PIXELFORMATDESCRIPTOR, 1, PFD_FLAGS, PFD_TYPE_RGBA, COLOR_DEPTH,\
