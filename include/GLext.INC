@@ -1,4 +1,7 @@
 extensionAddresses:
+        glBufferData            dd      ?
+        glGenBuffers            dd      ?
+        glBindBuffer            dd      ?
         glUseProgram            dd      ?
         glDetachShader          dd      ?
         glDeleteShader          dd      ?
@@ -15,9 +18,13 @@ extensionAddresses:
         glUniform1f             dd      ?
         glUniform2f             dd      ?
         glUniform2i             dd      ?
+        glUniform3f            dd      ?
         
 
 extensionNames:
+        db      "glBufferData",0
+        db      "glGenBuffers", 0
+        db      "glBindBuffer", 0
         db      "glUseProgram", 0
         db      "glDetachShader", 0
         db      "glDeleteShader", 0
@@ -34,9 +41,12 @@ extensionNames:
         db      "glUniform1f", 0
         db      "glUniform2f", 0
         db      "glUniform2i", 0
+        db      "glUniform3f", 0
         db      0
 
 define GL_FRAGMENT_SHADER                0x8B30
 define GL_VERTEX_SHADER                  0x8B31
 define GL_COMPILE_STATUS                 0x8B81
 define GL_LINK_STATUS                    0x8B82
+define GL_ARRAY_BUFFER                   0x8892
+define GL_STATIC_DRAW                    0x88E4

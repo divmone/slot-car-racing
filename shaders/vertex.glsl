@@ -1,12 +1,11 @@
-#version 330
+#version 330 core
 
-in vec4 pos;
-in vec3 norm;
-
-out vec3 normal;
+uniform float time;
+out vec4 vertexColor;
 
 void main()
 {
-        gl_Position = pos;
-        normal = norm;
+
+    vertexColor = vec4(0.5f * time , 0.02f * time, 0.02f * time, 1.0f); 
+
 }

@@ -2,7 +2,7 @@
 
         className       db              "OpenGLDemo", 0
         clientRect      RECT            0, 0, 0, 0
-        fileName        db              "..\models\car.obj",0
+        fileName        db              "..\models\ak47.obj",0
         akFileName      db              "..\models\skull.obj", 0
         hHeap           dd              ?
         hdcBack         dd              ?
@@ -10,7 +10,7 @@
         time            dd              ?
         hdc             dd              ?
         radian          GLfloat         57.32
-
+        vertexVBO             GLuint          ?
         angle           GLfloat         0.0
 ;transform
         angleY          GLfloat         0.0
@@ -24,12 +24,11 @@
         velocity        GLfloat         2.0
 
 
-
-; 
 ; fpu
         toRadian        GLfloat         180.0
 
-        step            GLfloat         0.01
+        step           GLfloat         5.0
+        stepp            GLfloat         0.01
         length          GLfloat         5.0
         pVector         Vector3         0.0, 0.0, 0.0
         programTime     dd              ?
@@ -77,7 +76,7 @@
         tPosition       Vector3         0,   0,    0
         cPosition       Vector3         150.0, 150.0, 150.0
 
-        cameraPosition  Vector3         0.0, 110.0, 0.0
+        cameraPosition  Vector3         50.0, 50.0, 50.0
         targetPosition  Vector3         1.0, 0.0, 0.0
         upVector        Vector3         0.0, 1.0, 0.0
 
@@ -132,7 +131,6 @@ fragmentShaderText:
         
         successMessage db       'shaders loaded successfully', 0
 
-
         include         "Init.asm"
         include         "Mesh.asm"
         include         "Vector.asm"
@@ -143,6 +141,7 @@ fragmentShaderText:
         include         "GLext.asm"
         include         "Utils.asm"
         include         "Logger.asm"
+        include         "VBO.asm"
 
 proc WinMain
 

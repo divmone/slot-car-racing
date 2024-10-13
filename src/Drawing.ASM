@@ -24,11 +24,15 @@ proc Draw, v1
 
 .Skip:
         
-      ;  invoke  glMatrixMode, GL_MODELVIEW
-      ;  invoke  glLoadIdentity
+          invoke  glClearColor, 0.6, 0.6, 1.0, 1.0
+        invoke  glClear, GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT
 
-      ;  stdcall Matrix.LookAt, cameraPosition, targetPosition, upVector
+        invoke  glMatrixMode, GL_MODELVIEW
+        invoke  glLoadIdentity
 
+        stdcall Matrix.LookAt, cameraPosition, targetPosition, upVector
+
+        
         cmp     [program], ebx
         je      @F
 
@@ -41,30 +45,27 @@ proc Draw, v1
         fild    [clientRect.right]
         fstp    [tempFloat]
         push    [tempFloat]
-        invoke  glUniform2f, 0
+        invoke  glUniform1f, [angle]
+        invoke  glUniform3f, 1, 0.5, 0.1, 0.2
+        invoke  glUniform3f, 2, 0.2, 0.5, 0.7
+
    
-        invoke  glUniform1f, 1, [angle]
+
                            
-        ;stdcall DrawMesh, plane, [drawingMode], 1.0, 1.0, 1.0
+        ;
 
         
 
-@@:
- invoke  glClearColor, 0.0, 0.69, 0.25, 1.0
-        invoke  glClear, GL_COLOR_BUFFER_BIT
-        invoke  glBegin, GL_QUADS
-        invoke  glVertex2i, 1, -1
-        invoke  glVertex2i, 1, 1
-        invoke  glVertex2i, -1, 1
-        invoke  glVertex2i, -1, -1
-        invoke  glEnd       
-        ;invoke glRotatef, [angleY], 0.0, 1.0, 0.0
-        ;invoke glRotatef, [angleX], 1.0, 0.0, 0.0
-        ;invoke glRotatef, [angleZ], 0.0, 0.0, 1.0
+@@:    
+        invoke glRotatef, [angleY], 0.0, 1.0, 0.0
+        invoke glRotatef, [angleX], 1.0, 0.0, 0.0
+        invoke glRotatef, [angleZ], 0.0, 0.0, 1.0
 
-        ;        stdcall DrawMesh, car, [drawingMode], 0.0, 0.0, 0.0
+        stdcall DrawMesh, car, [drawingMode], 0.0, 0.0, 0.0
         
-      ;  invoke  glUseProgram, 0
+       invoke  glUseProgram, 0
+
+     ;  stdcall DrawMesh, plane, [drawingMode], 1.0, 1.0, 1.0
         invoke  SwapBuffers, [hdc]
 
         ret
@@ -96,7 +97,7 @@ endp
 proc Tick
 
         fld     [angle]
-        fadd    [step]
+        fadd    [stepp]
         fstp    [angle]
 
         ret
@@ -111,7 +112,11 @@ proc DrawMesh uses esi,\
         invoke  glEnableClientState, GL_COLOR_ARRAY
         invoke  glEnableClientState, GL_NORMAL_ARRAY
 
-        invoke  glVertexPointer, 3, GL_FLOAT, ebx, [esi + Mesh.vertices]
+        invoke glBindBuffer, GL_ARRAY_BUFFER, [vertexVBO]
+             invoke  glVertexPointer, 3, GL_FLOAT, ebx,  ebx
+        invoke glBindBuffer, GL_ARRAY_BUFFER, 0
+        
+       ;  invoke  glVertexPointer, 3, GL_FLOAT, ebx,  [esi + Mesh.vertices]
         invoke  glColorPointer, 3, GL_FLOAT, ebx, [esi + Mesh.colors]
         invoke  glNormalPointer, GL_FLOAT, ebx, [esi + Mesh.normals]
         invoke  glDrawArrays, [flag], ebx, [esi + Mesh.verticesCount]
