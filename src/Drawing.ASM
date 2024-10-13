@@ -24,7 +24,7 @@ proc Draw, v1
 
 .Skip:
         
-          invoke  glClearColor, 0.6, 0.6, 1.0, 1.0
+        invoke  glClearColor, 0.6, 0.6, 1.0, 1.0
         invoke  glClear, GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT
 
         invoke  glMatrixMode, GL_MODELVIEW
@@ -49,13 +49,6 @@ proc Draw, v1
         invoke  glUniform3f, 1, 0.5, 0.1, 0.2
         invoke  glUniform3f, 2, 0.2, 0.5, 0.7
 
-   
-
-                           
-        ;
-
-        
-
 @@:    
         invoke glRotatef, [angleY], 0.0, 1.0, 0.0
         invoke glRotatef, [angleX], 1.0, 0.0, 0.0
@@ -63,7 +56,7 @@ proc Draw, v1
 
         stdcall DrawMesh, car, [drawingMode], 0.0, 0.0, 0.0
         
-       invoke  glUseProgram, 0
+        invoke  glUseProgram, 0
 
      ;  stdcall DrawMesh, plane, [drawingMode], 1.0, 1.0, 1.0
         invoke  SwapBuffers, [hdc]
@@ -112,14 +105,16 @@ proc DrawMesh uses esi,\
         invoke  glEnableClientState, GL_COLOR_ARRAY
         invoke  glEnableClientState, GL_NORMAL_ARRAY
 
-        invoke glBindBuffer, GL_ARRAY_BUFFER, [vertexVBO]
-             invoke  glVertexPointer, 3, GL_FLOAT, ebx,  ebx
-        invoke glBindBuffer, GL_ARRAY_BUFFER, 0
+     
+
         
        ;  invoke  glVertexPointer, 3, GL_FLOAT, ebx,  [esi + Mesh.vertices]
-        invoke  glColorPointer, 3, GL_FLOAT, ebx, [esi + Mesh.colors]
-        invoke  glNormalPointer, GL_FLOAT, ebx, [esi + Mesh.normals]
-        invoke  glDrawArrays, [flag], ebx, [esi + Mesh.verticesCount]
+       ; invoke  glColorPointer, 3, GL_FLOAT, ebx, [esi + Mesh.colors]
+       ; invoke  glNormalPointer, GL_FLOAT, ebx, [esi + Mesh.normals]
+        
+        invoke glBindVertexArray, [containerVAO]
+                invoke  glDrawArrays, [flag], ebx, [esi + Mesh.verticesCount]
+        invoke glBindVertexArray, 0
 
         invoke  glDisableClientState, GL_VERTEX_ARRAY
         invoke  glDisableClientState, GL_COLOR_ARRAY

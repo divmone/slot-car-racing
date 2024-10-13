@@ -1,11 +1,9 @@
 #version 330 core
+layout (location = 0) in vec3 position;
 
-uniform float time;
-out vec4 vertexColor;
+out vec3 FragPos;
 
 void main()
 {
-
-    vertexColor = vec4(0.5f * time , 0.02f * time, 0.02f * time, 1.0f); 
-
+    FragPos = vec3(0.3 * vec4(position, 1.0f));
 }

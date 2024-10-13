@@ -2,7 +2,7 @@
 
         className       db              "OpenGLDemo", 0
         clientRect      RECT            0, 0, 0, 0
-        fileName        db              "..\models\ak47.obj",0
+        fileName        db              "..\models\car.obj",0
         akFileName      db              "..\models\skull.obj", 0
         hHeap           dd              ?
         hdcBack         dd              ?
@@ -10,7 +10,7 @@
         time            dd              ?
         hdc             dd              ?
         radian          GLfloat         57.32
-        vertexVBO             GLuint          ?
+       
         angle           GLfloat         0.0
 ;transform
         angleY          GLfloat         0.0
@@ -76,7 +76,7 @@
         tPosition       Vector3         0,   0,    0
         cPosition       Vector3         150.0, 150.0, 150.0
 
-        cameraPosition  Vector3         50.0, 50.0, 50.0
+        cameraPosition  Vector3         100.0, 100.0, 100.0
         targetPosition  Vector3         1.0, 0.0, 0.0
         upVector        Vector3         0.0, 1.0, 0.0
 
@@ -142,6 +142,7 @@ fragmentShaderText:
         include         "Utils.asm"
         include         "Logger.asm"
         include         "VBO.asm"
+        include         "VAO.asm"
 
 proc WinMain
 
@@ -360,7 +361,7 @@ proc WindowProc uses ebx,\
 
 .Destroy:
         invoke CloseHandle, [logFile]
-
+        invoke glDeleteBuffers, 1, vertexVBO
         invoke  ExitProcess, ebx
 
 .ReturnZero:

@@ -18,8 +18,12 @@ extensionAddresses:
         glUniform1f             dd      ?
         glUniform2f             dd      ?
         glUniform2i             dd      ?
-        glUniform3f            dd      ?
-        
+        glUniform3f             dd      ?
+        glDeleteBuffers         dd      ?
+        glGenVertexArrays       dd      ?
+        glBindVertexArray       dd      ?
+        glVertexAttribPointer   dd      ?
+        glEnableVertexAttribArray dd    ?
 
 extensionNames:
         db      "glBufferData",0
@@ -42,6 +46,11 @@ extensionNames:
         db      "glUniform2f", 0
         db      "glUniform2i", 0
         db      "glUniform3f", 0
+        db      "glDeleteBuffers", 0
+        db      "glGenVertexArrays",0
+        db      "glBindVertexArray",0
+        db      "glVertexAttribPointer", 0
+        db      "glEnableVertexAttribArray", 0
         db      0
 
 define GL_FRAGMENT_SHADER                0x8B30

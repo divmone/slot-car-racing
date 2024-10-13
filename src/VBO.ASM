@@ -1,19 +1,25 @@
-proc VBO.Init 
+proc VBO.Init uses esi edi ebx,\
+        buffer, offset, mesh 
     
-     mov esi , car
+    locals
+        size    dd  ?
+    endl
 
+    mov esi , [mesh]
     xor edx, edx
     mov ecx, sizeof.Vertex
     mov eax, [esi + Mesh.verticesCount]
     mul ecx
-    mov [vCount], eax
+    mov [size], eax
     
-    invoke glGenBuffers, 1, vertexVBO
-    invoke glBindBuffer, GL_ARRAY_BUFFER, [vertexVBO]
-    invoke glBufferData, GL_ARRAY_BUFFER, [vCount], [esi + Mesh.vertices], GL_STATIC_DRAW
-    invoke glBindBuffer, GL_ARRAY_BUFFER, 0
+    invoke glGenBuffers, 1, [buffer]
+    mov ebx, [buffer]
+    mov ebx, [ebx]
+    invoke glBindBuffer, GL_ARRAY_BUFFER, ebx
 
-    
+    add esi, [offset]
+    invoke glBufferData, GL_ARRAY_BUFFER, [size], [esi], GL_STATIC_DRAW
+   ; invoke glBindBuffer, GL_ARRAY_BUFFER, 0
 
     ret
 endp

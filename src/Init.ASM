@@ -77,9 +77,8 @@ proc Init uses esi
         stdcall Mesh.CalculateNormals, plane
 
         stdcall Glext.InitShaders  
- 
-        stdcall VBO.Init
-
-
+        
+        stdcall VAO.Init, containerVAO, car
+        
         ret
 endp

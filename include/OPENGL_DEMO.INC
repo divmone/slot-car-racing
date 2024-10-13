@@ -17,6 +17,8 @@ entry   WinMain
         include         "String.inc"
         include         "Utils.inc"
         include         "Logger.inc"
+        include         "VBO.inc"
+        include         "VAO.inc"
     
 
 macro switch value
