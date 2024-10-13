@@ -2,15 +2,15 @@
 
         className       db              "OpenGLDemo", 0
         clientRect      RECT            0, 0, 0, 0
-        fileName        db              "../models/car.obj",0
-        akFileName      db              "../models/skull.obj", 0
+        fileName        db              "..\models\car.obj",0
+        akFileName      db              "..\models\skull.obj", 0
         hHeap           dd              ?
         hdcBack         dd              ?
         hConsole        dd              ?
         time            dd              ?
         hdc             dd              ?
         radian          GLfloat         57.32
-
+       
         angle           GLfloat         0.0
 ;transform
         angleY          GLfloat         0.0
@@ -24,12 +24,11 @@
         velocity        GLfloat         2.0
 
 
-
-; 
 ; fpu
         toRadian        GLfloat         180.0
 
-        step            GLfloat         5.0
+        step           GLfloat         5.0
+        stepp            GLfloat         0.01
         length          GLfloat         5.0
         pVector         Vector3         0.0, 0.0, 0.0
         programTime     dd              ?
@@ -77,7 +76,7 @@
         tPosition       Vector3         0,   0,    0
         cPosition       Vector3         150.0, 150.0, 150.0
 
-        cameraPosition  Vector3         0.0, 100.0, 0.0
+        cameraPosition  Vector3         100.0, 100.0, 100.0
         targetPosition  Vector3         1.0, 0.0, 0.0
         upVector        Vector3         0.0, 1.0, 0.0
 
@@ -107,20 +106,30 @@
         vertexShader    GLuint          0
         vshaderFile      db              "../shaders/vertex.glsl", 0
        
-        program         GLint           0
+       vertexShaderText:
+                        file            "./shaders/vertex.glsl"
+                        db              0
+        ;vertexShader    dd              vertexShaderText
+
+fragmentShaderText:
+                        file            "./shaders/fragment.glsl"
+                        db              0
+        ;fragmentShader  dd              fragmentShaderText
+
+        program         dd           0
         
         timeName        db              "time", 0
         sizeName        db              "size", 0
 
-   prevMouseX      dd      ?
+        prevMouseX      dd      ?
         prevMouseY      dd      ?
         mouseX          dd      ?
         mouseY          dd      ?
         mouseCaptured   dd      0
 
-        okMessage       db      "parsing is ok",0
-        successMessage db 'Shaders loaded successfully', 0
-
+        okMessage  String 'OK', 10
+        
+        successMessage db       'shaders loaded successfully', 0
 
         include         "Init.asm"
         include         "Mesh.asm"
@@ -130,6 +139,10 @@
         include         "Spline.asm"
         include         "File.asm"
         include         "GLext.asm"
+        include         "Utils.asm"
+        include         "Logger.asm"
+        include         "VBO.asm"
+        include         "VAO.asm"
 
 proc WinMain
 
@@ -347,6 +360,8 @@ proc WindowProc uses ebx,\
         jmp .ReturnZero
 
 .Destroy:
+        invoke CloseHandle, [logFile]
+        invoke glDeleteBuffers, 1, vertexVBO
         invoke  ExitProcess, ebx
 
 .ReturnZero:
@@ -355,23 +370,6 @@ proc WindowProc uses ebx,\
 .Return:
         ret
 endp
-
-
-proc PrintToConsole uses esi ebx, buffer, length
-
-        locals
-                hStdOut dd ?
-                written dd ?
-        endl
-        invoke  AllocConsole
-        invoke  GetStdHandle, STD_OUTPUT_HANDLE
-        mov     [hStdOut], eax
-
-        invoke  WriteConsole, [hStdOut], [buffer], [length], [written], ebx
-
-        ret
-endp
-
 
 proc ParseVerticesOBJ uses edi esi,\
     buffer, length, verticesCount;, verticesBuff, indicesBuff
@@ -588,97 +586,5 @@ proc CountVerticesOBJ uses esi,\
     ret
 endp
 
-proc StrToInt uses ebx edi,\
-     pointer
 
-        mov esi, [pointer]
-
-        xor eax, eax
- @@:
-        cmp byte[esi], '/'
-        je @F
-        mov bl, byte[esi]
-        sub ebx, '0'
-        imul eax,eax, 10
-        add eax, ebx
-        inc esi
-        dec ecx
-        jmp @B
-
-@@:
-        dec eax
-    ret
-endp
-
-proc StrToFloat  pointer
-
-        locals
-            number dd 0.0
-            precision dd 0
-            sign db 0
-            ten dd 10.0
-
-        endl
-
-        mov esi, [pointer]
-        xor eax, eax
-
-        cmp byte[esi], '-'
-        jne @F
-        mov [sign], 1
-        xor eax, eax
-        inc esi
-        dec ecx
-
-@@:
-        xor ebx, ebx
-        cmp byte[esi], '.'
-        je @F
-        mov bl, byte[esi]
-        sub ebx, '0'
-        imul eax, eax, 10
-        add eax, ebx
-        inc esi
-        dec ecx
-        jmp @B
-
-@@:
-        add eax, ebx
-
-@@:
-        inc esi
-        dec ecx
-        xor ebx, ebx
-        cmp byte[esi], ' '
-        je @F
-        cmp byte[esi], 10
-        je @F
-        mov bl, byte[esi]
-        sub ebx, '0'
-        imul eax, eax, 10
-        add eax, ebx
-        inc [precision]
-        jmp @B
-
-@@:
-        mov [number], eax
-        mov eax, [precision]
-        fild [number]
-@@:
-        cmp eax, 0
-        je @F
-        fdiv [ten]
-        dec eax
-        jmp @B
-@@:
-        cmp [sign], 1
-        jne @F
-        fchs
-@@:
-        fstp [number]
-
-        mov eax, [number]
-
-    ret
-endp
 

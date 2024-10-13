@@ -1,12 +1,12 @@
 format  PE GUI 5.0
 entry   WinMain
 
-        include         "win32a.inc"
+        include         "C:\FASM\include\win32a.inc"
 
-        include         "api\kernel32.inc"
-        include         "api\user32.inc"
-        include         "api\gdi32.inc"
-        include         "api\opengl.inc"
+        include         "C:\FASM\include\api\kernel32.inc"
+        include         "C:\FASM\include\api\user32.inc"
+        include         "C:\FASM\include\api\gdi32.inc"
+        include         "C:\FASM\include\api\opengl.inc"
 
         include         "Mesh.inc"
         include         "Vector.inc"
@@ -14,6 +14,11 @@ entry   WinMain
         include         "Matrix.inc"
         include         "Spline.inc"
         include         "GLext.inc"
+        include         "String.inc"
+        include         "Utils.inc"
+        include         "Logger.inc"
+        include         "VBO.inc"
+        include         "VAO.inc"
     
 
 macro switch value
@@ -64,7 +69,7 @@ macro malloc count, size
 
         COLOR_DEPTH     =       24
         PFD_FLAGS       =       PFD_SUPPORT_OPENGL or PFD_DOUBLEBUFFER or PFD_DRAW_TO_WINDOW
-        WINDOW_STYLE    =       WS_VISIBLE or WS_MAXIMIZE or WS_POPUP
+        POP_IT          =       WS_VISIBLE or WS_MAXIMIZE or WS_POPUP
 
         wndClass        WNDCLASS                0, WindowProc, 0, 0, 0, 0, 0, 0, 0, className
         pfd             PIXELFORMATDESCRIPTOR   sizeof.PIXELFORMATDESCRIPTOR, 1, PFD_FLAGS, PFD_TYPE_RGBA, COLOR_DEPTH,\

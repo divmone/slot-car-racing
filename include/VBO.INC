@@ -1,0 +1,2 @@
+ vertexVBO       GLuint          ?
+ normalsVBO      GLuint          ?         
