@@ -1,20 +1,20 @@
-proc Matrix.Projection uses edi,\
-     aspect, fov, zNear, zFar
+proc Matrix.Projection uses edi, \
+     matrixPtr, aspect, fov, zNear, zFar
 
         locals
-                matrix          Matrix4x4
                 sine            dd              ?
                 cotangent       dd              ?
                 deltaZ          dd              ?
                 radians         dd              ?
+                result          dd              ?
         endl
 
-        lea     edi, [matrix]
+        mov     edi, [matrixPtr]        ; Указываем на переданный указатель на матрицу
         mov     ecx, 4 * 4
         xor     eax, eax
-        rep     stosd
+        rep     stosd                  ; Очищаем переданную матрицу
 
-        lea     edi, [matrix]
+        mov     edi, [matrixPtr]        ; Повторно загружаем указатель на матрицу
 
         fld     [fov]
         fld1
@@ -39,7 +39,7 @@ proc Matrix.Projection uses edi,\
 
         fld     [cotangent]
         fdiv    [aspect]
-        fstp    [edi + Matrix4x4.m11]
+        fstp    [edi + Matrix4x4.m11]  ; Заполняем матрицу
 
         fld     [cotangent]
         fstp    [edi + Matrix4x4.m22]
@@ -63,13 +63,11 @@ proc Matrix.Projection uses edi,\
         fdiv    [deltaZ]
         fstp    [edi + Matrix4x4.m43]
 
-        invoke  glMultMatrixf, edi
+        ; invoke  glMultMatrixf, edi   ; Если нужно отправить матрицу в OpenGL, оставьте это
+                                       ; Если нужно просто вернуть матрицу, эту строку можно закомментировать
 
         ret
 endp
-; ���������� ������
-; ����� ���� �������
-; ������ ����������� �����
 
 proc Matrix.LookAt uses esi edi ebx,\
      camera, target, up
@@ -146,6 +144,7 @@ proc Matrix.LookAt uses esi edi ebx,\
         fld1
         fstp    [edi + Matrix4x4.m44]
 
+ 
         invoke  glMultMatrixf, edi
 
         mov     esi, [camera]

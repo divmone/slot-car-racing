@@ -2,7 +2,7 @@
 
         className       db              "OpenGLDemo", 0
         clientRect      RECT            0, 0, 0, 0
-        fileName        db              "..\models\car.obj",0
+        fileName        db              "..\models\cube.obj",0
         akFileName      db              "..\models\skull.obj", 0
         hHeap           dd              ?
         hdcBack         dd              ?
@@ -27,7 +27,7 @@
 ; fpu
         toRadian        GLfloat         180.0
 
-        step           GLfloat         5.0
+        step           GLfloat         0.2
         stepp            GLfloat         0.01
         length          GLfloat         5.0
         pVector         Vector3         0.0, 0.0, 0.0
@@ -53,6 +53,7 @@
         addressV         dd              0
         addressI         dd              0
 
+   
       ;  cubeMesh        PackedMesh      cubeVertices, cubeColors, cubeIndices, CUBE_TRIANGLES_COUNT
         cube            Mesh            0, 0, 0, 0
 
@@ -60,7 +61,7 @@
         ak              Mesh            0, 0, 0, 0
 
         carMesh          PackedMesh      0, zhColors, 0, 0
-        car              Mesh            0, 0, 0, 0
+        car              Mesh            0,0, 0, 0
 
         plane           Mesh            planeVertices, planeColors, 0, PLANE_VERTICES_COUNT
 
@@ -76,8 +77,8 @@
         tPosition       Vector3         0,   0,    0
         cPosition       Vector3         150.0, 150.0, 150.0
 
-        cameraPosition  Vector3         100.0, 100.0, 100.0
-        targetPosition  Vector3         1.0, 0.0, 0.0
+        cameraPosition  Vector3         10.0, 10.0, 10.0
+        targetPosition  Vector3         0.0, 0.0, 0.0
         upVector        Vector3         0.0, 1.0, 0.0
 
         xAxis           Vector3         0.0, 0.0, 0.0
@@ -118,8 +119,8 @@ fragmentShaderText:
 
         program         dd           0
         
-        timeName        db              "time", 0
-        sizeName        db              "size", 0
+        timeName        db              "pos", 0
+        sizeName        db              "color", 0
 
         prevMouseX      dd      ?
         prevMouseY      dd      ?
@@ -130,6 +131,10 @@ fragmentShaderText:
         okMessage  String 'OK', 10
         
         successMessage db       'shaders loaded successfully', 0
+
+        view            Matrix4x4          ?
+        model           Matrix4x4          ?
+        projection      Matrix4x4          ?
 
         include         "Init.asm"
         include         "Mesh.asm"
@@ -178,7 +183,7 @@ proc WindowProc uses ebx,\
 
 .Paint:
 
-        stdcall Draw,     directionVetcor.x
+        stdcall Draw
 
         jmp     .ReturnZero
 
@@ -196,13 +201,12 @@ proc WindowProc uses ebx,\
         je      .MoveBack
         cmp     [wParam], 57h
         je      .MoveUp
-         cmp     [wParam], 53h
+        cmp     [wParam], 53h
         je      .MoveDown
-          cmp     [wParam], 58h
-          je      .RotateRight
+        cmp     [wParam], 58h
+        je      .RotateRight
         cmp  [wParam], 31h
         je .selectMode
-
 
        cmp     [wParam], VK_SPACE
        jne     @F
