@@ -62,8 +62,13 @@ proc Init uses esi
       
        ; mov eax, zhIndices
 
-        ;stdcall Matrix.Projection, [aspect], [fovY], [zNear], [zFar], projection
+        ;invoke  glMatrixMode, GL_PROJECTION
+        ;invoke  glLoadIdentity
 
+       ; stdcall Matrix.Projection1, [aspect], [fovY], [zNear], [zFar]  
+
+       ; invoke glGetFloatv, GL_PROJECTION_MATRIX, projection
+    
         invoke  glShadeModel, GL_SMOOTH
         invoke  glHint, GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST
         invoke  glEnable, GL_DEPTH_TEST
@@ -76,7 +81,11 @@ proc Init uses esi
 
         stdcall Glext.InitShaders  
         
-         stdcall VAO.Init, containerVAO, car
+        stdcall VAO.Init, containerVAO, car
+
         invoke  glUseProgram, [program] 
+        stdcall Matrix.Projection, [aspect], [fovY], [zNear], [zFar], projection
+        
+
         ret
 endp

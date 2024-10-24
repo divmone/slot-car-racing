@@ -78,8 +78,8 @@ proc Mesh.Generate uses ebx esi edi,\
         mov     [edi + Vertex.z], edx   ; resultVertices[resultIndex].z = z
 
 
-        cmp     [copyColors], false
-        je      .DoNotCopyColors;
+        ;cmp     [copyColors], false
+        ;je      .DoNotCopyColors;
         xor     edx, edx
         mov     esi, [indices]
         movzx   eax, byte[esi + ebx]    ; index
