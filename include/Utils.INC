@@ -1,4 +1,5 @@
-eerorMessage String "error"
+erorMessage String "error"
+
 struct SYSTEM_TIME 
    wYear dw ?
    wMonth dw ?
@@ -11,3 +12,4 @@ struct SYSTEM_TIME
 ends
 
 systemTime SYSTEM_TIME ?
+

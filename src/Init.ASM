@@ -54,31 +54,38 @@ proc Init uses esi
 
         stdcall ParseIndicesOBJ, [buffer],  [bufferLength], [iCount] ;, [objVertices], [objIndices]
         mov [addressI], eax
-        stdcall Mesh.Generate, carMesh, car, true, [addressV], [addressI], [iCount]
+
+
+        stdcall Mesh.Generate, carMesh, car, false, [addressV], [addressI], [iCount]
       
     ;    stdcall Mesh.Generate, akMesh, ak, false, [addressV], [addressI], [iCount]
       
        ; mov eax, zhIndices
 
-        invoke  glMatrixMode, GL_PROJECTION
-        invoke  glLoadIdentity
+        ;invoke  glMatrixMode, GL_PROJECTION
+        ;invoke  glLoadIdentity
 
-        stdcall Matrix.Projection, [aspect], [fovY], [zNear], [zFar]
+       ; stdcall Matrix.Projection1, [aspect], [fovY], [zNear], [zFar]  
 
+       ; invoke glGetFloatv, GL_PROJECTION_MATRIX, projection
+    
         invoke  glShadeModel, GL_SMOOTH
         invoke  glHint, GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST
         invoke  glEnable, GL_DEPTH_TEST
         invoke  glEnable, GL_COLOR_MATERIAL
-
+     
         invoke  HeapAlloc, [hHeap], ebx, sizeof.Vertex * 6
         mov     [plane.normals], eax
         
         stdcall Mesh.CalculateNormals, car
-        stdcall Mesh.CalculateNormals, plane
 
         stdcall Glext.InitShaders  
         
         stdcall VAO.Init, containerVAO, car
+
+        invoke  glUseProgram, [program] 
+        stdcall Matrix.Projection, [aspect], [fovY], [zNear], [zFar], projection
         
+
         ret
 endp

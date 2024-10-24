@@ -1,9 +1,18 @@
-#version 330 core
-layout (location = 0) in vec3 position;
+#version 430
 
-out vec3 FragPos;
+
+layout (location = 0) in vec3 pos;
+layout (location = 1) in vec3 color;
+
+
+layout(location = 2) uniform mat4 MVP;
+
+out  vec4 colors;
 
 void main()
 {
-    FragPos = vec3(0.3 * vec4(position, 1.0f));
+
+    gl_Position = MVP * vec4(pos, 1.0);
+
+    colors = vec4(color, 1.0);
 }

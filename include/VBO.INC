@@ -1,2 +1,4 @@
  vertexVBO       GLuint          ?
- normalsVBO      GLuint          ?         
+ normalsVBO      GLuint          ?   
+ colorsVBO       GLuint          ?
+ EBO             GLuint          ?      

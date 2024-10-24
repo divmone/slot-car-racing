@@ -2,7 +2,7 @@
 
         className       db              "OpenGLDemo", 0
         clientRect      RECT            0, 0, 0, 0
-        fileName        db              "..\models\car.obj",0
+        fileName        db              "..\models\skull.obj",0
         akFileName      db              "..\models\skull.obj", 0
         hHeap           dd              ?
         hdcBack         dd              ?
@@ -27,7 +27,7 @@
 ; fpu
         toRadian        GLfloat         180.0
 
-        step           GLfloat         5.0
+        step           GLfloat           0.001
         stepp            GLfloat         0.01
         length          GLfloat         5.0
         pVector         Vector3         0.0, 0.0, 0.0
@@ -46,13 +46,14 @@
         isTransform     dd              0
         buffer          dd              0.0
         scaleStep       GLfloat         0.05
-        scale           GLfloat         2.0
+        scaleC           GLfloat         2.0
 
         drawingMode      dd              1
 
         addressV         dd              0
         addressI         dd              0
 
+   
       ;  cubeMesh        PackedMesh      cubeVertices, cubeColors, cubeIndices, CUBE_TRIANGLES_COUNT
         cube            Mesh            0, 0, 0, 0
 
@@ -60,7 +61,7 @@
         ak              Mesh            0, 0, 0, 0
 
         carMesh          PackedMesh      0, zhColors, 0, 0
-        car              Mesh            0, 0, 0, 0
+        car              Mesh            0,0, 0, 0
 
         plane           Mesh            planeVertices, planeColors, 0, PLANE_VERTICES_COUNT
 
@@ -76,8 +77,13 @@
         tPosition       Vector3         0,   0,    0
         cPosition       Vector3         150.0, 150.0, 150.0
 
-        cameraPosition  Vector3         100.0, 100.0, 100.0
-        targetPosition  Vector3         1.0, 0.0, 0.0
+        oPos            Vector3         0.0,  0.0,  0.0
+        oTurn           Vector3         0.0,  0.0,  0.0
+        oScale          Vector3         0.0,  0.0,  0.0
+
+
+        cameraPosition  Vector3         30.0, 30.0, 30.0
+        targetPosition  Vector3         0.0, 0.0, 0.0
         upVector        Vector3         0.0, 1.0, 0.0
 
         xAxis           Vector3         0.0, 0.0, 0.0
@@ -118,8 +124,8 @@ fragmentShaderText:
 
         program         dd           0
         
-        timeName        db              "time", 0
-        sizeName        db              "size", 0
+        timeName        db              "pos", 0
+        sizeName        db              "color", 0
 
         prevMouseX      dd      ?
         prevMouseY      dd      ?
@@ -130,6 +136,31 @@ fragmentShaderText:
         okMessage  String 'OK', 10
         
         successMessage db       'shaders loaded successfully', 0
+
+        view            Matrix4x4          
+        model           Matrix4x4          1.0,0.0,0.0,0.0,\
+                                           0.0,1.0,0.0,0.0,\
+                                           0.0,0.0,1.0,0.0,\
+                                           0.0,0.0,0.0,1.0 
+
+
+        scale           Matrix4x4          1.0,0.0,0.0,0.0,\
+                                           0.0,1.0,0.0,0.0,\
+                                           0.0,0.0,1.0,0.0,\
+                                           0.0,0.0,0.0,1.0
+
+        turn            Matrix4x4          
+
+        position        Matrix4x4          1.0,0.0,0.0,0.0,\
+                                           0.0,1.0,0.0,0.0,\
+                                           0.0,0.0,1.0,0.0,\
+                                           0.0,0.0,0.0,1.0
+
+        MVP             Matrix4x4
+         ;gf_pr_view_matrix * model
+        PV              Matrix4x4  ;gf_projection_matrix * gf_view_matrix
+
+        projection      Matrix4x4          ?
 
         include         "Init.asm"
         include         "Mesh.asm"
@@ -178,7 +209,7 @@ proc WindowProc uses ebx,\
 
 .Paint:
 
-        stdcall Draw,     directionVetcor.x
+        stdcall Draw
 
         jmp     .ReturnZero
 
@@ -196,13 +227,12 @@ proc WindowProc uses ebx,\
         je      .MoveBack
         cmp     [wParam], 57h
         je      .MoveUp
-         cmp     [wParam], 53h
+        cmp     [wParam], 53h
         je      .MoveDown
-          cmp     [wParam], 58h
-          je      .RotateRight
+        cmp     [wParam], 58h
+        je      .RotateRight
         cmp  [wParam], 31h
         je .selectMode
-
 
        cmp     [wParam], VK_SPACE
        jne     @F
@@ -262,33 +292,30 @@ proc WindowProc uses ebx,\
 
         jmp     .ReturnZero
 .MoveLeft:
-        fld     [posZ]
+        fld     [oPos + Vector3.x]
         fsub    [step]
-        fstp    [posZ]
+        fstp    [oPos + Vector3.x]
         
-        fld [cPosition + Vector3.z]
-        fsub    [step]
-        fstp [cPosition + Vector3.z]
         jmp     .ReturnZero
 
 .MoveRight:
-        fld     [posZ]
+        fld     [oPos + Vector3.x]
         fadd    [step]
-        fstp    [posZ]
+        fstp    [oPos + Vector3.x]
  
         jmp     .ReturnZero
 
 .MoveFront:
-        fld     [posY]
+        fld     [oPos + Vector3.y]
         fsub    [step]
-        fstp    [posY]
+        fstp    [oPos + Vector3.y]
 
         jmp     .ReturnZero
 
 .MoveBack:
-        fld     [posY]
+        fld     [oPos + Vector3.y]
         fadd    [step]
-        fstp    [posY]
+        fstp    [oPos + Vector3.y]
 
         jmp     .ReturnZero
 
@@ -336,15 +363,15 @@ proc WindowProc uses ebx,\
         mov     eax, [wParam]
         test    eax, 0x80000000
         jne     .Negative
-        fld [scale]
+        fld [scaleC]
         fadd [scaleStep]
-        fstp [scale]
+        fstp [scaleC]
         jmp     .ReturnZero
 
 .Negative:
-         fld [scale]
+         fld [scaleC]
         fsub [scaleStep]
-        fstp [scale]
+        fstp [scaleC]
         jmp     .ReturnZero
 
 .selectMode:

@@ -23,3 +23,18 @@ proc VBO.Init uses esi edi ebx,\
 
     ret
 endp
+
+proc VBO.InitA uses esi edi ebx,\
+        buffer, offset, size, mesh 
+    
+    invoke glGenBuffers, 1, [buffer]
+    mov ebx, [buffer]
+    mov ebx, [ebx]
+    invoke glBindBuffer, GL_ARRAY_BUFFER, ebx
+
+    add esi, [offset]
+    invoke glBufferData, GL_ARRAY_BUFFER, [size], [esi], GL_STATIC_DRAW
+   ; invoke glBindBuffer, GL_ARRAY_BUFFER, 0
+
+    ret
+endp
