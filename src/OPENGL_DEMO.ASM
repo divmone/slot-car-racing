@@ -2,7 +2,7 @@
 
         className       db              "OpenGLDemo", 0
         clientRect      RECT            0, 0, 0, 0
-        fileName        db              "..\models\skull.obj",0
+        fileName        db              "..\models\skibidi.obj",0
         akFileName      db              "..\models\skull.obj", 0
         hHeap           dd              ?
         hdcBack         dd              ?
@@ -11,6 +11,7 @@
         hdc             dd              ?
         radian          GLfloat         57.32
        
+        circleD         GLfloat         360.0
         angle           GLfloat         0.0
 ;transform
         angleY          GLfloat         0.0
@@ -27,8 +28,8 @@
 ; fpu
         toRadian        GLfloat         180.0
 
-        step           GLfloat           0.001
-        stepp            GLfloat         0.01
+        step           GLfloat           5.0
+        stepp           GLfloat         0.01
         length          GLfloat         5.0
         pVector         Vector3         0.0, 0.0, 0.0
         programTime     dd              ?
@@ -66,6 +67,7 @@
         plane           Mesh            planeVertices, planeColors, 0, PLANE_VERTICES_COUNT
 
 
+        zero            GLfloat         0.0
         fovY            GLfloat         60.0
         zNear           GLfloat         0.001
         zFar            GLfloat         1000.0
@@ -79,10 +81,12 @@
 
         oPos            Vector3         0.0,  0.0,  0.0
         oTurn           Vector3         0.0,  0.0,  0.0
-        oScale          Vector3         0.0,  0.0,  0.0
+        oScale          Vector3         0.5,  0.5,  0.5
 
+        lightColorV      Vector3         1.0, 0.0, 0.0
+        objectColor     Vector3         1.0, 0.0, 0.0
 
-        cameraPosition  Vector3         30.0, 30.0, 30.0
+        cameraPosition  Vector3         60.0, 60.0, 60.0
         targetPosition  Vector3         0.0, 0.0, 0.0
         upVector        Vector3         0.0, 1.0, 0.0
 
@@ -126,6 +130,30 @@ fragmentShaderText:
         
         timeName        db              "pos", 0
         sizeName        db              "color", 0
+
+        viewPosName     db              "viewPos", 0
+        viewPosLocation GLint           ?
+
+        lightPosName     db              "lightPos", 0
+        lightPosLocation GLint           ?
+
+        objectColorName     db              "objectColor", 0
+        objectColorLocation GLint           ?
+
+        lightColorName db                   "lightColor", 0
+        lightColorLocation GLint             ?
+
+        modelName db                   "model", 0
+        modelLocation GLint             ?
+
+        MVPName db                   "MVP", 0
+        MVPLocation GLint             ?
+
+
+
+        invoke   glGetUniformLocation , [program], lightColorName
+        mov [lightColorLocation], eax
+
 
         prevMouseX      dd      ?
         prevMouseY      dd      ?
@@ -612,6 +640,3 @@ proc CountVerticesOBJ uses esi,\
        mov ecx, [indicesCount]
     ret
 endp
-
-
-

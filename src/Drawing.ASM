@@ -23,7 +23,7 @@ proc Draw
       ;  stdcall UpdateMovement
 
 .Skip:
-        
+       
         invoke  glClearColor, 0.6, 0.6, 1.0, 1.0
         invoke  glClear, GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT
         invoke  glMatrixMode, GL_MODELVIEW
@@ -36,27 +36,41 @@ proc Draw
        
         invoke glGetFloatv, GL_MODELVIEW_MATRIX, view
 
-        stdcall Vector3.Translate, oTurn, [angleX], [angleY], [angleZ]
+        stdcall Vector3.Translate, oTurn, [angleX], [angleY],0 ;0[angleZ]
+
+        ;stdcall Vector3.Normalize, oTurn
+        mov [angleX], 0
+        mov [angleY], 0
+        mov [angleZ], 0
 
         stdcall Matrix.CreatePosition, oPos, position
-        stdcall Matrix.CreateScale, oScale, scale
+        ;stdcall Matrix.CreateScale, oScale, scale
         stdcall Matrix.CreateTurn, oTurn
-        stdcall Matrix.Multiply4x4, turn, model, model
-        stdcall Matrix.Multiply4x4, position, model,  model
+        stdcall Matrix.Multiply4x4, turn,  position, model
+        stdcall Matrix.Multiply4x4,  model, scale,   model
 
         stdcall Matrix.Multiply4x4, view, projection, PV
         stdcall Matrix.Multiply4x4, model, PV, MVP
 
+        ;mov [oTurn + Vector3.x], 0
+        ;mov [oTurn + Vector3.y], 0
+        ;mov [oTurn + Vector3.z], 0
+        ;mov [oPos + Vector3.x], 0
+        ;mov [oPos + Vector3.y], 0
+       
+        
         invoke  glUseProgram, [program]
         
-        invoke glUniformMatrix4fv, 2, 1, GL_FALSE, MVP
-        ;invoke  glUniformMatrix4fv, 2, 1, GL_FALSE, projection
-        ;invoke  glUniformMatrix4fv, 3, 1, GL_FALSE, view
-        ;invoke  glUniformMatrix4fv, 4, 1, GL_FALSE, model
-        ;invoke  glUniform1f, 5, [scale]
-@@:     
+        invoke glUniformMatrix4fv, [MVPLocation], 1, GL_FALSE, MVP
+        ;invoke glUniformMatrix4fv, [modelLocation], 1, GL_FALSE, model
+        
+        invoke glUniform3fv, [viewPosLocation], 1, cameraPosition
+        stdcall Vector3.RotateY, light0Position, [angle], light0Position
+        invoke glUniform3fv, [lightPosLocation], 1, light0Position
+        invoke glUniform3fv, [objectColorLocation], 1, objectColor
+        invoke glUniform3fv, [lightColorLocation], 1, lightColorV
  
-       
+@@:     
 
         stdcall DrawMesh, car, [drawingMode]
 
@@ -68,12 +82,23 @@ proc Draw
 endp
 
 proc Tick
+        finit
+    fld     [angle]        
+    fld [circleD]      
+    fcom      
+    fstsw   ax              
+    sahf                    
+    jb     @F              
+    
+    fldz
+    fstp    [angle]
+          
+    ret
 
-        fld     [angle]
-        fadd    [stepp]
-        fstp    [angle]
-
-        ret
+@@:
+    fadd    [stepp] 
+    fstp    [angle]
+    ret
 endp
 
 proc DrawMesh uses esi,\

@@ -26,6 +26,7 @@ extensionAddresses:
         glEnableVertexAttribArray dd    ?
         glUniformMatrix4fv      dd      ?
         glBindAttribLocation    dd      ?
+        glUniform3fv            dd      ?
 
 extensionNames:
         db      "glBufferData",0
@@ -55,6 +56,7 @@ extensionNames:
         db      "glEnableVertexAttribArray", 0
         db      "glUniformMatrix4fv", 0
         db      "glBindAttribLocation",0
+        db      "glUniform3fv",0
         db      0
 
 define GL_FRAGMENT_SHADER                0x8B30
