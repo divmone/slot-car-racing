@@ -2,7 +2,7 @@
 
         className       db              "OpenGLDemo", 0
         clientRect      RECT            0, 0, 0, 0
-        fileName        db              "..\models\skibidi.obj",0
+        fileName        db              "..\models\sphere2.obj",0
         akFileName      db              "..\models\skull.obj", 0
         hHeap           dd              ?
         hdcBack         dd              ?
@@ -11,7 +11,8 @@
         hdc             dd              ?
         radian          GLfloat         57.32
        
-        circleD         GLfloat         360.0
+        circleD         GLfloat         10.0
+        lightAngle      GLfloat         1.0
         angle           GLfloat         0.0
 ;transform
         angleY          GLfloat         0.0
@@ -64,7 +65,7 @@
         carMesh          PackedMesh      0, zhColors, 0, 0
         car              Mesh            0,0, 0, 0
 
-        plane           Mesh            planeVertices, planeColors, 0, PLANE_VERTICES_COUNT
+        plane           Mesh            planeVertices, 0, 0, PLANE_VERTICES_COUNT
 
 
         zero            GLfloat         0.0
@@ -86,7 +87,7 @@
         lightColorV      Vector3         1.0, 0.0, 0.0
         objectColor     Vector3         1.0, 0.0, 0.0
 
-        cameraPosition  Vector3         60.0, 60.0, 60.0
+        cameraPosition  Vector3         70.0, 70.0, 70.0
         targetPosition  Vector3         0.0, 0.0, 0.0
         upVector        Vector3         0.0, 1.0, 0.0
 
@@ -101,8 +102,6 @@
         light1Diffuse   ColorRGBA       1.0, 0.996, 0.839, 1.0
 
         directionVetcor  Vector4i       0, 0, 0, 0
-
-        
 
         timeLocation    GLint           0
         sizeLocation    GLint           0
@@ -121,7 +120,7 @@
                         db              0
         ;vertexShader    dd              vertexShaderText
 
-fragmentShaderText:
+        fragmentShaderText:
                         file            "./shaders/fragment.glsl"
                         db              0
         ;fragmentShader  dd              fragmentShaderText
@@ -264,7 +263,7 @@ proc WindowProc uses ebx,\
 
        cmp     [wParam], VK_SPACE
        jne     @F
-        stdcall Mesh.Subdivide, cube, cube
+        stdcall Mesh.Subdivide, car, car
 @@:
          cmp     [wParam], 5ah
         je      .RotateLeft
@@ -640,3 +639,5 @@ proc CountVerticesOBJ uses esi,\
        mov ecx, [indicesCount]
     ret
 endp
+
+;3 479

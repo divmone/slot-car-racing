@@ -14,7 +14,7 @@ proc Draw
 
         sub     eax, [time]
         cmp     eax, 10
-        jle     .Skip
+       ; jle     .Skip
 
         mov     eax, [currentTime]
         mov     [time], eax
@@ -35,7 +35,7 @@ proc Draw
 
        
         invoke glGetFloatv, GL_MODELVIEW_MATRIX, view
-
+        stdcall Vector3.RotateY, light0Position, [lightAngle], light0Position
         stdcall Vector3.Translate, oTurn, [angleX], [angleY],0 ;0[angleZ]
 
         ;stdcall Vector3.Normalize, oTurn
@@ -65,16 +65,20 @@ proc Draw
         ;invoke glUniformMatrix4fv, [modelLocation], 1, GL_FALSE, model
         
         invoke glUniform3fv, [viewPosLocation], 1, cameraPosition
-        stdcall Vector3.RotateY, light0Position, [angle], light0Position
+       
         invoke glUniform3fv, [lightPosLocation], 1, light0Position
         invoke glUniform3fv, [objectColorLocation], 1, objectColor
         invoke glUniform3fv, [lightColorLocation], 1, lightColorV
  
 @@:     
 
-        stdcall DrawMesh, car, [drawingMode]
+        stdcall DrawMesh, car, [drawingMode], [containerVAO]
 
+       ; invoke glTranslatef, 10.0, 40.0, 10.0
+
+       ; stdcall DrawMesh, plane, [drawingMode], [containerVAOPlane]
         invoke  glUseProgram, 0
+        
 
         invoke  SwapBuffers, [hdc]
 
@@ -82,33 +86,29 @@ proc Draw
 endp
 
 proc Tick
-        finit
     fld     [angle]        
-    fld [circleD]      
-    fcom      
+    fadd    [stepp]        
+    fcom   [circleD]      
     fstsw   ax              
     sahf                    
-    jb     @F              
-    
-    fldz
-    fstp    [angle]
-          
+    ja     @F  
+    fstp    [angle]         
     ret
 
 @@:
-    fadd    [stepp] 
-    fstp    [angle]
+    fstp    [angle]        
+    mov     [angle], 0.0
     ret
 endp
 
 proc DrawMesh uses esi,\
-     mesh, flag
+     mesh, flag, VAO
 
         mov     esi, [mesh]
 
-        invoke glBindVertexArray, [containerVAO]
+        invoke glBindVertexArray, [VAO]
                 invoke  glDrawArrays, [flag], ebx, [esi + Mesh.verticesCount] 
-        invoke glBindVertexArray, [containerVAO]
+        invoke glBindVertexArray, [VAO]
 
         ret
 endp

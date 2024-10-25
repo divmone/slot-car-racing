@@ -630,8 +630,6 @@ proc Matrix.CreateModel uses esi edi, pos, turnC, scaleC
     ret
 endp
 
-
-
 proc Matrix.Multiply uses ebx esi edi, Matrix1, Matrix2, ResMatrix
    locals
      Temp dd ?
@@ -693,8 +691,7 @@ endp
 
 
 proc Matrix.CreateTurn, turnV
-  ;gf_turn_matrix
-  
+
     locals
        a  dd  ?
        b  dd  ?
@@ -703,31 +700,29 @@ proc Matrix.CreateTurn, turnV
     endl
     mov esi, [turnV]
 
-    ;Calculate a in radian
     fldpi
     fmul  dword [esi]
     fdiv  [PiDegree]
     fstp  [a]
-    ;Calculate b in radian
+
     fldpi
     fmul  dword [esi + 4]
     fdiv  [PiDegree]
     fstp  [b]
-    ;Calculate c in radian
+
     fldpi
     fmul dword [esi + 8]
     fdiv [PiDegree]
     fstp  [c]
 
-    ;---Matrix[0][0]---
+
     fld  [b]
     fcos
     fld  [c]
     fcos
     fmulp
     fstp  dword[turn + 0]
-    ;------------------
-    ;---Matrix[0][1]---
+
     fld  [c]
     fsin
     fld  [b]
@@ -735,13 +730,11 @@ proc Matrix.CreateTurn, turnV
     fmulp
     fchs
     fstp  dword[turn + 4]
-    ;------------------
-    ;---Matrix[0][2]---
+
     fld  [b]
     fsin
     fstp  dword[turn + 8]
-    ;------------------
-    ;---Matrix[1][0]---
+
     fld  [a]
     fsin
     fld  [b]
@@ -757,8 +750,7 @@ proc Matrix.CreateTurn, turnV
     fmulp
     faddp
     fstp  dword[turn + 16]
-    ;------------------
-    ;---Matrix[1][1]---
+
     fld  [a]
     fcos
     fld  [c]
@@ -774,8 +766,7 @@ proc Matrix.CreateTurn, turnV
     fmulp
     fsubp
     fstp  dword[turn + 20]
-    ;------------------
-    ;---Matrix[1][2]---
+
     fld  [a]
     fsin
     fld  [b]
@@ -783,8 +774,7 @@ proc Matrix.CreateTurn, turnV
     fmulp
     fchs
     fstp  dword[turn + 24]
-    ;------------------
-    ;---Matrix[2][0]---
+
     fld  [a]
     fsin
     fld  [c]
@@ -800,8 +790,7 @@ proc Matrix.CreateTurn, turnV
     fmulp
     fsubp
     fstp  dword[turn + 32]
-    ;------------------
-    ;---Matrix[2][1]---
+
     fld  [a]
     fsin
     fld  [c]
@@ -817,21 +806,16 @@ proc Matrix.CreateTurn, turnV
     fmulp
     faddp
     fstp dword [turn + 36]
-    ;------------------
-    ;---Matrix[2][2]---
+
     fld  [a]
     fcos
     fld  [b]
     fcos
     fmulp
     fstp  dword[turn + 40]
-    ;------------------
-    ;---Matrix[3][3]---
+
     fld1
     fstp dword[turn + 60]
-    ;------------------
-  
-
   ret
 endp
 

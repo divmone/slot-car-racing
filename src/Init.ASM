@@ -58,7 +58,7 @@ proc Init uses esi
 
         stdcall Mesh.Generate, carMesh, car, false, [addressV], [addressI], [iCount]
       
-    ;    stdcall Mesh.Generate, akMesh, ak, false, [addressV], [addressI], [iCount]
+        ;stdcall Mesh.Generate, planeMesh, plane, false, planeVertices, planeIndices, PLANE_INDICES_COUNT
       
        ; mov eax, zhIndices
 
@@ -77,15 +77,17 @@ proc Init uses esi
         invoke  HeapAlloc, [hHeap], ebx, sizeof.Vertex * 6
         mov     [plane.normals], eax
         
+        stdcall Mesh.CalculateNormals, plane
+
         stdcall Mesh.CalculateNormals, car
 
         stdcall Glext.InitShaders  
         
-        stdcall VAO.Init, containerVAO, car
+        stdcall VAO.Init, containerVAO, car, vertexVBO, normalsVBO
 
-        invoke  glUseProgram, [program] 
+        stdcall VAO.Init, containerVAOPlane, plane, vertexVBOp, normalsVBOp
+
         stdcall Matrix.Projection, [aspect], [fovY], [zNear], [zFar], projection
         
-
         ret
 endp

@@ -68,8 +68,19 @@ proc StrToFloat  pointer
         imul eax, eax, 10
         add eax, ebx
         inc [precision]
+        cmp [precision], 9
+        ;jg .precisionOF
         jmp @B
 
+.precisionOF:
+        inc esi
+        dec ecx
+        xor ebx, ebx
+        cmp byte[esi], ' '
+        je @F
+        cmp byte[esi], 10
+        je @F
+        jmp .precisionOF
 @@:
         mov [number], eax
         mov eax, [precision]
