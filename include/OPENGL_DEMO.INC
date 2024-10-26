@@ -19,6 +19,8 @@ entry   WinMain
         include         "Logger.inc"
         include         "VBO.inc"
         include         "VAO.inc"
+        include         "Texture.inc"
+        include         "BMP.inc"
 
 macro switch value
 {

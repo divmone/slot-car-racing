@@ -2,15 +2,16 @@
 
         className       db              "OpenGLDemo", 0
         clientRect      RECT            0, 0, 0, 0
-        fileName        db              "..\models\skull        .obj",0
+        fileName        db              "..\\models\\skull.obj",0
         akFileName      db              "..\models\skull.obj", 0
+        textPath        db              "../textures/Penger.bmp", 0
         hHeap           dd              ?
         hdcBack         dd              ?
         hConsole        dd              ?
         time            dd              ?
         hdc             dd              ?
         radian          GLfloat         57.32
-       
+        
         circleD         GLfloat         10.0
         lightAngle      GLfloat         1.0
         angle           GLfloat         0.0
@@ -87,7 +88,7 @@
         lightColorV      Vector3         1.0, 0.0, 0.0
         objectColor     Vector3         1.0, 0.0, 0.0
 
-        cameraPosition  Vector3         70.0, 70.0, 70.0
+        cameraPosition  Vector3         10.0, 10.0, 10.0
         targetPosition  Vector3         0.0, 0.0, 0.0
         upVector        Vector3         0.0, 1.0, 0.0
 
@@ -200,6 +201,8 @@
         include         "Logger.asm"
         include         "VBO.asm"
         include         "VAO.asm"
+        include         "Texture.asm"
+        include         "BMP.asm"
 
 proc WinMain
 

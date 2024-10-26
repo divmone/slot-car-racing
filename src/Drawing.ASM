@@ -36,7 +36,7 @@ proc Draw
        
         invoke glGetFloatv, GL_MODELVIEW_MATRIX, view
         stdcall Vector3.RotateY, light0Position, [lightAngle], light0Position
-        stdcall Vector3.Translate, oTurn, [angleX],  [angleZ],[angleY]
+        stdcall Vector3.Translate, oTurn, [angleX], [angleZ], [angleY]
 
         ;stdcall Vector3.Normalize, oTurn
         mov [angleX], 0

@@ -76,6 +76,8 @@ proc Init uses esi
 
         stdcall VAO.Init, containerVAOPlane, plane, vertexVBOp, normalsVBOp
 
+        stdcall Texture.Init
+        
         stdcall Matrix.Projection, [aspect], [fovY], [zNear], [zFar], projection
         
         ret
