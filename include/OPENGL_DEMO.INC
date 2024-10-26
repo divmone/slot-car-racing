@@ -3,10 +3,10 @@ entry   WinMain
 
         include         "win32a.inc"
 
-        include         "C:\FASM\include\api\kernel32.inc"
-        include         "C:\FASM\include\api\user32.inc"
-        include         "C:\FASM\include\api\gdi32.inc"
-        include         "C:\FASM\include\api\opengl.inc"
+        include         "api\kernel32.inc"
+        include         "api\user32.inc"
+        include         "api\gdi32.inc"
+        include         "api\opengl.inc"
 
         include         "Mesh.inc"
         include         "Vector.inc"
@@ -19,7 +19,6 @@ entry   WinMain
         include         "Logger.inc"
         include         "VBO.inc"
         include         "VAO.inc"
-    
 
 macro switch value
 {

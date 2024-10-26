@@ -2,7 +2,7 @@
 
         className       db              "OpenGLDemo", 0
         clientRect      RECT            0, 0, 0, 0
-        fileName        db              "..\models\sphere2.obj",0
+        fileName        db              "..\models\skull        .obj",0
         akFileName      db              "..\models\skull.obj", 0
         hHeap           dd              ?
         hdcBack         dd              ?
@@ -108,7 +108,6 @@
         oneSecond       GLfloat         1000.0  
         startTime       dd              ?      
 
-       
         fragmentShader  GLuint          0
         fshaderFile      db              "../shaders/fragment.glsl", 0
 
@@ -639,5 +638,6 @@ proc CountVerticesOBJ uses esi,\
        mov ecx, [indicesCount]
     ret
 endp
+
 
 ;3 479
