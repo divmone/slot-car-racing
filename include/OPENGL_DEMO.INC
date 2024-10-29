@@ -1,12 +1,12 @@
 format  PE GUI 5.0
 entry   WinMain
 
-        include         "C:\FASM\include\win32a.inc"
+        include         "win32a.inc"
 
-        include         "C:\FASM\include\api\kernel32.inc"
-        include         "C:\FASM\include\api\user32.inc"
-        include         "C:\FASM\include\api\gdi32.inc"
-        include         "C:\FASM\include\api\opengl.inc"
+        include         "api\kernel32.inc"
+        include         "api\user32.inc"
+        include         "api\gdi32.inc"
+        include         "api\opengl.inc"
 
         include         "Mesh.inc"
         include         "Vector.inc"
@@ -19,7 +19,8 @@ entry   WinMain
         include         "Logger.inc"
         include         "VBO.inc"
         include         "VAO.inc"
-    
+        include         "Texture.inc"
+        include         "BMP.inc"
 
 macro switch value
 {
@@ -34,7 +35,7 @@ macro case label, [value]
 
 macro memset address, value, count
 {
-        mov     edi, adress
+        mov     edi, address
         mov     eax, value
         mov     ecx, count
         rep     stosb
@@ -48,15 +49,24 @@ macro memcpy dest, src, count
         rep     movsb
 }
 
-macro malloc size
+macro malloc [arg]
 {
-        invoke  HeapAlloc, [hHeap], ebx, size
-}
+  argc = 0
+forward
+  if ~arg eq
+    argc = argc+1
+  end if
+common
+  if argc = 1
+    invoke  HeapAlloc, [hHeap], ebx, arg
+  else if argc = 2
+    match count, size, arg
+    \{
+        invoke HeapAlloc, [hHeap], 8, count * size
+      \}
+  end if
+}  
 
-macro malloc count, size
-{
-        invoke  HeapAlloc, [hHeap], 8, count * size
-}
 
 
         include         "Plane.inc"

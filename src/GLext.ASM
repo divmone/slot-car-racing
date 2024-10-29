@@ -61,6 +61,25 @@ proc Glext.InitShaders
         cmp     eax, ebx
         je      .Error
 
+        invoke   glGetUniformLocation , [program], viewPosName
+        mov [viewPosLocation], eax
+
+        invoke   glGetUniformLocation , [program], lightPosName
+        mov [lightPosLocation], eax
+
+      
+        invoke   glGetUniformLocation , [program], objectColorName
+        mov [objectColorLocation], eax
+
+
+        invoke glGetUniformLocation, [program], lightColorName
+        mov [lightColorLocation], eax
+
+        invoke glGetUniformLocation, [program], MVPName
+        mov [MVPLocation], eax
+
+        invoke glGetUniformLocation, [program], modelName
+        mov [modelLocation], eax
          ;invoke  glBindAttribLocation, [program], 0, timeName
       ;  mov     [timeLocation], eax
          ;invoke  glBindAttribLocation, [program], 2, sizeName

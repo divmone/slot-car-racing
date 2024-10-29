@@ -1,4 +1,3 @@
-
 proc Vector3.Length uses esi,\
      vector
 
@@ -216,15 +215,7 @@ proc Vector3.RotateY  uses esi  ebx,\
      fstp    [ebx + Vector3.y]
 
      ret
-
-;x' = x * cos(theta) + z * sin(theta)
-;z' = z * cos(theta) - x * sin(theta)
-
 endp
-
-;x'=x*cos(L)-y*sin(L);
-;y'=-x*sin(L)+y*cos(L);
-;z'=z;
 
 proc Vector3.RotateZ  uses esi  ebx,\
      v1, theta, result

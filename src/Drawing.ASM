@@ -1,12 +1,7 @@
 proc Draw
 
         locals
-                currentTime     dd      ?
-                 tempFloat       dd      ? 
-                speed     GLfloat 0.0  
-                mposX   GLfloat 0.0  
-                mposY   GLfloat 0.0  
-                mposZ   GLfloat 0.0  
+                currentTime     dd    ?
         endl
 
         invoke  GetTickCount
@@ -14,7 +9,7 @@ proc Draw
 
         sub     eax, [time]
         cmp     eax, 10
-        jle     .Skip
+       ; jle     .Skip
 
         mov     eax, [currentTime]
         mov     [time], eax
@@ -23,7 +18,7 @@ proc Draw
       ;  stdcall UpdateMovement
 
 .Skip:
-        
+       
         invoke  glClearColor, 0.6, 0.6, 1.0, 1.0
         invoke  glClear, GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT
         invoke  glMatrixMode, GL_MODELVIEW
@@ -35,32 +30,50 @@ proc Draw
 
        
         invoke glGetFloatv, GL_MODELVIEW_MATRIX, view
+        stdcall Vector3.RotateY, light0Position, [lightAngle], light0Position
+        stdcall Vector3.Translate, oTurn, [angleX], [angleZ], [angleY]
 
-        stdcall Vector3.Translate, oTurn, [angleX], [angleY], [angleZ]
+        ;stdcall Vector3.Normalize, oTurn
+        mov [angleX], 0
+        mov [angleY], 0
+        mov [angleZ], 0
 
         stdcall Matrix.CreatePosition, oPos, position
-        stdcall Matrix.CreateScale, oScale, scale
+        ;stdcall Matrix.CreateScale, oScale, scale
         stdcall Matrix.CreateTurn, oTurn
-        stdcall Matrix.Multiply4x4, turn, model, model
-        stdcall Matrix.Multiply4x4, position, model,  model
+        stdcall Matrix.Multiply4x4, turn,  position, model
+        stdcall Matrix.Multiply4x4,  model, scale,   model
 
         stdcall Matrix.Multiply4x4, view, projection, PV
         stdcall Matrix.Multiply4x4, model, PV, MVP
 
+        ;mov [oTurn + Vector3.x], 0
+        ;mov [oTurn + Vector3.y], 0
+        ;mov [oTurn + Vector3.z], 0
+        ;mov [oPos + Vector3.x], 0
+        ;mov [oPos + Vector3.y], 0
+       
+        
         invoke  glUseProgram, [program]
         
-        invoke glUniformMatrix4fv, 2, 1, GL_FALSE, MVP
-        ;invoke  glUniformMatrix4fv, 2, 1, GL_FALSE, projection
-        ;invoke  glUniformMatrix4fv, 3, 1, GL_FALSE, view
-        ;invoke  glUniformMatrix4fv, 4, 1, GL_FALSE, model
-        ;invoke  glUniform1f, 5, [scale]
-@@:     
- 
+        invoke glUniformMatrix4fv, [MVPLocation], 1, GL_FALSE, MVP
+        ;invoke glUniformMatrix4fv, [modelLocation], 1, GL_FALSE, model
+        
+        invoke glUniform3fv, [viewPosLocation], 1, cameraPosition
        
+        invoke glUniform3fv, [lightPosLocation], 1, light0Position
+        invoke glUniform3fv, [objectColorLocation], 1, objectColor
+        invoke glUniform3fv, [lightColorLocation], 1, lightColorV
+ 
+@@:     
 
-        stdcall DrawMesh, car, [drawingMode]
+        stdcall DrawMesh, car, [drawingMode], [containerVAO]
 
+       ; invoke glTranslatef, 10.0, 40.0, 10.0
+
+       ; stdcall DrawMesh, plane, [drawingMode], [containerVAOPlane]
         invoke  glUseProgram, 0
+        
 
         invoke  SwapBuffers, [hdc]
 
@@ -68,22 +81,29 @@ proc Draw
 endp
 
 proc Tick
+    fld     [angle]        
+    fadd    [stepp]        
+    fcom   [circleD]      
+    fstsw   ax              
+    sahf                    
+    ja     @F  
+    fstp    [angle]         
+    ret
 
-        fld     [angle]
-        fadd    [stepp]
-        fstp    [angle]
-
-        ret
+@@:
+    fstp    [angle]        
+    mov     [angle], 0.0
+    ret
 endp
 
 proc DrawMesh uses esi,\
-     mesh, flag
+     mesh, flag, VAO
 
         mov     esi, [mesh]
 
-        invoke glBindVertexArray, [containerVAO]
+        invoke glBindVertexArray, [VAO]
                 invoke  glDrawArrays, [flag], ebx, [esi + Mesh.verticesCount] 
-        invoke glBindVertexArray, [containerVAO]
+        invoke glBindVertexArray, [VAO]
 
         ret
 endp
