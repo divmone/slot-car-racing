@@ -1,12 +1,7 @@
 proc Draw
 
         locals
-                currentTime     dd      ?
-                 tempFloat       dd      ? 
-                speed     GLfloat 0.0  
-                mposX   GLfloat 0.0  
-                mposY   GLfloat 0.0  
-                mposZ   GLfloat 0.0  
+                currentTime     dd    ?
         endl
 
         invoke  GetTickCount

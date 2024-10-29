@@ -2,9 +2,9 @@
 
         className       db              "OpenGLDemo", 0
         clientRect      RECT            0, 0, 0, 0
-        fileName        db              "..\\models\\skull.obj",0
+        fileName        db              "..\models\skibidi.obj",0
         akFileName      db              "..\models\skull.obj", 0
-        textPath        db              "../textures/Penger.bmp", 0
+        textPath        db              "../textures/penger2.bmp", 0
         hHeap           dd              ?
         hdcBack         dd              ?
         hConsole        dd              ?
@@ -16,6 +16,7 @@
         lightAngle      GLfloat         1.0
         angle           GLfloat         0.0
 ;transform
+        
         angleY          GLfloat         0.0
         angleX          GLfloat         0.0
         angleZ          GLfloat         0.0
@@ -49,7 +50,7 @@
         isTransform     dd              0
         buffer          dd              0.0
         scaleStep       GLfloat         0.05
-        scaleC           GLfloat         2.0
+        scaleC          GLfloat         2.0
 
         drawingMode      dd              1
 
@@ -416,6 +417,7 @@ proc WindowProc uses ebx,\
         jmp .ReturnZero
 
 .Destroy:
+        invoke HeapFree, [hHeap]
         invoke CloseHandle, [logFile]
         invoke glDeleteBuffers, 1, vertexVBO
         invoke  ExitProcess, ebx
@@ -440,7 +442,7 @@ proc ParseVerticesOBJ uses edi esi,\
         mov ecx, 12
         mov eax, [verticesCount]
         mul ecx
-        invoke  HeapAlloc, [hHeap], HEAP_ZERO_MEMORY, eax   ; eax
+        malloc  eax   ; eax
         mov     [resultVertices], eax
 
         mov esi, [buffer]
@@ -507,7 +509,7 @@ proc ParseIndicesOBJ uses ebx edi esi ,\
         mov eax, [indicesCount]
         mul ecx
 
-        invoke  HeapAlloc, [hHeap], HEAP_ZERO_MEMORY, eax  ; eax
+        malloc eax  ; eax
         mov     [resultIndices], eax
 
         mov eax, [indicesCount]

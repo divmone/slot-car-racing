@@ -1,11 +1,9 @@
 proc Init uses esi
-
         locals
                 hMainWindow     dd              ?
                 aspect          dd              ?
         endl
 
-   
         invoke  GetProcessHeap
         mov     [hHeap], eax
 
@@ -15,7 +13,7 @@ proc Init uses esi
         mov     [hMainWindow], eax
 
         invoke  GetClientRect, eax, clientRect
-        invoke  ShowCursor, ebx
+        invoke  ShowCursor, 999
         invoke  GetTickCount
         mov     [time], eax
 
