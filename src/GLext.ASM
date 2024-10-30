@@ -38,9 +38,10 @@ proc Glext.InitShaders
 
 @@:
 
-        ;stdcall Glext.LoadShader, vshaderFile, GL_FRAGMENT_SHADER
+        stdcall Glext.LoadShader, vshaderFile, GL_VERTEX_SHADER
         mov     [vertexShader], eax
 
+        stdcall Log, SHADER_LOADED_SUCCESSFULLY, SHADER_LOADED_SUCCESSFULLY.size 
         cmp     eax, 0
         je      .Error
 
@@ -48,8 +49,11 @@ proc Glext.InitShaders
         stdcall Glext.LoadShader, fshaderFile, GL_FRAGMENT_SHADER
         mov     [fragmentShader], eax
 
+        stdcall Log, SHADER_LOADED_SUCCESSFULLY, SHADER_LOADED_SUCCESSFULLY.size 
         cmp     eax, ebx
         je      .Error
+
+ 
 
         stdcall Glext.CreateProgram,  [vertexShader], [fragmentShader]
         mov     [program], eax
@@ -57,13 +61,31 @@ proc Glext.InitShaders
         cmp     eax, ebx
         je      .Error
 
-        invoke  glGetUniformLocation, [program], timeName
-        mov     [timeLocation], eax
-        invoke  glGetUniformLocation, [program], sizeName
-        mov     [sizeLocation], eax
-  
-              
+        invoke   glGetUniformLocation , [program], viewPosName
+        mov [viewPosLocation], eax
+
+        invoke   glGetUniformLocation , [program], lightPosName
+        mov [lightPosLocation], eax
+
       
+        invoke   glGetUniformLocation , [program], objectColorName
+        mov [objectColorLocation], eax
+
+
+        invoke glGetUniformLocation, [program], lightColorName
+        mov [lightColorLocation], eax
+
+        invoke glGetUniformLocation, [program], MVPName
+        mov [MVPLocation], eax
+
+        invoke glGetUniformLocation, [program], modelName
+        mov [modelLocation], eax
+         ;invoke  glBindAttribLocation, [program], 0, timeName
+      ;  mov     [timeLocation], eax
+         ;invoke  glBindAttribLocation, [program], 2, sizeName
+      ;  mov     [sizeLocation], eax
+  
+
       ;  invoke  WriteConsole, [hStdOut], okMessage, 20, 0, ebx
 
   
@@ -71,6 +93,7 @@ proc Glext.InitShaders
 
 
 .Error:
+        ;stdcall Log, SHADER_LOADED_FAILED, SHADER_LOADED_FAILED.size 
         mov     [program], ebx
 
 .Return:

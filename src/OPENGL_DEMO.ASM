@@ -2,17 +2,21 @@
 
         className       db              "OpenGLDemo", 0
         clientRect      RECT            0, 0, 0, 0
-        fileName        db              "..\models\car.obj",0
+        fileName        db              "..\models\skibidi.obj",0
         akFileName      db              "..\models\skull.obj", 0
+        textPath        db              "../textures/penger2.bmp", 0
         hHeap           dd              ?
         hdcBack         dd              ?
         hConsole        dd              ?
         time            dd              ?
         hdc             dd              ?
         radian          GLfloat         57.32
-
+        
+        circleD         GLfloat         10.0
+        lightAngle      GLfloat         1.0
         angle           GLfloat         0.0
 ;transform
+        
         angleY          GLfloat         0.0
         angleX          GLfloat         0.0
         angleZ          GLfloat         0.0
@@ -24,12 +28,11 @@
         velocity        GLfloat         2.0
 
 
-
-; 
 ; fpu
         toRadian        GLfloat         180.0
 
-        step            GLfloat         5.0
+        step           GLfloat           5.0
+        stepp           GLfloat         0.01
         length          GLfloat         5.0
         pVector         Vector3         0.0, 0.0, 0.0
         programTime     dd              ?
@@ -47,13 +50,14 @@
         isTransform     dd              0
         buffer          dd              0.0
         scaleStep       GLfloat         0.05
-        scale           GLfloat         2.0
+        scaleC          GLfloat         2.0
 
         drawingMode      dd              1
 
         addressV         dd              0
         addressI         dd              0
 
+   
       ;  cubeMesh        PackedMesh      cubeVertices, cubeColors, cubeIndices, CUBE_TRIANGLES_COUNT
         cube            Mesh            0, 0, 0, 0
 
@@ -61,11 +65,12 @@
         ak              Mesh            0, 0, 0, 0
 
         carMesh          PackedMesh      0, zhColors, 0, 0
-        car              Mesh            0, 0, 0, 0
+        car              Mesh            0,0, 0, 0
 
-        plane           Mesh            planeVertices, planeColors, 0, PLANE_VERTICES_COUNT
+        plane           Mesh            planeVertices, 0, 0, PLANE_VERTICES_COUNT
 
 
+        zero            GLfloat         0.0
         fovY            GLfloat         60.0
         zNear           GLfloat         0.001
         zFar            GLfloat         1000.0
@@ -77,8 +82,15 @@
         tPosition       Vector3         0,   0,    0
         cPosition       Vector3         150.0, 150.0, 150.0
 
-        cameraPosition  Vector3         0.0, 110.0, 0.0
-        targetPosition  Vector3         1.0, 0.0, 0.0
+        oPos            Vector3         0.0,  0.0,  0.0
+        oTurn           Vector3         0.0,  0.0,  0.0
+        oScale          Vector3         0.5,  0.5,  0.5
+
+        lightColorV      Vector3         1.0, 0.0, 0.0
+        objectColor     Vector3         1.0, 0.0, 0.0
+
+        cameraPosition  Vector3         10.0, 10.0, 10.0
+        targetPosition  Vector3         0.0, 0.0, 0.0
         upVector        Vector3         0.0, 1.0, 0.0
 
         xAxis           Vector3         0.0, 0.0, 0.0
@@ -93,24 +105,55 @@
 
         directionVetcor  Vector4i       0, 0, 0, 0
 
-        
-
         timeLocation    GLint           0
         sizeLocation    GLint           0
         oneSecond       GLfloat         1000.0  
         startTime       dd              ?      
 
-       
         fragmentShader  GLuint          0
         fshaderFile      db              "../shaders/fragment.glsl", 0
 
         vertexShader    GLuint          0
         vshaderFile      db              "../shaders/vertex.glsl", 0
        
-        program         GLint           0
+       vertexShaderText:
+                        file            "./shaders/vertex.glsl"
+                        db              0
+        ;vertexShader    dd              vertexShaderText
+
+        fragmentShaderText:
+                        file            "./shaders/fragment.glsl"
+                        db              0
+        ;fragmentShader  dd              fragmentShaderText
+
+        program         dd           0
         
-        timeName        db              "time", 0
-        sizeName        db              "size", 0
+        timeName        db              "pos", 0
+        sizeName        db              "color", 0
+
+        viewPosName     db              "viewPos", 0
+        viewPosLocation GLint           ?
+
+        lightPosName     db              "lightPos", 0
+        lightPosLocation GLint           ?
+
+        objectColorName     db              "objectColor", 0
+        objectColorLocation GLint           ?
+
+        lightColorName db                   "lightColor", 0
+        lightColorLocation GLint             ?
+
+        modelName db                   "model", 0
+        modelLocation GLint             ?
+
+        MVPName db                   "MVP", 0
+        MVPLocation GLint             ?
+
+
+
+        invoke   glGetUniformLocation , [program], lightColorName
+        mov [lightColorLocation], eax
+
 
         prevMouseX      dd      ?
         prevMouseY      dd      ?
@@ -118,10 +161,34 @@
         mouseY          dd      ?
         mouseCaptured   dd      0
 
-        okMessage  String 'OK'
+        okMessage  String 'OK', 10
         
         successMessage db       'shaders loaded successfully', 0
 
+        view            Matrix4x4          
+        model           Matrix4x4          1.0,0.0,0.0,0.0,\
+                                           0.0,1.0,0.0,0.0,\
+                                           0.0,0.0,1.0,0.0,\
+                                           0.0,0.0,0.0,1.0 
+
+
+        scale           Matrix4x4          1.0,0.0,0.0,0.0,\
+                                           0.0,1.0,0.0,0.0,\
+                                           0.0,0.0,1.0,0.0,\
+                                           0.0,0.0,0.0,1.0
+
+        turn            Matrix4x4          
+
+        position        Matrix4x4          1.0,0.0,0.0,0.0,\
+                                           0.0,1.0,0.0,0.0,\
+                                           0.0,0.0,1.0,0.0,\
+                                           0.0,0.0,0.0,1.0
+
+        MVP             Matrix4x4
+         ;gf_pr_view_matrix * model
+        PV              Matrix4x4  ;gf_projection_matrix * gf_view_matrix
+
+        projection      Matrix4x4          ?
 
         include         "Init.asm"
         include         "Mesh.asm"
@@ -133,6 +200,10 @@
         include         "GLext.asm"
         include         "Utils.asm"
         include         "Logger.asm"
+        include         "VBO.asm"
+        include         "VAO.asm"
+        include         "Texture.asm"
+        include         "BMP.asm"
 
 proc WinMain
 
@@ -168,7 +239,7 @@ proc WindowProc uses ebx,\
 
 .Paint:
 
-        stdcall Draw,     directionVetcor.x
+        stdcall Draw
 
         jmp     .ReturnZero
 
@@ -186,17 +257,16 @@ proc WindowProc uses ebx,\
         je      .MoveBack
         cmp     [wParam], 57h
         je      .MoveUp
-         cmp     [wParam], 53h
+        cmp     [wParam], 53h
         je      .MoveDown
-          cmp     [wParam], 58h
-          je      .RotateRight
+        cmp     [wParam], 58h
+        je      .RotateRight
         cmp  [wParam], 31h
         je .selectMode
 
-
        cmp     [wParam], VK_SPACE
        jne     @F
-        stdcall Mesh.Subdivide, cube, cube
+        stdcall Mesh.Subdivide, car, car
 @@:
          cmp     [wParam], 5ah
         je      .RotateLeft
@@ -252,33 +322,30 @@ proc WindowProc uses ebx,\
 
         jmp     .ReturnZero
 .MoveLeft:
-        fld     [posZ]
+        fld     [oPos + Vector3.x]
         fsub    [step]
-        fstp    [posZ]
+        fstp    [oPos + Vector3.x]
         
-        fld [cPosition + Vector3.z]
-        fsub    [step]
-        fstp [cPosition + Vector3.z]
         jmp     .ReturnZero
 
 .MoveRight:
-        fld     [posZ]
+        fld     [oPos + Vector3.x]
         fadd    [step]
-        fstp    [posZ]
+        fstp    [oPos + Vector3.x]
  
         jmp     .ReturnZero
 
 .MoveFront:
-        fld     [posY]
+        fld     [oPos + Vector3.y]
         fsub    [step]
-        fstp    [posY]
+        fstp    [oPos + Vector3.y]
 
         jmp     .ReturnZero
 
 .MoveBack:
-        fld     [posY]
+        fld     [oPos + Vector3.y]
         fadd    [step]
-        fstp    [posY]
+        fstp    [oPos + Vector3.y]
 
         jmp     .ReturnZero
 
@@ -326,15 +393,15 @@ proc WindowProc uses ebx,\
         mov     eax, [wParam]
         test    eax, 0x80000000
         jne     .Negative
-        fld [scale]
+        fld [scaleC]
         fadd [scaleStep]
-        fstp [scale]
+        fstp [scaleC]
         jmp     .ReturnZero
 
 .Negative:
-         fld [scale]
+         fld [scaleC]
         fsub [scaleStep]
-        fstp [scale]
+        fstp [scaleC]
         jmp     .ReturnZero
 
 .selectMode:
@@ -350,8 +417,9 @@ proc WindowProc uses ebx,\
         jmp .ReturnZero
 
 .Destroy:
+        invoke HeapFree, [hHeap]
         invoke CloseHandle, [logFile]
-        
+        invoke glDeleteBuffers, 1, vertexVBO
         invoke  ExitProcess, ebx
 
 .ReturnZero:
@@ -374,7 +442,7 @@ proc ParseVerticesOBJ uses edi esi,\
         mov ecx, 12
         mov eax, [verticesCount]
         mul ecx
-        invoke  HeapAlloc, [hHeap], HEAP_ZERO_MEMORY, eax   ; eax
+        malloc  eax   ; eax
         mov     [resultVertices], eax
 
         mov esi, [buffer]
@@ -441,7 +509,7 @@ proc ParseIndicesOBJ uses ebx edi esi ,\
         mov eax, [indicesCount]
         mul ecx
 
-        invoke  HeapAlloc, [hHeap], HEAP_ZERO_MEMORY, eax  ; eax
+        malloc eax  ; eax
         mov     [resultIndices], eax
 
         mov eax, [indicesCount]
@@ -577,4 +645,4 @@ proc CountVerticesOBJ uses esi,\
 endp
 
 
-
+;3 479

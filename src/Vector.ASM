@@ -1,4 +1,3 @@
-
 proc Vector3.Length uses esi,\
      vector
 
@@ -216,15 +215,7 @@ proc Vector3.RotateY  uses esi  ebx,\
      fstp    [ebx + Vector3.y]
 
      ret
-
-;x' = x * cos(theta) + z * sin(theta)
-;z' = z * cos(theta) - x * sin(theta)
-
 endp
-
-;x'=x*cos(L)-y*sin(L);
-;y'=-x*sin(L)+y*cos(L);
-;z'=z;
 
 proc Vector3.RotateZ  uses esi  ebx,\
      v1, theta, result
@@ -497,3 +488,68 @@ proc RotateCamera uses ebx ecx edx,\
 
     ret
 endp
+
+
+proc ksjhfv
+template <typename T> 
+GLM_FUNC_QUALIFIER detail::tmat4x4<T> rotate
+(
+    detail::tmat4x4<T> const & m,
+    T const & angle, 
+    detail::tvec3<T> const & v
+)
+{
+    T a = radians(angle);
+    T c = cos(a);
+    T s = sin(a);
+
+    detail::tvec3<T> axis = normalize(v);
+
+    detail::tvec3<T> temp = (T(1) - c) * axis;
+
+    detail::tmat4x4<T> Rotate(detail::tmat4x4<T>::null);
+    Rotate[0][0] = c + temp[0] * axis[0];
+    Rotate[0][1] = 0 + temp[0] * axis[1] + s * axis[2];
+    Rotate[0][2] = 0 + temp[0] * axis[2] - s * axis[1];
+
+    Rotate[1][0] = 0 + temp[1] * axis[0] - s * axis[2];
+    Rotate[1][1] = c + temp[1] * axis[1];
+    Rotate[1][2] = 0 + temp[1] * axis[2] + s * axis[0];
+
+    Rotate[2][0] = 0 + temp[2] * axis[0] + s * axis[1];
+    Rotate[2][1] = 0 + temp[2] * axis[1] - s * axis[0];
+    Rotate[2][2] = c + temp[2] * axis[2];
+
+    detail::tmat4x4<T> Result(detail::tmat4x4<T>::null);
+    Result[0] = m[0] * Rotate[0][0] + m[1] * Rotate[0][1] + m[2] * Rotate[0][2];
+    Result[1] = m[0] * Rotate[1][0] + m[1] * Rotate[1][1] + m[2] * Rotate[1][2];
+    Result[2] = m[0] * Rotate[2][0] + m[1] * Rotate[2][1] + m[2] * Rotate[2][2];
+    Result[3] = m[3];
+    return Result;
+}
+ret66         vf5
+endp
+
+
+proc Vecto3.Dup uses edi esi, Vec1, Vec2
+  locals
+    res   dd    ?
+  endl
+  mov esi, [Vec1]
+  mov edi, [Vec2]
+  
+  fld  dword[esi]
+  fmul dword[edi]
+  fld  dword[esi + 4]
+  fmul dword[edi + 4]
+  faddp
+  fld  dword[esi + 8]
+  fmul dword[edi + 8]
+  faddp
+  fstp [res]
+  mov eax, [res]
+
+  ret
+endp
+
+

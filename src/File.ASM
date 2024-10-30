@@ -14,6 +14,7 @@ proc File.LoadContent uses edi,\
         invoke  GetFileSize, [hFile], ebx
         inc     eax
         mov     [length], eax
+        ;malloc 1, 8
         invoke  HeapAlloc, [hHeap], 8, [length]
         mov     [pBuffer], eax
 

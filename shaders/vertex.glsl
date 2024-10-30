@@ -1,10 +1,17 @@
-#version 330 core
-layout (location = 0) in vec3 aPos; // координатные переменные в атрибуте идут первыми среди всех остальных данных, поэтому указываем для них location = 0
-  
-out vec4 vertexColor; // определяем выходную переменную, задающую цвет, которую затем отправим во фрагментный шейдер
- 
+#version 430
+
+layout (location = 0) in vec3 pos;
+layout (location = 1) in vec3 normal;
+
+uniform mat4 MVP;
+uniform mat4 model;
+
+out vec3 Normal;
+out vec3 FragPos;
+
 void main()
 {
-    gl_Position = vec4(aPos, 1.0); // обратите внимание, что в конструктор переменной типа vec4 мы напрямую передаем переменную типа vec3
-    vertexColor = vec4(0.5, 0.0, 0.0, 1.0); // задаем темно-красное значение цвета для выходной переменной
-}
+    gl_Position = MVP * vec4(pos, 1.0f);
+    FragPos = vec3(model * vec4(pos, 1.0f));
+    Normal = normal;  
+} 
