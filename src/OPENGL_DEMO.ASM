@@ -4,7 +4,7 @@
         clientRect      RECT            0, 0, 0, 0
         fileName        db              "..\models\skibidi.obj",0
         akFileName      db              "..\models\skull.obj", 0
-        textPath        db              "../textures/penger2.bmp", 0
+        textPath        db              "../textures/Penger.bmp", 0
         hHeap           dd              ?
         hdcBack         dd              ?
         hConsole        dd              ?

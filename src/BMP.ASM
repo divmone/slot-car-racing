@@ -1,8 +1,9 @@
 proc BMP.LoadFromFile uses edi esi ebx,\
             fileName
     locals 
-        buffer BMP 
+        buffer dd 0 
         n dd 0
+        number dd 0
     endl
     
     stdcall File.LoadContent, [fileName]
@@ -13,14 +14,19 @@ proc BMP.LoadFromFile uses edi esi ebx,\
     mov eax, [ebx + BMPHeader.bfOffBits]
 
     mov eax, [ebx + BMP.biHeight]
-    mov [buffer + BMP.biHeight], eax
-    stdcall IntToStr, [buffer + BMP.biHeight]
-    mov [n], eax
-    stdcall GetNumberLength, eax
+    mov ecx, [ebx + BMP.biWidth]
+    xor edx, edx
+    mul ecx
 
-    stdcall Log, [n], eax 
+    xor edx, edx
+    mov ecx, 3
+    mul ecx
 
-    
- 
+    malloc eax
+
+
+
+
+
     ret
 endp
