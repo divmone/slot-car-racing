@@ -22,6 +22,14 @@ proc VAO.Init uses edi esi ebx,\
         invoke glEnableVertexAttribArray, 1
     
         invoke glVertexAttribPointer, 1, 3, GL_FLOAT, GL_FALSE, 0, 0
+
+        invoke glGenBuffers, 1, textVBO
+        invoke glBindBuffer, GL_ARRAY_BUFFER, [textVBO]
+        invoke glBufferData, GL_ARRAY_BUFFER, 72 * 4 , cubeTextCoord, GL_STATIC_DRAW
+
+        invoke glEnableVertexAttribArray, 2
+    
+        invoke glVertexAttribPointer, 2, 2, GL_FLOAT, GL_FALSE, 0, 0
         
         invoke glBindVertexArray, 0
     ret

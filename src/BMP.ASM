@@ -4,19 +4,21 @@ proc BMP.LoadFromFile uses edi esi ebx,\
         buffer dd 0 
         BMPBuffer dd 0
         BMPBufferSize dd 0
-        n dd 0
-        number dd 0
+        h dd ?
+        w dd ?
     endl
     
     stdcall File.LoadContent, [fileName]
-    mov [buffer], eax
+    mov ebx, eax
 
-    mov ebx, [buffer]
+    ;mov ebx, [buffer]
 
-    mov eax, [ebx + BMPHeader.bfOffBits]
+   
 
     mov eax, [ebx + BMP.biHeight]
     mov ecx, [ebx + BMP.biWidth]
+    mov [h], eax
+    mov [w], ecx
     xor edx, edx
     mul ecx
 
@@ -29,10 +31,14 @@ proc BMP.LoadFromFile uses edi esi ebx,\
 
     mov [BMPBuffer], eax
 
-    add ebx, BMPHeader.bfOffBits
+    mov eax, [ebx + BMP.bfOffBits]
+    add ebx, eax
 
     memcpy [BMPBuffer], ebx, [BMPBufferSize]
     
+    stdcall Log, BMP_LOADED_SUCCESSFULLY, BMP_LOADED_SUCCESSFULLY.size
     mov eax, [BMPBuffer]
+    mov ecx, [h]
+    mov edx, [w]
     ret
 endp

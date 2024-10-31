@@ -27,9 +27,6 @@ extensionAddresses:
         glUniformMatrix4fv      dd      ?
         glBindAttribLocation    dd      ?
         glUniform3fv            dd      ?
-      ;  glBindTexture           dd      ?
-        glTexParametri          dd      ?
-        ;glTexImage2D            dd      ?
         glGenerateMipmap        dd      ?
 
 extensionNames:
@@ -61,9 +58,6 @@ extensionNames:
         db      "glUniformMatrix4fv", 0
         db      "glBindAttribLocation",0
         db      "glUniform3fv",0
-      ;  db      "glBindTexture", 0
-        db      "glTexParametri",0
-       ; db      "glTexImage2D", 0
         db      "glGenerateMipmap", 0
         db      0
 
@@ -74,3 +68,5 @@ define GL_LINK_STATUS                    0x8B82
 define GL_ARRAY_BUFFER                   0x8892
 define GL_STATIC_DRAW                    0x88E4
 define GL_ELEMENT_ARRAY_BUFFER           0x8893
+define GL_CLAMP_TO_EDGE                  0x812F 
+define GL_MIRRORED_REPEAT                0x8370 
