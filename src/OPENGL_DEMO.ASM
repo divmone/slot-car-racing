@@ -2,9 +2,9 @@
 
         className       db              "OpenGLDemo", 0
         clientRect      RECT            0, 0, 0, 0
-        fileName        db              "..\models\skibidi.obj",0
+        fileName        db              "..\models\cube.obj",0
         akFileName      db              "..\models\skull.obj", 0
-        textPath        db              "../textures/penger2.bmp", 0
+        textPath        db              "../textures/penger.bmp", 0
         hHeap           dd              ?
         hdcBack         dd              ?
         hConsole        dd              ?
@@ -86,11 +86,11 @@
         oTurn           Vector3         0.0,  0.0,  0.0
         oScale          Vector3         0.5,  0.5,  0.5
 
-        lightColorV      Vector3         1.0, 0.0, 0.0
+        lightColorV     Vector3         1.0, 0.0, 0.0
         objectColor     Vector3         1.0, 0.0, 0.0
 
-        cameraPosition  Vector3         10.0, 10.0, 10.0
-        targetPosition  Vector3         0.0, 0.0, 0.0
+        cameraPosition  Vector3         2.0, 5.0, 2.0
+        targetPosition  Vector3         1.0, 0.0, 1.0
         upVector        Vector3         0.0, 1.0, 0.0
 
         xAxis           Vector3         0.0, 0.0, 0.0
@@ -165,11 +165,8 @@
         
         successMessage db       'shaders loaded successfully', 0
 
-        view            Matrix4x4          
-        model           Matrix4x4          1.0,0.0,0.0,0.0,\
-                                           0.0,1.0,0.0,0.0,\
-                                           0.0,0.0,1.0,0.0,\
-                                           0.0,0.0,0.0,1.0 
+        view            Matrix4x4         ?  
+        model           Matrix4x4         ?
 
 
         scale           Matrix4x4          1.0,0.0,0.0,0.0,\
@@ -177,7 +174,7 @@
                                            0.0,0.0,1.0,0.0,\
                                            0.0,0.0,0.0,1.0
 
-        turn            Matrix4x4          
+        turn            Matrix4x4          ?
 
         position        Matrix4x4          1.0,0.0,0.0,0.0,\
                                            0.0,1.0,0.0,0.0,\

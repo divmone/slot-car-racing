@@ -157,13 +157,12 @@ proc IntToStr uses edi esi, \
     mov byte [esi + ecx], al 
     inc ecx
     cmp ecx, [numberLength]
-    jb .loop_pop
+    jne .loop_pop
 
     mov byte [esi + ecx], 0 
     mov eax, [resString]
     ret
 endp
-
 
 proc GetNumberLength uses edx,\
                         value
@@ -198,6 +197,22 @@ proc GetNumberLength uses edx,\
     ret
 endp  
 
+proc GetStringLength uses esi,\
+                string
+
+    xor ecx, ecx
+    mov esi, [string]
+
+.loop:
+    cmp byte[esi], 0
+    je @f
+    inc esi
+    inc ecx
+    jmp .loop
+@@: 
+    mov eax, ecx
+    ret
+endp
 proc Time.Get
 
     invoke GetSystemTime, systemTime 
