@@ -36,28 +36,9 @@ proc Init uses esi
         fstp    [aspect]
 
         stdcall Glext.LoadFunctions
-   
-        stdcall File.LoadContent, fileName;, size
-        mov [buffer], eax
-        stdcall File.GetSize, fileName
-        mov [bufferLength], eax
-        stdcall OBJ.CountObj,  [buffer], [bufferLength], vCount, iCount, tCount
+        
+        stdcall Object.Create, car, fileName
 
-        stdcall OBJ.ParseVertices, [buffer],  [bufferLength], [vCount];, [objVertices], [objIndices]
-        mov [addressV], eax
-
-        stdcall OBJ.ParseIndices, [buffer],  [bufferLength], [iCount] ;, [objVertices], [objIndices]
-        mov [addressI], eax
-
-        stdcall OBJ.ParseTextCoord, [buffer],  [bufferLength], [iCount] ;, [objVertices], [objIndices]
-        mov [addressT], eax
-
-
-        stdcall Mesh.Generate, carMesh, car, false, [addressV], [addressI], [iCount]
-      
-         invoke HeapFree, [hHeap], 0, [addressT]
-        invoke HeapFree, [hHeap], 0, [addressI]
-        invoke HeapFree, [hHeap], 0, [addressV]
         invoke  glShadeModel, GL_SMOOTH
         invoke  glHint, GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST
         invoke  glEnable, GL_DEPTH_TEST

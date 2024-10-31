@@ -58,9 +58,6 @@
         akMesh          PackedMesh       0, 0, 0, 0
         ak              Mesh            0, 0, 0, 0
 
-        carMesh          PackedMesh      0, zhColors, 0, 0
-        car              Mesh            0,0, 0, 0
-
         plane           Mesh            planeVertices, 0, 0, PLANE_VERTICES_COUNT
 
 
@@ -106,6 +103,7 @@
         include         "Texture.asm"
         include         "BMP.asm"
         include         "OBJ.asm"
+        include         "Object.asm"
 
 proc WinMain
 

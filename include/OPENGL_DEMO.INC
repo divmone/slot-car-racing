@@ -23,6 +23,7 @@ entry   WinMain
         include         "BMP.inc"
         include         "OBJ.inc"
         include         "Shader.inc"
+        include         "Object.inc"
 
 macro switch value
 {

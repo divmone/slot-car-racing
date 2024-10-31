@@ -19,8 +19,6 @@ proc Mesh.Generate uses ebx esi edi,\
         mov     eax, [addressV]
 
         mov     [vertices], eax
-        mov     eax, [esi + PackedMesh.colors]
-        mov     [colors], eax
 
         mov     eax, [addressI]
 
@@ -78,31 +76,31 @@ proc Mesh.Generate uses ebx esi edi,\
         mov     [edi + Vertex.z], edx   ; resultVertices[resultIndex].z = z
 
 
-        ;cmp     [copyColors], false
-        ;je      .DoNotCopyColors;
-        xor     edx, edx
-        mov     esi, [indices]
-        movzx   eax, byte[esi + ebx]    ; index
-        mov     edi, sizeof.Color
-        mul     edi                     ; index * sizeof.Color
+        cmp     [copyColors], false
+        je      .DoNotCopyColors;
+        ;xor     edx, edx
+        ;mov     esi, [indices]
+        ;movzx   eax, byte[esi + ebx]    ; index
+        ;mov     edi, sizeof.Color
+        ;mul     edi                     ; index * sizeof.Color
 
-        mov     esi, [colors]
-        add     esi, eax                ; colors + index * sizeof.Color = colors[index]
+        ;mov     esi, [colors]
+        ;add     esi, eax                ; colors + index * sizeof.Color = colors[index]
 
-        xor     edx, edx
-        mov     eax, [resultIndex]      ; resultIndex
-        mov     edi, sizeof.Color
-        mul     edi                     ; resultIndex * sizeof.Color
+        ;xor     edx, edx
+        ;mov     eax, [resultIndex]      ; resultIndex
+        ;mov     edi, sizeof.Color
+        ;mul     edi                     ; resultIndex * sizeof.Color
 
-        mov     edi, [resultColors]
-        add     edi, eax                ; resultColors + resultIndex * sizeof.Color = resultColors[resultIndex]
+        ;mov     edi, [resultColors]
+        ;add     edi, eax                ; resultColors + resultIndex * sizeof.Color = resultColors[resultIndex]
 
-        mov     eax, [esi + Color.r]    ; r = colors[index].r
-        mov     ecx, [esi + Color.g]    ; g = colors[index].g
-        mov     edx, [esi + Color.b]    ; b = colors[index].b
-        mov     [edi + Color.r], eax    ; resultColors[resultIndex].r = r
-        mov     [edi + Color.g], ecx    ; resultColors[resultIndex].g = g
-        mov     [edi + Color.b], edx    ; resultColors[resultIndex].b = b
+        ;mov     eax, [esi + Color.r]    ; r = colors[index].r
+        ;mov     ecx, [esi + Color.g]    ; g = colors[index].g
+        ;mov     edx, [esi + Color.b]    ; b = colors[index].b
+        ;mov     [edi + Color.r], eax    ; resultColors[resultIndex].r = r
+        ;mov     [edi + Color.g], ecx    ; resultColors[resultIndex].g = g
+        ;mov     [edi + Color.b], edx    ; resultColors[resultIndex].b = b
 
 .DoNotCopyColors:
 
