@@ -2,9 +2,9 @@
 
         className       db              "OpenGLDemo", 0
         clientRect      RECT            0, 0, 0, 0
-        fileName        db              "..\models\cube.obj",0
+        fileName        db              "..\models\skull.obj",0
         akFileName      db              "..\models\skull.obj", 0
-        textPath        db              "../textures/penger.bmp", 0
+        textPath        db              "../textures/2.bmp", 0
         hHeap           dd              ?
         hdcBack         dd              ?
         hConsole        dd              ?
@@ -39,11 +39,7 @@
         bufferLength    dd              0
         two             dd              1.5
 
-        vCount          dd              0
-        iCount          dd              0
-
         matrixT         Matrix4x4       ?
-
   
         size            dd             1000
         fileSize        dd             0
@@ -54,8 +50,6 @@
 
         drawingMode      dd              1
 
-        addressV         dd              0
-        addressI         dd              0
 
    
       ;  cubeMesh        PackedMesh      cubeVertices, cubeColors, cubeIndices, CUBE_TRIANGLES_COUNT
@@ -86,106 +80,16 @@
         oTurn           Vector3         0.0,  0.0,  0.0
         oScale          Vector3         0.5,  0.5,  0.5
 
-        lightColorV     Vector3         1.0, 0.0, 0.0
+        
         objectColor     Vector3         1.0, 0.0, 0.0
 
         cameraPosition  Vector3         2.0, 5.0, 2.0
         targetPosition  Vector3         1.0, 0.0, 1.0
         upVector        Vector3         0.0, 1.0, 0.0
 
-        xAxis           Vector3         0.0, 0.0, 0.0
-        yAxis           Vector3         0.0, 0.0, 0.0
-        zAxis           Vector3         0.0, 0.0, 0.0
+        lightPosition  Vector4         5.0, 5.1, 5.0, 1.0
+        lightColor     Vector3         1.0, 0.0, 0.0
 
-        light0Position  Vector4         5.0, 5.1, 5.0, 1.0
-        light0Diffuse   ColorRGBA       1.0, 0.996, 0.839, 1.0
-
-        light1Position  Vector4         10.0, 10.5, 10.0, 1.0
-        light1Diffuse   ColorRGBA       1.0, 0.996, 0.839, 1.0
-
-        directionVetcor  Vector4i       0, 0, 0, 0
-
-        timeLocation    GLint           0
-        sizeLocation    GLint           0
-        oneSecond       GLfloat         1000.0  
-        startTime       dd              ?      
-
-        fragmentShader  GLuint          0
-        fshaderFile      db              "../shaders/fragment.glsl", 0
-
-        vertexShader    GLuint          0
-        vshaderFile      db              "../shaders/vertex.glsl", 0
-       
-       vertexShaderText:
-                        file            "./shaders/vertex.glsl"
-                        db              0
-        ;vertexShader    dd              vertexShaderText
-
-        fragmentShaderText:
-                        file            "./shaders/fragment.glsl"
-                        db              0
-        ;fragmentShader  dd              fragmentShaderText
-
-        program         dd           0
-        
-        timeName        db              "pos", 0
-        sizeName        db              "color", 0
-
-        viewPosName     db              "viewPos", 0
-        viewPosLocation GLint           ?
-
-        lightPosName     db              "lightPos", 0
-        lightPosLocation GLint           ?
-
-        objectColorName     db              "objectColor", 0
-        objectColorLocation GLint           ?
-
-        lightColorName db                   "lightColor", 0
-        lightColorLocation GLint             ?
-
-        modelName db                   "model", 0
-        modelLocation GLint             ?
-
-        MVPName db                   "MVP", 0
-        MVPLocation GLint             ?
-
-
-
-        invoke   glGetUniformLocation , [program], lightColorName
-        mov [lightColorLocation], eax
-
-
-        prevMouseX      dd      ?
-        prevMouseY      dd      ?
-        mouseX          dd      ?
-        mouseY          dd      ?
-        mouseCaptured   dd      0
-
-        okMessage  String 'OK', 10
-        
-        successMessage db       'shaders loaded successfully', 0
-
-        view            Matrix4x4         ?  
-        model           Matrix4x4         ?
-
-
-        scale           Matrix4x4          1.0,0.0,0.0,0.0,\
-                                           0.0,1.0,0.0,0.0,\
-                                           0.0,0.0,1.0,0.0,\
-                                           0.0,0.0,0.0,1.0
-
-        turn            Matrix4x4          ?
-
-        position        Matrix4x4          1.0,0.0,0.0,0.0,\
-                                           0.0,1.0,0.0,0.0,\
-                                           0.0,0.0,1.0,0.0,\
-                                           0.0,0.0,0.0,1.0
-
-        MVP             Matrix4x4
-         ;gf_pr_view_matrix * model
-        PV              Matrix4x4  ;gf_projection_matrix * gf_view_matrix
-
-        projection      Matrix4x4          ?
 
         include         "Init.asm"
         include         "Mesh.asm"
@@ -201,6 +105,7 @@
         include         "VAO.asm"
         include         "Texture.asm"
         include         "BMP.asm"
+        include         "OBJ.asm"
 
 proc WinMain
 
@@ -425,221 +330,4 @@ proc WindowProc uses ebx,\
 .Return:
         ret
 endp
-
-proc ParseVerticesOBJ uses edi esi,\
-    buffer, length, verticesCount;, verticesBuff, indicesBuff
-
-        locals
-            resultVertices dd 0
-
-        endl
-
-
-        xor edx, edx
-        mov ecx, 12
-        mov eax, [verticesCount]
-        mul ecx
-        malloc  eax   ; eax
-        mov     [resultVertices], eax
-
-        mov esi, [buffer]
-        mov ecx, [length]
-        mov edi, [resultVertices]
-.cycle:
-        cmp byte[esi], 'v'
-        jne .skipLine
-
-        cmp byte [esi + 1], ' '
-        jne .skipLine
-
-        add esi, 2
-        sub ecx, 2
-        stdcall StrToFloat, esi
-        mov [edi], eax
-        add esi, 1
-        dec ecx
-        stdcall StrToFloat, esi
-        mov [edi + 4], eax
-
-        add esi, 1
-        dec ecx
-        stdcall StrToFloat, esi
-        mov [edi + 8], eax
-
-        add edi, 12
-        add esi, 1
-        dec ecx
-        loop .cycle
-
-.skipLine:
-
-        cmp byte [esi], 10
-        je @F
-        cmp byte [esi], 0
-        je @F
-         dec ecx
-         jz .end
-        inc esi
-        jmp .skipLine
-
-@@:
-        inc esi
-        loop .cycle
-
-.end:
-
-       mov eax, [resultVertices]
-    ret
-endp
-
-
-proc ParseIndicesOBJ uses ebx edi esi ,\
-    buffer, length, indicesCount
-
-        locals
-            resultIndices dd 0
-            iCount        dd 0
-        endl
-
-        xor edx, edx
-        mov ecx, 20
-        mov eax, [indicesCount]
-        mul ecx
-
-        malloc eax  ; eax
-        mov     [resultIndices], eax
-
-        mov eax, [indicesCount]
-        imul eax, eax, 3
-        mov [iCount], eax
-
-        mov esi, [buffer]
-        mov ecx, [length]
-        mov edi, [resultIndices]
-.cycle:
-        cmp byte[esi], 'f'
-        jne .skipLine
-
-        cmp byte [esi + 1], ' '
-        jne .skipLine
-
-
-        add esi, 2
-        dec ecx
-        dec ecx
-        stdcall StrToInt, esi
-        mov [edi], eax
-
-        dec[iCount]
-
-        stdcall SkipToSpace, esi
-
-        inc esi
-        dec ecx
-
-
-        stdcall StrToInt, esi
-
-        mov [edi +  4], eax
-
-        dec[iCount]
-
-
-        stdcall SkipToSpace, esi
-
-        inc esi
-        dec ecx
-
-        stdcall StrToInt, esi
-        mov [edi + 8], eax
-        dec[iCount]
-        add edi, 12
-
-       jmp .ccc
-
-.skipLine:
-
-        cmp byte [esi], 10
-        je @F
-        cmp byte [esi], 0
-        je @F
-        dec ecx
-        jz .end
-        inc esi
-        jmp .skipLine
-
-@@:
-        inc esi
-
-
-
-.ccc:
-        cmp [iCount], 0
-        je .end
-        loop .cycle
-
-.end:
-       mov eax, [resultIndices]
-
-    ret
-endp
-
-proc SkipToSpace  pointer
-
-        mov esi, [pointer]
-.cycle:
-        cmp byte[esi], ' '
-        je @F
-        inc esi
-        dec ecx
-        jmp .cycle
-
-@@:
-        ret
-endp
-
-proc CountVerticesOBJ uses esi,\
-    buffer, length;, verticesBuff, indicesBuff
-
-        locals
-            verticesCount dd 0
-            indicesCount dd 0
-        endl
-
-        mov esi, [buffer]
-        mov ecx, [length]
-
-.countCycle:
-        cmp byte[esi], 'v'
-        jne @F
-        cmp byte[esi + 1], ' '
-        jne @F
-        inc [verticesCount]
-        jmp .newLine
-
-@@:
-        cmp byte[esi], 'f'
-        jne .newLine
-        inc [indicesCount]
-        jmp .newLine
-
-.newLine:
-
-        cmp byte [esi], 10
-        je @F
-        cmp byte[esi], 0
-        je .endl
-        inc esi
-        dec ecx
-        jmp .newLine
-@@:
-        inc esi
-        loop .countCycle
-.endl:
-       mov eax, [verticesCount]
-       mov ecx, [indicesCount]
-    ret
-endp
-
-
 ;3 479

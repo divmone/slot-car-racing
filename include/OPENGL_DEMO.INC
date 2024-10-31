@@ -21,6 +21,8 @@ entry   WinMain
         include         "VAO.inc"
         include         "Texture.inc"
         include         "BMP.inc"
+        include         "OBJ.inc"
+        include         "Shader.inc"
 
 macro switch value
 {
@@ -66,6 +68,8 @@ common
       \}
   end if
 }  
+
+
 
 
 

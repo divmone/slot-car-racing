@@ -13,7 +13,7 @@ proc Init uses esi
         mov     [hMainWindow], eax
 
         invoke  GetClientRect, eax, clientRect
-        invoke  ShowCursor, 999
+        invoke  ShowCursor, 0
         invoke  GetTickCount
         mov     [time], eax
 
@@ -41,29 +41,31 @@ proc Init uses esi
         mov [buffer], eax
         stdcall File.GetSize, fileName
         mov [bufferLength], eax
-        ; stdcall  PrintToConsole, [buffer] , eax
-        stdcall CountVerticesOBJ,  [buffer], [bufferLength]
-        mov [vCount], eax
-       ; mov [objTrianglesCount], eax
-        mov [iCount], ecx
+        stdcall OBJ.CountObj,  [buffer], [bufferLength], vCount, iCount, tCount
 
-        stdcall ParseVerticesOBJ, [buffer],  [bufferLength], [vCount];, [objVertices], [objIndices]
+        stdcall OBJ.ParseVertices, [buffer],  [bufferLength], [vCount];, [objVertices], [objIndices]
         mov [addressV], eax
 
-        stdcall ParseIndicesOBJ, [buffer],  [bufferLength], [iCount] ;, [objVertices], [objIndices]
+        stdcall OBJ.ParseIndices, [buffer],  [bufferLength], [iCount] ;, [objVertices], [objIndices]
         mov [addressI], eax
+
+        stdcall OBJ.ParseTextCoord, [buffer],  [bufferLength], [iCount] ;, [objVertices], [objIndices]
+        mov [addressT], eax
 
 
         stdcall Mesh.Generate, carMesh, car, false, [addressV], [addressI], [iCount]
       
+         invoke HeapFree, [hHeap], 0, [addressT]
+        invoke HeapFree, [hHeap], 0, [addressI]
+        invoke HeapFree, [hHeap], 0, [addressV]
         invoke  glShadeModel, GL_SMOOTH
         invoke  glHint, GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST
         invoke  glEnable, GL_DEPTH_TEST
-        ;invoke  glDepthFunc, GL_ALWAYS
+        invoke  glDepthFunc, GL_ALWAYS
      
         invoke  HeapAlloc, [hHeap], ebx, sizeof.Vertex * 6
         mov     [plane.normals], eax
-        
+
         stdcall Mesh.CalculateNormals, plane
 
         stdcall Mesh.CalculateNormals, car
