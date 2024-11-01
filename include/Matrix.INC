@@ -17,4 +17,26 @@ struct Matrix4x4
         m44     dd      ?
 ends
 
+view            Matrix4x4           
+        model           Matrix4x4         
+
+
+        scale           Matrix4x4          1.0,0.0,0.0,0.0,\
+                                           0.0,1.0,0.0,0.0,\
+                                           0.0,0.0,1.0,0.0,\
+                                           0.0,0.0,0.0,1.0
+
+        turn            Matrix4x4          
+
+        position        Matrix4x4          1.0,0.0,0.0,0.0,\
+                                           0.0,1.0,0.0,0.0,\
+                                           0.0,0.0,1.0,0.0,\
+                                           0.0,0.0,0.0,1.0
+        MVP             Matrix4x4
+
+        PV              Matrix4x4
+
+        projection      Matrix4x4          
+
+
 

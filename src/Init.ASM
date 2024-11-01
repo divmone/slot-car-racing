@@ -13,7 +13,7 @@ proc Init uses esi
         mov     [hMainWindow], eax
 
         invoke  GetClientRect, eax, clientRect
-        invoke  ShowCursor, 999
+        invoke  ShowCursor, 0
         invoke  GetTickCount
         mov     [time], eax
 
@@ -36,26 +36,11 @@ proc Init uses esi
         fstp    [aspect]
 
         stdcall Glext.LoadFunctions
-   
-        stdcall File.LoadContent, fileName;, size
-        mov [buffer], eax
-        stdcall File.GetSize, fileName
-        mov [bufferLength], eax
-        ; stdcall  PrintToConsole, [buffer] , eax
-        stdcall CountVerticesOBJ,  [buffer], [bufferLength]
-        mov [vCount], eax
-       ; mov [objTrianglesCount], eax
-        mov [iCount], ecx
+        
+        stdcall Glext.InitShaders  
+        
+        stdcall Object.Create, car, fileName
 
-        stdcall ParseVerticesOBJ, [buffer],  [bufferLength], [vCount];, [objVertices], [objIndices]
-        mov [addressV], eax
-
-        stdcall ParseIndicesOBJ, [buffer],  [bufferLength], [iCount] ;, [objVertices], [objIndices]
-        mov [addressI], eax
-
-
-        stdcall Mesh.Generate, carMesh, car, false, [addressV], [addressI], [iCount]
-      
         invoke  glShadeModel, GL_SMOOTH
         invoke  glHint, GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST
         invoke  glEnable, GL_DEPTH_TEST
@@ -63,14 +48,8 @@ proc Init uses esi
      
         invoke  HeapAlloc, [hHeap], ebx, sizeof.Vertex * 6
         mov     [plane.normals], eax
-        
+
         stdcall Mesh.CalculateNormals, plane
-
-        stdcall Mesh.CalculateNormals, car
-
-        stdcall Glext.InitShaders  
-        
-        stdcall VAO.Init, containerVAO, car, vertexVBO, normalsVBO
 
         stdcall VAO.Init, containerVAOPlane, plane, vertexVBOp, normalsVBOp
 

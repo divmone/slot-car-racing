@@ -30,7 +30,7 @@ proc Draw
 
        
         invoke glGetFloatv, GL_MODELVIEW_MATRIX, view
-        stdcall Vector3.RotateY, light0Position, [lightAngle], light0Position
+        stdcall Vector3.RotateY, lightPosition, [lightAngle], lightPosition
         stdcall Vector3.Translate, oTurn, [angleX], [angleZ], [angleY]
 
         ;stdcall Vector3.Normalize, oTurn
@@ -47,31 +47,23 @@ proc Draw
         stdcall Matrix.Multiply4x4, view, projection, PV
         stdcall Matrix.Multiply4x4, model, PV, MVP
 
-        ;mov [oTurn + Vector3.x], 0
-        ;mov [oTurn + Vector3.y], 0
-        ;mov [oTurn + Vector3.z], 0
-        ;mov [oPos + Vector3.x], 0
-        ;mov [oPos + Vector3.y], 0
-       
-        
         invoke  glUseProgram, [program]
         
         invoke glUniformMatrix4fv, [MVPLocation], 1, GL_FALSE, MVP
-        ;invoke glUniformMatrix4fv, [modelLocation], 1, GL_FALSE, model
-        
+      
         invoke glUniform3fv, [viewPosLocation], 1, cameraPosition
        
-        invoke glUniform3fv, [lightPosLocation], 1, light0Position
+        invoke glUniform3fv, [lightPosLocation], 1, lightPosition
         invoke glUniform3fv, [objectColorLocation], 1, objectColor
-        invoke glUniform3fv, [lightColorLocation], 1, lightColorV
+        invoke glUniform3fv, [lightColorLocation], 1, lightColor
  
 @@:     
 
-        ;stdcall DrawMesh, car, [drawingMode], [containerVAO]
+        stdcall DrawMesh, car, [drawingMode], [containerVAO]
 
        ; invoke glTranslatef, 10.0, 40.0, 10.0
 
-        stdcall DrawMesh, plane, [drawingMode], [containerVAOPlane]
+        ;stdcall DrawMesh, plane, [drawingMode], [containerVAOPlane]
         invoke  glUseProgram, 0
         
 
@@ -104,7 +96,8 @@ proc DrawMesh uses esi,\
         invoke glBindTexture, GL_TEXTURE_2D, [texture]
         invoke glBindVertexArray, [VAO]
                 invoke  glDrawArrays, [flag], ebx, [esi + Mesh.verticesCount] 
-        invoke glBindVertexArray, [VAO]
+        invoke glBindVertexArray, 0
+        invoke glBindTexture, GL_TEXTURE_2D, 0
 
         ret
 endp

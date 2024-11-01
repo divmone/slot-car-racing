@@ -80,6 +80,7 @@ proc Glext.InitShaders
 
         invoke glGetUniformLocation, [program], modelName
         mov [modelLocation], eax
+
          ;invoke  glBindAttribLocation, [program], 0, timeName
       ;  mov     [timeLocation], eax
          ;invoke  glBindAttribLocation, [program], 2, sizeName

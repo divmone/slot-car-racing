@@ -3,6 +3,7 @@ proc VAO.Init uses edi esi ebx,\
         
         locals
            size    dd  ?
+           
         endl
 
         mov ebx, [buffer]
@@ -25,7 +26,19 @@ proc VAO.Init uses edi esi ebx,\
 
         invoke glGenBuffers, 1, textVBO
         invoke glBindBuffer, GL_ARRAY_BUFFER, [textVBO]
-        invoke glBufferData, GL_ARRAY_BUFFER, 72 * 4 , cubeTextCoord, GL_STATIC_DRAW
+
+        mov esi , [mesh]
+        xor edx, edx
+        mov ecx, sizeof.TextCoord
+        mov eax, [esi + Mesh.verticesCount]
+        mul ecx
+        mov [size], eax
+
+        mov esi, [mesh]
+        add esi, Mesh.texCoords
+
+        
+        invoke glBufferData, GL_ARRAY_BUFFER, [size] ,[esi], GL_STATIC_DRAW
 
         invoke glEnableVertexAttribArray, 2
     

@@ -1,0 +1,10 @@
+create Object
+
+создаем обект : меш vao vbo 
+
+retunrn адрес обекта
+
+draw
+
+    получаем vao
+    вызываем drawarrays

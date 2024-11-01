@@ -16,4 +16,5 @@ struct Mesh
         colors          dd      ?
         normals         dd      ?
         verticesCount   dd      ?
+        texCoords       dd      ?   
 ends
