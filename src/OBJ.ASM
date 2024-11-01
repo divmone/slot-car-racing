@@ -72,15 +72,17 @@ proc OBJ.ParseIndices uses ebx edi esi ,\
         endl
 
         xor edx, edx
-        mov ecx, 20
+        mov ecx, 3 * 4
         mov eax, [indicesCount]
         mul ecx
 
         malloc eax  ; eax
         mov     [resultIndices], eax
 
+        xor edx, edx
+        mov ecx, 3
         mov eax, [indicesCount]
-        imul eax, eax, 3
+        mul ecx
         mov [iCount], eax
 
         mov esi, [buffer]
@@ -228,6 +230,8 @@ proc OBJ.ParseTextCoord uses edi esi,\
     buffer, length, textCoordCount
           locals
             resultVertices dd 0
+            temp       dd 0
+            ten dd 10.0
         endl
 
         xor edx, edx
@@ -250,10 +254,20 @@ proc OBJ.ParseTextCoord uses edi esi,\
         add esi, 2
         sub ecx, 2
         stdcall StrToFloat, esi
+        mov [temp], eax
+        fld [temp]
+        fmul [ten]
+        fstp [temp]
+        mov eax, [temp]
         mov [edi], eax
         add esi, 1
         dec ecx
         stdcall StrToFloat, esi
+        mov [temp], eax
+        fld [temp]
+        fmul [ten]
+        fstp [temp]
+        mov eax, [temp]
         mov [edi + 4], eax
         add esi, 1
         dec ecx
@@ -278,9 +292,104 @@ proc OBJ.ParseTextCoord uses edi esi,\
 
 .end:
 
-       mov eax, [resultVertices]
-    ret
+        mov eax, [resultVertices]
+        ret
+endp
 
-    ret
+proc SkipToSlash pointer
+        mov esi, [pointer]
+.cycle:
+        cmp byte[esi], '/'
+        je @F
+        inc esi
+        dec ecx
+        jmp .cycle
+
+@@:
+        ret
+endp
+
+proc OBJ.ParseTextCoordI uses ebx edi esi ,\
+    buffer, length, indicesCount
+
+        locals
+            resultIndices dd 0
+            iCount        dd 0
+        endl
+
+        xor edx, edx
+        mov ecx, 3 * 4
+        mov eax, [indicesCount]
+        mul ecx
+
+        malloc eax 
+        mov     [resultIndices], eax
+
+        xor edx, edx
+        mov ecx, 3
+        mov eax, [indicesCount]
+        mul ecx
+        mov [iCount], eax
+
+        mov esi, [buffer]
+        mov ecx, [length]
+        mov edi, [resultIndices]
+.cycle:
+        cmp byte[esi], 'f'
+        jne .skipLine
+
+        cmp byte [esi + 1], ' '
+        jne .skipLine
+
+        
+        add esi, 2
+        sub ecx, 2
+        
+        stdcall SkipToSlash, esi
+        inc esi
+        dec ecx
+
+        stdcall StrToInt, esi
+        mov [edi], eax
+        dec[iCount]
+
+        stdcall SkipToSpace, esi
+        stdcall SkipToSlash, esi
+        inc esi
+        dec ecx
+
+        stdcall StrToInt, esi
+        mov [edi +  4], eax
+        dec[iCount]
+
+        stdcall SkipToSpace, esi
+        stdcall SkipToSlash, esi
+        inc esi
+        dec ecx
+
+        stdcall StrToInt, esi
+        mov [edi + 8], eax
+        dec[iCount]
+
+        add edi, 12
+        jmp .l1
+.skipLine:
+        cmp byte [esi], 10
+        je @F
+        cmp byte [esi], 0
+        je @F
+        dec ecx
+        jz .end
+        inc esi
+        jmp .skipLine
+@@:
+        inc esi
+.l1:
+        cmp [iCount], 0
+        je .end
+        loop .cycle
+.end:
+        mov eax, [resultIndices]
+        ret
 endp
 

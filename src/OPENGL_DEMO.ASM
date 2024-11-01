@@ -2,9 +2,9 @@
 
         className       db              "OpenGLDemo", 0
         clientRect      RECT            0, 0, 0, 0
-        fileName        db              "..\models\skull.obj",0
+        fileName        db              "..\models\car.obj",0
         akFileName      db              "..\models\skull.obj", 0
-        textPath        db              "../textures/2.bmp", 0
+        textPath        db              "../textures/penger2.bmp", 0
         hHeap           dd              ?
         hdcBack         dd              ?
         hConsole        dd              ?

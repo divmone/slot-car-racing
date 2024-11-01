@@ -42,7 +42,7 @@ proc Init uses esi
         invoke  glShadeModel, GL_SMOOTH
         invoke  glHint, GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST
         invoke  glEnable, GL_DEPTH_TEST
-        invoke  glDepthFunc, GL_ALWAYS
+        ;invoke  glDepthFunc, GL_ALWAYS
      
         invoke  HeapAlloc, [hHeap], ebx, sizeof.Vertex * 6
         mov     [plane.normals], eax

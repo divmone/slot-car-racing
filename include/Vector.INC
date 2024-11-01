@@ -11,6 +11,11 @@ struct Vector4
         w       GLfloat         ?
 ends
 
+struct TextCoord
+        x       GLfloat         ?
+        y       GLfloat         ?
+ends
+
 struct Vector4i
       x         dd      ?
       y         dd      ?

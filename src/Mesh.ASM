@@ -27,7 +27,6 @@ proc Mesh.Generate uses ebx esi edi,\
         mov     [resultIndex], 0
 
         mov     eax, [indicesCount]
-        ; mov     [edi + Mesh.trianglesCount], eax
         xor     edx, edx
         mov     ecx, 3
         mul     ecx
@@ -75,35 +74,6 @@ proc Mesh.Generate uses ebx esi edi,\
         mov     [edi + Vertex.y], ecx   ; resultVertices[resultIndex].y = y
         mov     [edi + Vertex.z], edx   ; resultVertices[resultIndex].z = z
 
-
-        cmp     [copyColors], false
-        je      .DoNotCopyColors;
-        ;xor     edx, edx
-        ;mov     esi, [indices]
-        ;movzx   eax, byte[esi + ebx]    ; index
-        ;mov     edi, sizeof.Color
-        ;mul     edi                     ; index * sizeof.Color
-
-        ;mov     esi, [colors]
-        ;add     esi, eax                ; colors + index * sizeof.Color = colors[index]
-
-        ;xor     edx, edx
-        ;mov     eax, [resultIndex]      ; resultIndex
-        ;mov     edi, sizeof.Color
-        ;mul     edi                     ; resultIndex * sizeof.Color
-
-        ;mov     edi, [resultColors]
-        ;add     edi, eax                ; resultColors + resultIndex * sizeof.Color = resultColors[resultIndex]
-
-        ;mov     eax, [esi + Color.r]    ; r = colors[index].r
-        ;mov     ecx, [esi + Color.g]    ; g = colors[index].g
-        ;mov     edx, [esi + Color.b]    ; b = colors[index].b
-        ;mov     [edi + Color.r], eax    ; resultColors[resultIndex].r = r
-        ;mov     [edi + Color.g], ecx    ; resultColors[resultIndex].g = g
-        ;mov     [edi + Color.b], edx    ; resultColors[resultIndex].b = b
-
-.DoNotCopyColors:
-
         inc     ebx
         inc     [resultIndex]
 
@@ -120,6 +90,74 @@ proc Mesh.Generate uses ebx esi edi,\
         mov     [edi + Mesh.normals], eax
         mov     eax, [verticesCountz]
         mov     [edi + Mesh.verticesCount], eax
+
+        ret
+endp
+
+proc Mesh.GenerateTextCoord uses esi edi ebx edx,\
+        tCount, iCount, textCoord, textICoord
+
+        locals
+                tCoord          dd      ?
+                tIndices        dd      ?
+                imCount         dd      ?
+                resultTextCoord dd      ?
+                resultIndex     dd      0
+        endl
+
+        mov     eax, [textCoord]
+        mov     [tCoord], eax
+
+        mov     eax, [textICoord]
+        mov     [tIndices], eax
+
+        mov     eax, [iCount]
+        xor     edx, edx
+        mov     ecx, 3
+        mul     ecx
+        mov     [imCount], eax   
+
+        xor     edx, edx
+        mov     ecx, sizeof.TextCoord
+        mul     ecx
+
+        invoke  HeapAlloc, [hHeap], 8, eax
+        mov     [resultTextCoord], eax
+
+        xor     ebx, ebx           
+        mov     ecx, [imCount]
+.CopyCycle:
+        push    ecx
+
+        xor     edx, edx
+        mov     esi, [tIndices]
+        movzx   eax, word[esi + ebx * 4] 
+        mov     edi, sizeof.TextCoord
+        mul     edi                     
+
+        mov     esi, [tCoord]
+        add     esi, eax                
+
+        xor     edx, edx
+        mov     eax, [resultIndex]      
+        mov     edi, sizeof.TextCoord
+        mul     edi                     
+
+        mov     edi, [resultTextCoord]
+        add     edi, eax              
+
+        mov     eax, [esi + TextCoord.x]
+        mov     ecx, [esi + TextCoord.y]
+
+        mov     [edi + TextCoord.x], eax
+        mov     [edi + TextCoord.y], ecx  
+        
+        inc     ebx
+        inc     [resultIndex]
+
+        pop     ecx
+        loop    .CopyCycle
+        mov     eax, [resultTextCoord]
 
         ret
 endp

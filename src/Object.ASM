@@ -1,10 +1,13 @@
-proc Object.Create uses esi edi,\
+proc Object.Create uses esi edi ,\
             objPtr, fileName
     
     locals
         addressV     dd 0
         addressI     dd 0
         addressT     dd 0
+        addressTI    dd 0
+        resultT      dd 0
+
         vCount       dd 0
         iCount       dd 0
         tCount       dd 0
@@ -23,6 +26,7 @@ proc Object.Create uses esi edi,\
     lea ecx, [iCount]
     lea edx, [tCount]
 
+
     stdcall OBJ.CountObj,  [buffer], [bufferLength], eax, ecx, edx
 
     stdcall OBJ.ParseVertices, [buffer],  [bufferLength], [vCount]
@@ -31,14 +35,24 @@ proc Object.Create uses esi edi,\
     stdcall OBJ.ParseIndices, [buffer],  [bufferLength], [iCount]
     mov [addressI], eax
 
-    stdcall OBJ.ParseTextCoord, [buffer],  [bufferLength], [iCount]
+    stdcall OBJ.ParseTextCoord, [buffer],  [bufferLength], [tCount]
     mov [addressT], eax
+
+    stdcall OBJ.ParseTextCoordI, [buffer], [bufferLength], [iCount]
+    mov [addressTI], eax
+    
+    stdcall Mesh.GenerateTextCoord, [tCount], [iCount], [addressT], [addressTI]
+    mov [textCoord], eax
+
+    invoke HeapFree, [hHeap], 0, [addressT]
+    invoke HeapFree, [hHeap], 0, [addressTI]
 
     stdcall Mesh.Generate, 0, [objPtr], false, [addressV], [addressI], [iCount]
       
-    invoke HeapFree, [hHeap], 0, [addressT]
+
     invoke HeapFree, [hHeap], 0, [addressI]
     invoke HeapFree, [hHeap], 0, [addressV]
+
 
     ret
 endp
