@@ -37,6 +37,8 @@ proc Init uses esi
 
         stdcall Glext.LoadFunctions
         
+        stdcall Glext.InitShaders  
+        
         stdcall Object.Create, car, fileName
 
         invoke  glShadeModel, GL_SMOOTH
@@ -48,12 +50,6 @@ proc Init uses esi
         mov     [plane.normals], eax
 
         stdcall Mesh.CalculateNormals, plane
-
-        stdcall Mesh.CalculateNormals, car
-
-        stdcall Glext.InitShaders  
-        
-        stdcall VAO.Init, containerVAO, car, vertexVBO, normalsVBO
 
         stdcall VAO.Init, containerVAOPlane, plane, vertexVBOp, normalsVBOp
 

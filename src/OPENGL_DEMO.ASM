@@ -2,9 +2,6 @@
 
         className       db              "OpenGLDemo", 0
         clientRect      RECT            0, 0, 0, 0
-        fileName        db              "..\models\car.obj",0
-        akFileName      db              "..\models\skull.obj", 0
-        textPath        db              "../textures/penger2.bmp", 0
         hHeap           dd              ?
         hdcBack         dd              ?
         hConsole        dd              ?
@@ -49,14 +46,6 @@
         scaleC          GLfloat         2.0
 
         drawingMode      dd              1
-
-
-   
-      ;  cubeMesh        PackedMesh      cubeVertices, cubeColors, cubeIndices, CUBE_TRIANGLES_COUNT
-        cube            Mesh            0, 0, 0, 0
-
-        akMesh          PackedMesh       0, 0, 0, 0
-        ak              Mesh            0, 0, 0, 0
 
         plane           Mesh            planeVertices, 0, 0, PLANE_VERTICES_COUNT
 

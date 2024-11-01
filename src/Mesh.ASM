@@ -1,5 +1,5 @@
 proc Mesh.Generate uses ebx esi edi,\
-     sourceMesh, resultMesh , copyColors, addressV, addressI, indicesCount
+     resultMesh , addressT, addressV, addressI, indicesCount
 
         locals
                 verticesCountz   dd      ?
@@ -12,7 +12,7 @@ proc Mesh.Generate uses ebx esi edi,\
                 indices         dd      ?
         endl
 
-        mov     esi, [sourceMesh]
+        
         mov     edi, [resultMesh]
 
 
@@ -90,6 +90,9 @@ proc Mesh.Generate uses ebx esi edi,\
         mov     [edi + Mesh.normals], eax
         mov     eax, [verticesCountz]
         mov     [edi + Mesh.verticesCount], eax
+        
+        mov eax, [addressT]
+        mov [edi + Mesh.texCoords], eax
 
         ret
 endp
