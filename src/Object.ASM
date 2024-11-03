@@ -1,5 +1,5 @@
 proc Object.Create uses esi edi ,\
-            objPtr, fileName
+            objPtr, fileName, texFileName
     
     locals
         addressV     dd 0
@@ -61,6 +61,11 @@ proc Object.Create uses esi edi ,\
     mov esi, [objPtr]
     add esi, Object.VAO
     stdcall VAO.Init, esi, [objPtr]
+
+    stdcall Texture.Create, [texFileName]
+    mov esi, [objPtr]
+    add esi, Object.texture
+    mov [esi], eax
     ;mov [objPtr + Object.VAO], eax
     ;;;;;;;;;доделать VAO !!!!!!
     

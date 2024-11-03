@@ -64,7 +64,8 @@
 
         oPos            Vector3         0.0,  0.0,  0.0
         oTurn           Vector3         0.0,  0.0,  0.0
-        oScale          Vector3         0.5,  0.5,  0.5
+
+        oScale          Vector3         2.0,  2.0,  2.0
 
         
         objectColor     Vector3         1.0, 0.0, 0.0

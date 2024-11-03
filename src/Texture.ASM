@@ -1,12 +1,14 @@
-proc Texture.Init
+proc Texture.Create ,textPath
     locals
-        temp dd 0   
+        temp dd 0 
+        texture GLuint 0  
     endl
 
-    invoke glGenTextures, 1, texture
+    lea eax, [texture]
+    invoke glGenTextures, 1, eax
     invoke glBindTexture, GL_TEXTURE_2D, [texture]
     
-    stdcall BMP.LoadFromFile, textPath
+    stdcall BMP.LoadFromFile, [textPath]
     mov [temp], eax
     invoke glTexImage2D, GL_TEXTURE_2D, 0, GL_RGB,  ecx, edx, 0, GL_BGR, GL_UNSIGNED_BYTE, eax   
     invoke glGenerateMipmap, GL_TEXTURE_2D
@@ -18,5 +20,6 @@ proc Texture.Init
     invoke HeapFree, [hHeap], 0, [temp]
     invoke glBindTexture, GL_TEXTURE_2D, 0
 
+    mov eax, [texture]
     ret
 endp
