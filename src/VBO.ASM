@@ -1,5 +1,5 @@
-proc VBO.Init uses esi edi ebx,\
-        buffer, offset, mesh 
+proc VBO.Create uses esi edi ebx,\
+        buffer, sizeOfType, offset, mesh 
     
     locals
         size    dd  ?
@@ -7,7 +7,7 @@ proc VBO.Init uses esi edi ebx,\
 
     mov esi , [mesh]
     xor edx, edx
-    mov ecx, sizeof.Vertex
+    mov ecx, [sizeOfType]
     mov eax, [esi + Mesh.verticesCount]
     mul ecx
     mov [size], eax

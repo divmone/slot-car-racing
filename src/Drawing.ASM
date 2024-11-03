@@ -59,13 +59,11 @@ proc Draw
  
 @@:     
 
-        stdcall DrawMesh, car, [drawingMode], [containerVAO]
+        stdcall DrawMesh, car, [drawingMode]
+        stdcall DrawMesh, plane, [drawingMode]
 
-       ; invoke glTranslatef, 10.0, 40.0, 10.0
 
-        ;stdcall DrawMesh, plane, [drawingMode], [containerVAOPlane]
         invoke  glUseProgram, 0
-        
 
         invoke  SwapBuffers, [hdc]
 
@@ -89,13 +87,13 @@ proc Tick
 endp
 
 proc DrawMesh uses esi,\
-     mesh, flag, VAO
+     mesh, flag
 
         mov     esi, [mesh]
 
         invoke glBindTexture, GL_TEXTURE_2D, [texture]
-        invoke glBindVertexArray, [VAO]
-                invoke  glDrawArrays, [flag], ebx, [esi + Mesh.verticesCount] 
+        invoke glBindVertexArray, [esi + Object.VAO]
+                invoke  glDrawArrays, [flag], 0, [esi + Mesh.verticesCount] 
         invoke glBindVertexArray, 0
         invoke glBindTexture, GL_TEXTURE_2D, 0
 

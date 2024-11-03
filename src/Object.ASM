@@ -58,12 +58,11 @@ proc Object.Create uses esi edi ,\
     invoke HeapFree, [hHeap], 0, [addressV]
 
     stdcall Mesh.CalculateNormals, [objPtr]
-
-    lea eax, [vertexVBO]
-    lea ecx, [normalsVBO]
-    lea edx, [textVBO]
+    mov esi, [objPtr]
+    add esi, Object.VAO
+    stdcall VAO.Init, esi, [objPtr]
+    ;mov [objPtr + Object.VAO], eax
+    ;;;;;;;;;доделать VAO !!!!!!
     
-    stdcall VAO.Init, containerVAO, [objPtr], eax, ecx, edx
-
     ret
 endp

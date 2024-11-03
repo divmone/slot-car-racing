@@ -6,8 +6,8 @@ struct Object
     ;texFileName  dd ?
 ends
 
-fileName        db              "..\models\skull.obj",0
+fileName        db              "../models/gtr.obj",0
 textPath        db              "../textures/penger.bmp", 0
       
 
-car Object 0;, fileName, textPath
+car Object 

@@ -308,7 +308,6 @@ proc WindowProc uses ebx,\
 .Destroy:
         invoke HeapFree, [hHeap]
         invoke CloseHandle, [logFile]
-        invoke glDeleteBuffers, 1, vertexVBO
         invoke  ExitProcess, ebx
 
 .ReturnZero:

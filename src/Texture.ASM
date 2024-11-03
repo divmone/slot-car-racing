@@ -8,7 +8,7 @@ proc Texture.Init
     
     stdcall BMP.LoadFromFile, textPath
     mov [temp], eax
-    invoke glTexImage2D, GL_TEXTURE_2D, 0, GL_RGB,  ecx, edx, 0, GL_RGB, GL_UNSIGNED_BYTE, eax   
+    invoke glTexImage2D, GL_TEXTURE_2D, 0, GL_RGB,  ecx, edx, 0, GL_BGR, GL_UNSIGNED_BYTE, eax   
     invoke glGenerateMipmap, GL_TEXTURE_2D
         invoke glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT
         invoke glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT
