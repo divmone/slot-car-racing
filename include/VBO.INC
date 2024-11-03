@@ -1,7 +1,4 @@
- vertexVBO       GLuint          ?
- normalsVBO      GLuint          ?   
- colorsVBO       GLuint          ?
- textVBO         GLuint          ?
+ ;;containerVAO             GLuint          ?
  EBO             GLuint          ?  
 
 vertexVBOp       GLuint          ?

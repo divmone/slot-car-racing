@@ -231,7 +231,7 @@ proc OBJ.ParseTextCoord uses edi esi,\
           locals
             resultVertices dd 0
             temp       dd 0
-            ten dd 100.0
+            ten dd 1.0
         endl
 
         xor edx, edx

@@ -64,7 +64,8 @@
 
         oPos            Vector3         0.0,  0.0,  0.0
         oTurn           Vector3         0.0,  0.0,  0.0
-        oScale          Vector3         0.5,  0.5,  0.5
+
+        oScale          Vector3         2.0,  2.0,  2.0
 
         
         objectColor     Vector3         1.0, 0.0, 0.0
@@ -308,7 +309,6 @@ proc WindowProc uses ebx,\
 .Destroy:
         invoke HeapFree, [hHeap]
         invoke CloseHandle, [logFile]
-        invoke glDeleteBuffers, 1, vertexVBO
         invoke  ExitProcess, ebx
 
 .ReturnZero:

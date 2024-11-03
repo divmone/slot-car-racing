@@ -31,15 +31,16 @@ proc Init uses esi
 
         invoke  glViewport, ebx, ebx, [clientRect.right], [clientRect.bottom]
 
-        fild    [clientRect.right]      ; width
-        fidiv   [clientRect.bottom]     ; width / height
+        fild    [clientRect.right]      
+        fidiv   [clientRect.bottom]     
         fstp    [aspect]
 
         stdcall Glext.LoadFunctions
         
         stdcall Glext.InitShaders  
         
-        stdcall Object.Create, car, fileName
+        stdcall Object.Create, car, fileName, textPath
+        stdcall Object.Create, nissan, fileNameN, textPathN
 
         invoke  glShadeModel, GL_SMOOTH
         invoke  glHint, GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST
@@ -53,7 +54,7 @@ proc Init uses esi
 
         stdcall VAO.Init, containerVAOPlane, plane, vertexVBOp, normalsVBOp
 
-        stdcall Texture.Init
+        
         
         stdcall Matrix.Projection, [aspect], [fovY], [zNear], [zFar], projection
         

@@ -1,5 +1,5 @@
 proc Object.Create uses esi edi ,\
-            objPtr, fileName
+            objPtr, fileName, texFileName
     
     locals
         addressV     dd 0
@@ -58,12 +58,16 @@ proc Object.Create uses esi edi ,\
     invoke HeapFree, [hHeap], 0, [addressV]
 
     stdcall Mesh.CalculateNormals, [objPtr]
+    mov esi, [objPtr]
+    add esi, Object.VAO
+    stdcall VAO.Init, esi, [objPtr]
 
-    lea eax, [vertexVBO]
-    lea ecx, [normalsVBO]
-    lea edx, [textVBO]
+    stdcall Texture.Create, [texFileName]
+    mov esi, [objPtr]
+    add esi, Object.texture
+    mov [esi], eax
+    ;mov [objPtr + Object.VAO], eax
+    ;;;;;;;;;доделать VAO !!!!!!
     
-    stdcall VAO.Init, containerVAO, [objPtr], eax, ecx, edx
-
     ret
 endp

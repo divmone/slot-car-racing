@@ -1,7 +1,8 @@
-proc Draw
+proc Draw uses esi
 
         locals
                 currentTime     dd    ?
+                pos Vector3 3.0, 0.0, 0.0
         endl
 
         invoke  GetTickCount
@@ -23,9 +24,8 @@ proc Draw
         invoke  glClear, GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT
         invoke  glMatrixMode, GL_MODELVIEW
         
-       invoke  glLoadIdentity
-        ;stdcall  gf_get_camera_lookvec, 
-       ; stdcall Matrix.Rotate, view, 10.0, upVector
+        invoke  glLoadIdentity
+
         stdcall Matrix.LookAt, cameraPosition, targetPosition, upVector, view 
 
        
@@ -33,7 +33,6 @@ proc Draw
         stdcall Vector3.RotateY, lightPosition, [lightAngle], lightPosition
         stdcall Vector3.Translate, oTurn, [angleX], [angleZ], [angleY]
 
-        ;stdcall Vector3.Normalize, oTurn
         mov [angleX], 0
         mov [angleY], 0
         mov [angleZ], 0
@@ -42,7 +41,7 @@ proc Draw
         ;stdcall Matrix.CreateScale, oScale, scale
         stdcall Matrix.CreateTurn, oTurn
         stdcall Matrix.Multiply4x4, turn,  position, model
-        stdcall Matrix.Multiply4x4,  model, scale,   model
+        stdcall Matrix.Multiply4x4,  scale, model,   model
 
         stdcall Matrix.Multiply4x4, view, projection, PV
         stdcall Matrix.Multiply4x4, model, PV, MVP
@@ -59,13 +58,20 @@ proc Draw
  
 @@:     
 
-        stdcall DrawMesh, car, [drawingMode], [containerVAO]
-
-       ; invoke glTranslatef, 10.0, 40.0, 10.0
-
-        ;stdcall DrawMesh, plane, [drawingMode], [containerVAOPlane]
-        invoke  glUseProgram, 0
+        stdcall DrawMesh, car, [drawingMode]
         
+        invoke glLoadIdentity
+        
+        lea eax, [pos]
+        stdcall Matrix.CreatePosition, eax, position
+        stdcall Matrix.Multiply4x4, turn,  position, model
+  
+        stdcall Matrix.Multiply4x4, model, PV, MVP
+        invoke glUniformMatrix4fv, [MVPLocation], 1, GL_FALSE, MVP
+     
+        stdcall DrawMesh, nissan, [drawingMode]
+       
+        invoke  glUseProgram, 0
 
         invoke  SwapBuffers, [hdc]
 
@@ -89,13 +95,13 @@ proc Tick
 endp
 
 proc DrawMesh uses esi,\
-     mesh, flag, VAO
+     mesh, flag
 
         mov     esi, [mesh]
 
-        invoke glBindTexture, GL_TEXTURE_2D, [texture]
-        invoke glBindVertexArray, [VAO]
-                invoke  glDrawArrays, [flag], ebx, [esi + Mesh.verticesCount] 
+        invoke glBindTexture, GL_TEXTURE_2D, [esi + Object.texture]
+        invoke glBindVertexArray, [esi + Object.VAO]
+                invoke  glDrawArrays, [flag], 0, [esi + Mesh.verticesCount] 
         invoke glBindVertexArray, 0
         invoke glBindTexture, GL_TEXTURE_2D, 0
 
