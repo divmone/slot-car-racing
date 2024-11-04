@@ -52,16 +52,19 @@ proc PopMatrix, matrix
         ret
 endp
 
-proc DrawObject, objPtr, posV, turnV, scaleV 
+proc DrawObject uses esi, objPtr, posV, turnV, scaleV 
         memcpy tempMatrix, MVP, sizeof.Matrix4x4
-       
+
         stdcall Matrix.CreatePosition, [posV], position
         stdcall Matrix.CreateScale, [scaleV], scale
         stdcall Matrix.CreateTurn, [turnV]
-        stdcall Matrix.Multiply4x4, position, turn, model
+        
+        stdcall Matrix.Multiply4x4, turn, position, model
         stdcall Matrix.Multiply4x4, scale, model, model
         stdcall Matrix.Multiply4x4, view, projection, PV
         stdcall Matrix.Multiply4x4, model, PV, MVP
+
+        stdcall Matrix.Multiply4x4, turn, model, model  ; Rotate the model's axes
 
         invoke  glUseProgram, [program]
         
@@ -78,8 +81,8 @@ proc DrawObject, objPtr, posV, turnV, scaleV
         
         memcpy MVP, tempMatrix, sizeof.Matrix4x4
         ret
-endp    
-
+endp  
+  
 proc DrawMesh uses esi,\
      mesh, flag
 

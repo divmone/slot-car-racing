@@ -29,8 +29,8 @@
 ; fpu
         toRadian        GLfloat         180.0
 
-        step           GLfloat           1.0
-        stepp           GLfloat         0.01
+        step           GLfloat           5.0
+        stepp           GLfloat         1.0
         length          GLfloat         5.0
         pVector         Vector3         0.0, 0.0, 0.0
         programTime     dd              ?
@@ -71,8 +71,13 @@
         oPos2            Vector3         0.0,  0.0,  0.0
         objectColor     Vector3         1.0, 0.0, 0.0
 
-        cameraPosition  Vector3         2.0, 5.0, 2.0
-        targetPosition  Vector3         1.0, 0.0, 1.0
+
+        nPos Vector3
+        negPosition Matrix4x4
+        backPosition Matrix4x4
+
+        cameraPosition  Vector3         10.0, 10.0, 10.0
+        targetPosition  Vector3         0.0, 0.0, 0.0
         upVector        Vector3         0.0, 1.0, 0.0
 
         lightPosition  Vector4         5.0, 5.1, 5.0, 1.0
@@ -214,29 +219,29 @@ proc WindowProc uses ebx,\
         jmp     .ReturnZero
 .MoveLeft:
         fld     [oPos + Vector3.x]
-        fsub    [step]
+        fsub    [stepp]
         fstp    [oPos + Vector3.x]
         
         jmp     .ReturnZero
 
 .MoveRight:
         fld     [oPos + Vector3.x]
-        fadd    [step]
+        fadd    [stepp]
         fstp    [oPos + Vector3.x]
  
         jmp     .ReturnZero
 
 .MoveFront:
-        fld     [oPos + Vector3.y]
-        fsub    [step]
-        fstp    [oPos + Vector3.y]
+        fld     [oPos + Vector3.z]
+        fsub    [stepp]
+        fstp    [oPos + Vector3.z]
 
         jmp     .ReturnZero
 
 .MoveBack:
-        fld     [oPos + Vector3.y]
-        fadd    [step]
-        fstp    [oPos + Vector3.y]
+        fld     [oPos + Vector3.z]
+        fadd    [stepp]
+        fstp    [oPos + Vector3.z]
 
         jmp     .ReturnZero
 
