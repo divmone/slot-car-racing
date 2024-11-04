@@ -36,25 +36,15 @@ proc Init uses esi
         fstp    [aspect]
 
         stdcall Glext.LoadFunctions
-        
-        stdcall Glext.InitShaders  
+        stdcall Glext.CreateShaders  
         
         stdcall Object.Create, car, fileName, textPath
         stdcall Object.Create, nissan, fileNameN, textPathN
+        stdcall Object.Create, table, fileNameT, textPathT
 
         invoke  glShadeModel, GL_SMOOTH
         invoke  glHint, GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST
         invoke  glEnable, GL_DEPTH_TEST
-        ;invoke  glDepthFunc, GL_ALWAYS
-     
-        invoke  HeapAlloc, [hHeap], ebx, sizeof.Vertex * 6
-        mov     [plane.normals], eax
-
-        stdcall Mesh.CalculateNormals, plane
-
-        stdcall VAO.Init, containerVAOPlane, plane, vertexVBOp, normalsVBOp
-
-        
         
         stdcall Matrix.Projection, [aspect], [fovY], [zNear], [zFar], projection
         

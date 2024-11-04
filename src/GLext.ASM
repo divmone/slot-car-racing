@@ -21,8 +21,7 @@ proc Glext.LoadFunctions uses esi edi
         ret
 endp
 
-proc Glext.InitShaders
-
+proc Glext.CreateShaders
         invoke  glUseProgram, ebx
 
         cmp     [program], ebx

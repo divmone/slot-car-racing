@@ -330,7 +330,7 @@ proc Matrix.Multiply uses ebx esi edi, Matrix1, Matrix2, ResMatrix
 endp
 
 
-proc Matrix.CreatePosition, posV, positionM
+proc Matrix.CreatePosition uses esi edi, posV, positionM
   mov edi, [positionM]
                         
   mov esi, [posV]
@@ -348,7 +348,7 @@ proc Matrix.CreatePosition, posV, positionM
 endp
 
 
-proc Matrix.CreateTurn, turnV
+proc Matrix.CreateTurn uses esi edi , turnV
 
     locals
        a  dd  ?
@@ -478,17 +478,18 @@ proc Matrix.CreateTurn, turnV
 endp
 
 
-proc Matrix.CreateScale, scaleC, scaleM 
-          
+proc Matrix.CreateScale uses esi edi, scaleC, scaleM 
+
+  mov esi, [scaleC]     
   mov edi, [scaleM]  
           
-  fld  [scaleC]    
+  fld  [esi + Vector3.x]    
   fstp [edi + Matrix4x4.m11]
   
-  fld  [scaleC]
+  fld  [esi + Vector3.y]
   fstp [edi + Matrix4x4.m22]
   
-  fld  [scaleC]
+  fld  [esi + Vector3.z]
   fstp [edi + Matrix4x4.m33]
   
   ret
