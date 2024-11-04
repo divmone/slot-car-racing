@@ -7,8 +7,8 @@ struct Object
 ends
 
 car Object 
-fileName        db              "../models/carcar.obj",0
-textPath        db              "../textures/carcar.bmp", 0
+fileName        db              "../models/gtr.obj",0
+textPath        db              "../textures/gt-r.bmp", 0
 
 nissan Object 
 fileNameN        db              "../models/nissan.obj",0

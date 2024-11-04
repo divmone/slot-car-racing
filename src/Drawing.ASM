@@ -2,7 +2,7 @@ proc Draw uses esi
 
         locals
                 currentTime     dd    ?
-                pos Vector3 3.0, 0.0, 0.0
+                five dd 5.0
         endl
 
         invoke  GetTickCount
@@ -17,29 +17,32 @@ proc Draw uses esi
 
         stdcall Tick
       ;  stdcall UpdateMovement
-
 .Skip:
-       
         invoke  glClearColor, 0.6, 0.6, 1.0, 1.0
         invoke  glClear, GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT
-        invoke  glMatrixMode, GL_MODELVIEW
-        
-        invoke  glLoadIdentity
+        stdcall DrawObject, car, oPos, oTurn        
+        invoke  SwapBuffers, [hdc]
+        ret
+endp
 
-        stdcall Matrix.LookAt, cameraPosition, targetPosition, upVector, view 
-
-       
-        invoke glGetFloatv, GL_MODELVIEW_MATRIX, view
+proc DrawObject, objPtr, posV, turnV
         stdcall Vector3.RotateY, lightPosition, [lightAngle], lightPosition
-        stdcall Vector3.Translate, oTurn, [angleX], [angleZ], [angleY]
-
+        
+        stdcall Vector3.Translate, [turnV], [angleX], [angleZ], [angleY]
+        
         mov [angleX], 0
         mov [angleY], 0
         mov [angleZ], 0
 
-        stdcall Matrix.CreatePosition, oPos, position
+        invoke  glMatrixMode, GL_MODELVIEW 
+        invoke  glLoadIdentity
+        stdcall Matrix.LookAt, cameraPosition, targetPosition, upVector, view 
+        invoke glGetFloatv, GL_MODELVIEW_MATRIX, view
+
+
+        stdcall Matrix.CreatePosition, [posV], position
         ;stdcall Matrix.CreateScale, oScale, scale
-        stdcall Matrix.CreateTurn, oTurn
+        stdcall Matrix.CreateTurn, [turnV]
         stdcall Matrix.Multiply4x4, turn,  position, model
         stdcall Matrix.Multiply4x4,  scale, model,   model
 
@@ -55,25 +58,22 @@ proc Draw uses esi
         invoke glUniform3fv, [lightPosLocation], 1, lightPosition
         invoke glUniform3fv, [objectColorLocation], 1, objectColor
         invoke glUniform3fv, [lightColorLocation], 1, lightColor
- 
 @@:     
-
-        stdcall DrawMesh, car, [drawingMode]
-        
-        invoke glLoadIdentity
-        
-        lea eax, [pos]
-        stdcall Matrix.CreatePosition, eax, position
-        stdcall Matrix.Multiply4x4, turn,  position, model
-  
-        stdcall Matrix.Multiply4x4, model, PV, MVP
-        invoke glUniformMatrix4fv, [MVPLocation], 1, GL_FALSE, MVP
-     
-        stdcall DrawMesh, nissan, [drawingMode]
-       
+        stdcall DrawMesh, [objPtr], [drawingMode]
         invoke  glUseProgram, 0
+        ret
+endp
 
-        invoke  SwapBuffers, [hdc]
+proc DrawMesh uses esi,\
+     mesh, flag
+
+        mov     esi, [mesh]
+
+        invoke glBindTexture, GL_TEXTURE_2D, [esi + Object.texture]
+        invoke glBindVertexArray, [esi + Object.VAO]
+                invoke  glDrawArrays, [flag], 0, [esi + Mesh.verticesCount] 
+        invoke glBindVertexArray, 0
+        invoke glBindTexture, GL_TEXTURE_2D, 0
 
         ret
 endp
@@ -92,18 +92,4 @@ proc Tick
     fstp    [angle]        
     mov     [angle], 0.0
     ret
-endp
-
-proc DrawMesh uses esi,\
-     mesh, flag
-
-        mov     esi, [mesh]
-
-        invoke glBindTexture, GL_TEXTURE_2D, [esi + Object.texture]
-        invoke glBindVertexArray, [esi + Object.VAO]
-                invoke  glDrawArrays, [flag], 0, [esi + Mesh.verticesCount] 
-        invoke glBindVertexArray, 0
-        invoke glBindTexture, GL_TEXTURE_2D, 0
-
-        ret
 endp

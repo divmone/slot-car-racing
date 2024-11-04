@@ -10,6 +10,7 @@
         radian          GLfloat         57.32
         
         circleD         GLfloat         10.0
+        
         lightAngle      GLfloat         1.0
         angle           GLfloat         0.0
 ;transform
