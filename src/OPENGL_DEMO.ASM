@@ -29,7 +29,7 @@
 ; fpu
         toRadian        GLfloat         180.0
 
-        step           GLfloat           5.0
+        step           GLfloat           1.0
         stepp           GLfloat         0.01
         length          GLfloat         5.0
         pVector         Vector3         0.0, 0.0, 0.0
@@ -65,10 +65,10 @@
 
         oPos            Vector3         0.0,  0.0,  0.0
         oTurn           Vector3         0.0,  0.0,  0.0
+        oScale          Vector3         1.0,  1.0,  1.0
 
-        oScale          Vector3         2.0,  2.0,  2.0
-
-        
+        oTurn2           Vector3         0.0,  0.0,  0.0
+        oPos2            Vector3         0.0,  0.0,  0.0
         objectColor     Vector3         1.0, 0.0, 0.0
 
         cameraPosition  Vector3         2.0, 5.0, 2.0
@@ -284,15 +284,11 @@ proc WindowProc uses ebx,\
         mov     eax, [wParam]
         test    eax, 0x80000000
         jne     .Negative
-        fld [scaleC]
-        fadd [scaleStep]
-        fstp [scaleC]
+        stdcall Vector3.AddValue, oScale, [scaleStep]
         jmp     .ReturnZero
 
 .Negative:
-         fld [scaleC]
-        fsub [scaleStep]
-        fstp [scaleC]
+        stdcall Vector3.SubValue, oScale, [scaleStep]
         jmp     .ReturnZero
 
 .selectMode:

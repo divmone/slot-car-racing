@@ -40,6 +40,7 @@ proc Init uses esi
         
         stdcall Object.Create, car, fileName, textPath
         stdcall Object.Create, nissan, fileNameN, textPathN
+        stdcall Object.Create, table, fileNameT, textPathT
 
         invoke  glShadeModel, GL_SMOOTH
         invoke  glHint, GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST

@@ -422,21 +422,45 @@ proc Vector3.Translate  uses esi edi ebx,\
      v1, x, y, z
 
      mov esi, [v1]
-
      fld [x]
-     fadd  [esi + Vector3.x]
      fstp  [esi + Vector3.x]
-
      fld [y]
-     fadd  [esi + Vector3.y]
      fstp  [esi + Vector3.y]
-
      fld [z]
-     fadd  [esi + Vector3.z]
      fstp  [esi + Vector3.z]
-
      ret
+endp
 
+proc Vector3.AddValue uses esi,\
+     v1, x
+
+     mov esi, [v1]
+     fld  [esi + Vector3.x]
+     fadd [x]
+     fstp  [esi + Vector3.x]
+     fld [esi + Vector3.y]
+     fadd [x]  
+     fstp  [esi + Vector3.y]
+     fld [esi + Vector3.z]
+     fadd [x] 
+     fstp  [esi + Vector3.z]
+     ret
+endp
+
+proc Vector3.SubValue uses esi,\
+     v1, x
+
+     mov esi, [v1]
+     fld [esi + Vector3.x]
+     fsub  [x]
+     fstp  [esi + Vector3.x]
+     fld [esi + Vector3.y]
+     fsub  [x]
+     fstp  [esi + Vector3.y]
+     fld [esi + Vector3.z]
+     fsub  [x]
+     fstp  [esi + Vector3.z]
+     ret
 endp
 
 

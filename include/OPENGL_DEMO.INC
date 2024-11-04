@@ -69,11 +69,6 @@ common
       \}
   end if
 }  
-
-
-
-
-
         include         "Plane.inc"
          include         "Cube.inc"
          include         "zhiguli.inc"
