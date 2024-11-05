@@ -24,6 +24,7 @@ entry   WinMain
         include         "OBJ.inc"
         include         "Shader.inc"
         include         "Object.inc"
+        include         "Controller.inc"
 
 macro switch value
 {
