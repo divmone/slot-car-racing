@@ -11,10 +11,6 @@ proc BMP.LoadFromFile uses edi esi ebx,\
     stdcall File.LoadContent, [fileName]
     mov ebx, eax
 
-    ;mov ebx, [buffer]
-
-   
-
     mov eax, [ebx + BMP.biHeight]
     mov ecx, [ebx + BMP.biWidth]
     mov [h], eax

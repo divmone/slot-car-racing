@@ -69,7 +69,7 @@
 
         oTurn2           Vector3         0.0,  0.0,  0.0
         oPos2            Vector3         0.0,  0.0,  0.0
-        objectColor     Vector3         1.0, 0.0, 0.0
+        objectColor     Vector3          1.0, 0.0, 0.0
 
 
         nPos Vector3
@@ -140,44 +140,21 @@ proc WindowProc uses ebx,\
         jmp     .ReturnZero
 
 .KeyDown:
- 
-        cmp     [wParam], VK_ESCAPE
-        je      .Destroy
-        cmp     [wParam], 41h
-        je      .MoveLeft
-        cmp     [wParam], 44h
-        je      .MoveRight
-        cmp     [wParam], 51h
-        je      .MoveFront
-        cmp     [wParam], 45h
-        je      .MoveBack
-        cmp     [wParam], 57h
-        je      .MoveUp
-        cmp     [wParam], 53h
-        je      .MoveDown
-        cmp     [wParam], 58h
-        je      .RotateRight
-        cmp  [wParam], 31h
-        je .selectMode
-
-       cmp     [wParam], VK_SPACE
-       jne     @F
-        stdcall Mesh.Subdivide, car, car
-@@:
-         cmp     [wParam], 5ah
-        je      .RotateLeft
-        cmp     [wParam], VK_LEFT
-
-        je .RotateLeftC
-        cmp     [wParam], VK_RIGHT
-          je .RotateRightC
-          cmp     [wParam], VK_UP
-        je      .RotateUp
-        cmp     [wParam], VK_DOWN
-         je      .RotateDown
-        cmp     [wParam], 45h
-        je      .MoveDown
-
+        switch [wParam]
+        case .Destroy, VK_ESCAPE
+        case .MoveLeft, VK_A   
+        case .MoveRight, VK_D
+        case .MoveFront, VK_W
+        case .MoveBack, VK_S
+        case .MoveUp, VK_E
+        case .MoveDown,VK_Q
+        case .RotateRight, 58h
+        case .selectMode, 31h
+        case .RotateLeft, 5Ah
+        case .RotateLeftC, VK_LEFT
+        case .RotateRightC, VK_RIGHT
+        case .RotateUp, VK_UP
+        case .RotateDown, VK_DOWN
         jmp     .ReturnZero
 .MoveUp:
       
@@ -218,47 +195,29 @@ proc WindowProc uses ebx,\
 
         jmp     .ReturnZero
 .MoveLeft:
-        fld     [oPos + Vector3.x]
-        fsub    [stepp]
-        fstp    [oPos + Vector3.x]
-        
+        stdcall Float.AddValue, car.transform.position.x, [stepp]
         jmp     .ReturnZero
 
 .MoveRight:
-        fld     [oPos + Vector3.x]
-        fadd    [stepp]
-        fstp    [oPos + Vector3.x]
+        stdcall Float.SubValue, car.transform.position.x, [stepp]
  
         jmp     .ReturnZero
 
 .MoveFront:
-        fld     [oPos + Vector3.z]
-        fsub    [stepp]
-        fstp    [oPos + Vector3.z]
-
+        stdcall Float.AddValue, car.transform.position.z, [stepp]
         jmp     .ReturnZero
 
 .MoveBack:
-        fld     [oPos + Vector3.z]
-        fadd    [stepp]
-        fstp    [oPos + Vector3.z]
-
+        stdcall Float.SubValue, car.transform.position.z, [stepp]
         jmp     .ReturnZero
 
 .RotateLeft:
-        fld     [angleY]
-        fadd    [step]
-
-        fstp    [angleY]
-
-
+        stdcall Float.AddValue, car.transform.rotation.y, [step]
         jmp     .ReturnZero
 
 
 .RotateRight:
-        fld     [angleY]
-        fsub    [step]
-        fstp    [angleY]
+        stdcall Float.SubValue, car.transform.rotation.y, [step]
         jmp     .ReturnZero
 
 .RotateRightC:

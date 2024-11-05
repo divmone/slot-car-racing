@@ -1,3 +1,19 @@
+proc Float.AddValue uses ebx, value,  term 
+    mov ebx, [value]
+    fld dword [ebx]
+    fadd [term] 
+    fstp dword[ebx]
+    ret
+endp
+
+proc Float.SubValue uses ebx, value, term 
+    mov ebx, [value]
+    fld dword [ebx]
+    fsub [term] 
+    fstp dword[ebx]
+    ret
+endp
+
 proc StrToInt uses ebx edi,\
      pointer
 

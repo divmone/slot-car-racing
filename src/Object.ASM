@@ -66,8 +66,20 @@ proc Object.Create uses esi edi ,\
     mov esi, [objPtr]
     add esi, Object.texture
     mov [esi], eax
-    ;mov [objPtr + Object.VAO], eax
-    ;;;;;;;;;доделать VAO !!!!!!
+
+    mov esi, [objPtr]
+    ;add esi, Object.transform
+    mov [esi + Object.transform.position.x], 0.0
+    mov [esi + Object.transform.position.y], 0.0
+    mov [esi + Object.transform.position.z], 0.0
+
+    mov [esi + Object.transform.rotation.x], 0.0
+    mov [esi + Object.transform.rotation.y], 0.0
+    mov [esi + Object.transform.rotation.z], 0.0
+
+    mov [esi + Object.transform.scale.x], 1.0
+    mov [esi + Object.transform.scale.y], 1.0
+    mov [esi + Object.transform.scale.z], 1.0
     
     ret
 endp

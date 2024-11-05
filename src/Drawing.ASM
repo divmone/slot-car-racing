@@ -29,10 +29,8 @@ proc Draw uses esi
 
         stdcall Vector3.Translate, oTurn, [angleX], [angleZ], [angleY]
         
-
-        stdcall DrawObject, car, oPos, oTurn, oScale   
-
-        stdcall DrawObject, table, oPos2, oTurn2, oScale
+        stdcall Object.Draw, car
+        stdcall Object.Draw, table
 
         invoke  SwapBuffers, [hdc]
         ret
@@ -52,13 +50,19 @@ proc PopMatrix, matrix
         ret
 endp
 
-proc DrawObject uses esi, objPtr, posV, turnV, scaleV 
+proc Object.Draw uses esi ,\ 
+        objPtr
+
         memcpy tempMatrix, MVP, sizeof.Matrix4x4
 
-        stdcall Matrix.CreatePosition, [posV], position
-        stdcall Matrix.CreateScale, [scaleV], scale
-        stdcall Matrix.CreateTurn, [turnV]
-        
+        mov esi, [objPtr]
+        add esi, Object.transform.position
+        stdcall Matrix.CreatePosition, esi, position
+        add esi, 12
+        stdcall Matrix.CreateTurn, esi
+        add esi, 12
+        stdcall Matrix.CreateScale, esi, scale
+
         stdcall Matrix.Multiply4x4, turn, position, model
         stdcall Matrix.Multiply4x4, scale, model, model
         stdcall Matrix.Multiply4x4, view, projection, PV
