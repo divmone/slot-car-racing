@@ -1,25 +1,31 @@
 proc Draw uses esi
-
-        locals
-                currentTime     dd    ?
-        endl
-
         invoke  GetTickCount
         mov     [currentTime], eax
+        sub     eax, [startTime]
+        mov     [programTime], eax
 
-        sub     eax, [time]
-        cmp     eax, 10
-       ; jle     .Skip
+        fild    [programTime]
+        fdiv    [oneSecond]
+        fstp    [programTime]
 
         mov     eax, [currentTime]
-        mov     [time], eax
+        sub     eax, [lastTime]
+        cmp     eax, 10
+        jle     .Skip
 
-        stdcall Tick
+        mov     eax, [currentTime]
+        mov     [lastTime], eax   
+        ;stdcall Tick
       ;  stdcall UpdateMovement
 .Skip:
         invoke  glClearColor, 0.6, 0.6, 1.0, 1.0
         invoke  glClear, GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT
-        stdcall Vector3.RotateY, lightPosition, [lightAngle], lightPosition
+        
+        stdcall Spline.GetPoint, cubeSpline, car.transform.position, [programTime]                                                  
+        
+        stdcall Spline.GetPoint, rotateSpline, car.transform.rotation, [programTime]                                                  
+        
+        stdcall Vector3.RotateY, sphere.transform.position, [lightAngle], sphere.transform.position
  
         invoke  glMatrixMode, GL_MODELVIEW 
         invoke  glLoadIdentity
@@ -31,6 +37,7 @@ proc Draw uses esi
         
         stdcall Object.Draw, car
         stdcall Object.Draw, table
+        stdcall Object.Draw, sphere
 
         invoke  SwapBuffers, [hdc]
         ret
@@ -76,7 +83,7 @@ proc Object.Draw uses esi ,\
       
         invoke glUniform3fv, [viewPosLocation], 1, cameraPosition
        
-        invoke glUniform3fv, [lightPosLocation], 1, lightPosition
+        invoke glUniform3fv, [lightPosLocation], 1, sphere.transform.position
         invoke glUniform3fv, [objectColorLocation], 1, objectColor
         invoke glUniform3fv, [lightColorLocation], 1, lightColor
 @@:     

@@ -13,7 +13,7 @@ struct Object
     ;texFileName  dd ?
 ends
 
-car Object 0, 0, 0, 0
+car Object 0,0,0,0
 fileName        db              "../models/gtr.obj",0
 textPath        db              "../textures/gt-r.bmp", 0
 
@@ -23,4 +23,8 @@ textPathN        db              "../textures/nissan.bmp", 0
 
 table Object 
 fileNameT        db               "../models/table.obj",0 
-textPathT        db              "../textures/8027.bmp", 0
+textPathT        db              "../textures/images.bmp", 0
+
+sphere Object
+fileNameS        db             "../models/sphere.obj",0 
+textPathS        db             "../textures/light.bmp", 0
