@@ -1,24 +1,28 @@
 proc Draw uses esi
-
-        locals
-                currentTime     dd    ?
-        endl
-
         invoke  GetTickCount
         mov     [currentTime], eax
+        sub     eax, [startTime]
+        mov     [programTime], eax
 
-        sub     eax, [time]
-        cmp     eax, 10
-       ; jle     .Skip
+        fild    [programTime]
+        fdiv    [oneSecond]
+        fstp    [programTime]
 
         mov     eax, [currentTime]
-        mov     [time], eax
+        sub     eax, [lastTime]
+        cmp     eax, 10
+        jle     .Skip
 
-        stdcall Tick
+        mov     eax, [currentTime]
+        mov     [lastTime], eax   
+        ;stdcall Tick
       ;  stdcall UpdateMovement
 .Skip:
         invoke  glClearColor, 0.6, 0.6, 1.0, 1.0
         invoke  glClear, GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT
+        
+        stdcall Spline.GetPoint, cubeSpline, car.transform.position, [programTime]                                                  
+        
         stdcall Vector3.RotateY, lightPosition, [lightAngle], lightPosition
  
         invoke  glMatrixMode, GL_MODELVIEW 
@@ -27,8 +31,10 @@ proc Draw uses esi
         
         invoke glGetFloatv, GL_MODELVIEW_MATRIX, view
 
+        
         stdcall Vector3.Translate, oTurn, [angleX], [angleZ], [angleY]
         
+        ;
         stdcall Object.Draw, car
         stdcall Object.Draw, table
 
