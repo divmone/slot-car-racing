@@ -422,11 +422,15 @@ proc Vector3.Translate  uses esi edi ebx,\
      v1, x, y, z
 
      mov esi, [v1]
+
      fld [x]
+     fmul [esi + Vector3.x]
      fstp  [esi + Vector3.x]
-     fld [y]
+     fld [esi + Vector3.y]
+     fmul [y]
      fstp  [esi + Vector3.y]
      fld [z]
+     fmul [esi + Vector3.z]
      fstp  [esi + Vector3.z]
      ret
 endp

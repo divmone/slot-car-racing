@@ -88,35 +88,37 @@
         trackPointPosition3 Vector3 0.0, 0.0, 0.0
         trackPointPosition4 Vector3 0.0, 0.0, 0.0
 
-        cameraPosition1 Vector3         50.0, 0.0, 100.0
-        cameraDirPrev1  Vector3         50.0, 0.0, 100.0
-        cameraDirNext1  Vector3         50.0, 0.0, 100.0
+        cameraPosition1 Vector3         45.0, 0.0, 90.0
+        cameraDirPrev1  Vector3         0.0, 0.0, 90.0
+        cameraDirNext1  Vector3         45.0, 0.0, 0.0
 
-        cameraPosition2 Vector3         50.0, 0.0, -100.0
-        cameraDirPrev2  Vector3         50.0, 0.0, -100.0
-        cameraDirNext2  Vector3         50.0, 0.0, -100.0 
+        cameraPosition2 Vector3         45.0, 0.0, -90.0
+        cameraDirPrev2  Vector3         45.0, 0.0,  0.0
+        cameraDirNext2  Vector3         0.0, 0.0, -90.0 
 
-        cameraPosition3 Vector3         -50.0, 0.0, -100.0
-        cameraDirPrev3  Vector3         -50.0, 0.0, -100.0
-        cameraDirNext3  Vector3          50.0, 0.0, -100.0
+        cameraPosition3 Vector3         -45.0, 0.0, -90.0
+        cameraDirPrev3  Vector3          0.0, 0.0, -90.0 
+        cameraDirNext3  Vector3          -45.0, 0.0, 0.0
 
-        cameraPosition4 Vector3         -50.0, 0.0, 100.0
-        cameraDirPrev4  Vector3         -50.0, 0.0, 100.0
-        cameraDirNext4  Vector3          50.0, 0.0, 100.0
+        cameraPosition4 Vector3         -45.0, 0.0, 90.0
+        cameraDirPrev4  Vector3          -45.0, 0.0, 0.0
+        cameraDirNext4  Vector3          0.0, 0.0, 90.0
 
-        cubePoints:     Spline.Point    cameraPosition1, cameraDirPrev1, cameraDirNext1, 5.0
-                        Spline.Point    cameraPosition2, cameraDirPrev2, cameraDirNext2, 5.0
-                        Spline.Point    cameraPosition3, cameraDirPrev3, cameraDirNext3, 5.0
-                        Spline.Point    cameraPosition4, cameraDirPrev4, cameraDirNext4, 5.0
+        cubePoints:     Spline.Point    cameraPosition1, cameraDirPrev1, cameraDirNext1, 2.0
+                        Spline.Point    cameraPosition2, cameraDirPrev2, cameraDirNext2, 1.0
+                        Spline.Point    cameraPosition3, cameraDirPrev3, cameraDirNext3, 2.0
+                        Spline.Point    cameraPosition4, cameraDirPrev4, cameraDirNext4, 1.0
 
-        cubeSpline      Spline          4, cubePoints, true, 20.0
+        cubeSpline      Spline          4, cubePoints, 1, 6.0
 
         startTime       dd              ?
         lastTime        dd              ?
         currentTime     dd              ?
         programTime     dd              ?   
-        oneSecond       GLfloat         1000.0                                                           
+        oneSecond       GLfloat         1000.0      
 
+        rVector         Vector3         0.0, 1.0, 0.0                                                     
+        ninety          GLfloat         90.0
 
         include         "Init.asm"
         include         "Mesh.asm"

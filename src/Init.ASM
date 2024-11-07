@@ -38,9 +38,11 @@ proc Init uses esi
         stdcall Glext.LoadFunctions
         stdcall Glext.CreateShaders  
         
+       
         stdcall Object.Create, car, fileName, textPath
         stdcall Object.Create, nissan, fileNameN, textPathN
         stdcall Object.Create, table, fileNameT, textPathT
+        stdcall Object.Create, sphere, fileNameS, textPathS
 
         invoke  glShadeModel, GL_SMOOTH
         invoke  glHint, GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST

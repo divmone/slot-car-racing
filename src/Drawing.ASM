@@ -22,6 +22,17 @@ proc Draw uses esi
         invoke  glClear, GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT
         
         stdcall Spline.GetPoint, cubeSpline, car.transform.position, [programTime]                                                  
+        stdcall Spline.GetPoint, cubeSpline, car.transform.rotation, [programTime]                                                  
+        
+        stdcall Vector3.Translate, car.transform.rotation, 0.0, 0.0, 1.0
+
+        mov eax, [car.transform.rotation.z]
+        mov [car.transform.rotation.z], 0.0
+        mov [car.transform.rotation.y], eax
+
+        fld [car.transform.rotation.y]
+        fadd [ninety]
+        fstp [car.transform.rotation.y]
         
         stdcall Vector3.RotateY, lightPosition, [lightAngle], lightPosition
  
@@ -31,12 +42,11 @@ proc Draw uses esi
         
         invoke glGetFloatv, GL_MODELVIEW_MATRIX, view
 
-        
         stdcall Vector3.Translate, oTurn, [angleX], [angleZ], [angleY]
         
-        ;
         stdcall Object.Draw, car
         stdcall Object.Draw, table
+        stdcall Object.Draw, sphere
 
         invoke  SwapBuffers, [hdc]
         ret
