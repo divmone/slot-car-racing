@@ -23,7 +23,7 @@ textPathN        db              "../textures/nissan.bmp", 0
 
 table Object 
 fileNameT        db               "../models/table.obj",0 
-textPathT        db              "../textures/nissan.bmp", 0
+textPathT        db              "../textures/images.bmp", 0
 
 sphere Object
 fileNameS        db             "../models/sphere.obj",0 

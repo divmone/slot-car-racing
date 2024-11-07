@@ -81,7 +81,7 @@
         upVector        Vector3         0.0, 1.0, 0.0
 
         lightPosition  Vector4         5.0, 5.1, 5.0, 1.0
-        lightColor     Vector3         1.0, 0.0, 0.0
+        lightColor     Vector3         0.99, 0.99, 0.99
         
         trackPointPosition1 Vector3 0.0, 0.0, 0.0
         trackPointPosition2 Vector3 0.0, 0.0, 0.0
@@ -111,11 +111,38 @@
 
         cubeSpline      Spline          4, cubePoints, 1, 6.0
 
+
+        sRotation1      Vector3         0.0, 90.0, 0.0
+        sRotation1Prev  Vector3         0.0, 0.0, 0.0
+        sRotation1Next  Vector3         0.0, 0.0, 0.0
+        
+        sRotation2      Vector3         0.0, 0.0, 0.0
+        sRotation2Prev  Vector3         0.0, 0.0, 0.0
+        sRotation2Next  Vector3         0.0, 0.0, 0.0
+
+        sRotation3      Vector3         0.0, 180.0, 0.0
+        sRotation3Prev  Vector3         0.0, 0.0, 0.0
+        sRotation3Next  Vector3         0.0, 0.0, 0.0
+
+        sRotation4      Vector3         0.0, 0.0, 0.0
+        sRotation4Prev  Vector3         0.0, 0.0, 0.0
+        sRotation4Next  Vector3         0.0, 90.0, 0.0
+
+        sPoints:     Spline.Point    sRotation1, sRotation1Prev, sRotation1Next, 2.0
+                     Spline.Point    sRotation2, sRotation2Prev, sRotation2Next, 1.0
+                     Spline.Point    sRotation3, sRotation3Prev, sRotation3Next, 2.0
+                     Spline.Point    sRotation4, sRotation4Prev, sRotation4Next, 1.0
+
+        rotateSpline      Spline          4, sPoints, 1, 6.0
+
+
         startTime       dd              ?
         lastTime        dd              ?
         currentTime     dd              ?
         programTime     dd              ?   
-        oneSecond       GLfloat         1000.0      
+        nprogramTime     dd              ?   
+        oneSecond       GLfloat         1000.0   
+        ten             dd              0.1   
 
         rVector         Vector3         0.0, 1.0, 0.0                                                     
         ninety          GLfloat         90.0
@@ -284,11 +311,11 @@ proc WindowProc uses ebx,\
         mov     eax, [wParam]
         test    eax, 0x80000000
         jne     .Negative
-        stdcall Vector3.AddValue, oScale, [scaleStep]
+        stdcall Vector3.AddValue, car.transform.scale, [scaleStep]
         jmp     .ReturnZero
 
 .Negative:
-        stdcall Vector3.SubValue, oScale, [scaleStep]
+        stdcall Vector3.SubValue, car.transform.scale, [scaleStep]
         jmp     .ReturnZero
 
 .selectMode:

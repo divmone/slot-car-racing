@@ -22,19 +22,10 @@ proc Draw uses esi
         invoke  glClear, GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT
         
         stdcall Spline.GetPoint, cubeSpline, car.transform.position, [programTime]                                                  
-        stdcall Spline.GetPoint, cubeSpline, car.transform.rotation, [programTime]                                                  
         
-        stdcall Vector3.Translate, car.transform.rotation, 0.0, 0.0, 1.0
-
-        mov eax, [car.transform.rotation.z]
-        mov [car.transform.rotation.z], 0.0
-        mov [car.transform.rotation.y], eax
-
-        fld [car.transform.rotation.y]
-        fadd [ninety]
-        fstp [car.transform.rotation.y]
+        stdcall Spline.GetPoint, rotateSpline, car.transform.rotation, [programTime]                                                  
         
-        stdcall Vector3.RotateY, lightPosition, [lightAngle], lightPosition
+        stdcall Vector3.RotateY, sphere.transform.position, [lightAngle], sphere.transform.position
  
         invoke  glMatrixMode, GL_MODELVIEW 
         invoke  glLoadIdentity
@@ -92,7 +83,7 @@ proc Object.Draw uses esi ,\
       
         invoke glUniform3fv, [viewPosLocation], 1, cameraPosition
        
-        invoke glUniform3fv, [lightPosLocation], 1, lightPosition
+        invoke glUniform3fv, [lightPosLocation], 1, sphere.transform.position
         invoke glUniform3fv, [objectColorLocation], 1, objectColor
         invoke glUniform3fv, [lightColorLocation], 1, lightColor
 @@:     

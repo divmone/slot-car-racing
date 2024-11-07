@@ -44,6 +44,11 @@ proc Init uses esi
         stdcall Object.Create, table, fileNameT, textPathT
         stdcall Object.Create, sphere, fileNameS, textPathS
 
+
+        mov [sphere.transform.position.x], 50.0
+        mov [sphere.transform.position.y], 50.0
+        mov [sphere.transform.position.z], 50.0
+
         invoke  glShadeModel, GL_SMOOTH
         invoke  glHint, GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST
         invoke  glEnable, GL_DEPTH_TEST
