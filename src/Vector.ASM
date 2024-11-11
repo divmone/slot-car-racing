@@ -315,6 +315,33 @@ proc Vector3.Copy uses esi edi,\
         ret
 endp
 
+proc Vector3.DotProduct uses esi edi,\
+               v1, v2
+
+     locals 
+          result    dd   0.0
+     endl
+     
+     mov  esi, [v1]
+     mov  edi, [v2]
+
+     fld [esi + Vector3.x]
+     fmul [esi + Vector3.x]
+     fstp [result]
+
+     fld [esi + Vector3.y]
+     fmul [esi + Vector3.y]
+     fadd [result]
+     fstp [result]
+
+     fld [esi + Vector3.z]
+     fmul [esi + Vector3.z]
+     fadd [result]
+     fstp [result]
+     
+     mov eax, [result]
+     ret
+endp
 proc Vector3.Add uses esi edi,\
      dest, src
 
@@ -559,7 +586,7 @@ ret66         vf5
 endp
 
 
-proc Vecto3.Dup uses edi esi, Vec1, Vec2
+proc Vector3.Dup uses edi esi, Vec1, Vec2
   locals
     res   dd    ?
   endl

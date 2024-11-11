@@ -81,3 +81,40 @@ proc Spline.GetPoint uses esi edi ebx,\
 .Return:
         ret
 endp
+
+proc Spline.GetTangentVector uses esi edi,\
+        spline, result, time
+
+        locals
+                prevPoint Vector3 
+                nextPoint Vector3 
+                eps       dd    0.1
+                prevTime      dd    ?
+                nextTime      dd    ?
+        endl
+
+        fld [time]
+        fsub [eps]
+        fstp [prevTime]
+
+        fld [time]
+        fadd [eps]
+        fstp [nextTime]
+
+        lea eax, [prevPoint]
+        stdcall Spline.GetPoint, [spline], eax, [prevTime] 
+
+        lea eax, [nextPoint]
+        stdcall Spline.GetPoint, [spline], eax, [nextTime] 
+
+        lea eax, [prevPoint]
+        lea ecx, [nextPoint]
+        stdcall Vector3.Sub, ecx, eax
+
+        mov edi, [result]
+        lea eax, [nextPoint]
+        mov esi, eax
+        mov ecx, 3
+        rep movsd 
+        ret
+endp

@@ -15,21 +15,79 @@ proc Draw uses esi
 
         mov     eax, [currentTime]
         mov     [lastTime], eax   
-        ;stdcall Tick
-      ;  stdcall UpdateMovement
+
+
+        ;stdcall Spline.GetPoint, cubeSpline,  tempPosition1, [programTime] 
+        ;fld [programTime]
+        ;fadd [one]
+        ;fstp [nprogramTime]
+     
+        stdcall Spline.GetPoint, cubeSpline, car.transform.position, [programTime] 
+        stdcall Spline.GetTangentVector, cubeSpline, tangentVector, [programTime] 
+
+        stdcall Vector3.Normalize, tangentVector
+        
+
+        ;fld [nprogramTime]
+        ;fadd [one]
+        ;fstp [nprogramTime]
+        
+        ;stdcall Spline.GetPoint, cubeSpline, tempPosition2, [nprogramTime] 
+
+        ;mov     esi, car.transform.position
+        ;mov     edi, tempPosition
+        ;mov     ecx, 3
+        ;rep     movsd
 .Skip:
+        
+
+        ;stdcall Vector3.Sub, tempPosition2, tempPosition
+        ;stdcall Vector3.Sub, tempPosition, tempPosition1 
+
+        ;stdcall Vector3.Length, tempPosition
+        ;mov [v1Length], eax
+
+        ;stdcall Vector3.Length, tempPosition2
+        ;mov [v2Length], eax
+
+        ;stdcall Vector3.Dup, tempPosition, tempPosition2
+        ;mov [cosAngle], eax
+
+        ;fld [v1Length]    ;v1L
+        ;fmul [v2Length]  
+
+        ;fdivr [cosAngle]       
+
+        ;fld st0
+        ;fmul st0, st0    ; srctan(sqrt(1 - src^2)/src)
+        
+        ;fld1
+
+        ;fsubr [oneF]
+        ;fsqrt
+        ;fxch
+        ;fpatan
+        
+        ;fmul [toRadian]
+
+        ;fldpi
+
+        ;fdivr st0, st1  
+        ;fchs 
+        ;fadd [ninety] 
+        ;fadd [car.transform.rotation.y]   
+        ;fstp [car.transform.rotation.y] 
+
         invoke  glClearColor, 0.6, 0.6, 1.0, 1.0
         invoke  glClear, GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT
+         
+       
+        ;stdcall Vector3.RotateY, sphere.transform.position, [step], sphere.transform.position
+        ;stdcall Spline.GetPoint, rotateSpline, sphere.transform.position, [programTime]
         
-        stdcall Spline.GetPoint, cubeSpline, car.transform.position, [programTime]                                                  
-        
-        stdcall Spline.GetPoint, rotateSpline, car.transform.rotation, [programTime]                                                  
-        
-        stdcall Vector3.RotateY, sphere.transform.position, [lightAngle], sphere.transform.position
- 
         invoke  glMatrixMode, GL_MODELVIEW 
         invoke  glLoadIdentity
-        stdcall Matrix.LookAt, cameraPosition, targetPosition, upVector, view 
+        stdcall Matrix.LookAt, cameraPosition, targetPosition, upVector;, view 
         
         invoke glGetFloatv, GL_MODELVIEW_MATRIX, view
 
@@ -40,20 +98,6 @@ proc Draw uses esi
         stdcall Object.Draw, sphere
 
         invoke  SwapBuffers, [hdc]
-        ret
-endp
-
-proc PushMatrix
-
-        
-
-        ret
-endp
-
-proc PopMatrix, matrix
-
-        memcpy MVP, tempMatrix, sizeof.Matrix4x4
-
         ret
 endp
 
@@ -83,7 +127,7 @@ proc Object.Draw uses esi ,\
       
         invoke glUniform3fv, [viewPosLocation], 1, cameraPosition
        
-        invoke glUniform3fv, [lightPosLocation], 1, sphere.transform.position
+        invoke glUniform3fv, [lightPosLocation], 1, cameraPosition;sphere.transform.position
         invoke glUniform3fv, [objectColorLocation], 1, objectColor
         invoke glUniform3fv, [lightColorLocation], 1, lightColor
 @@:     

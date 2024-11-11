@@ -83,3 +83,48 @@ proc Object.Create uses esi edi ,\
     
     ret
 endp
+
+proc Object.SetPosition uses esi,\
+               object, x, y, z
+
+    mov esi, [object]
+
+    mov eax, [x]
+    mov [esi + Object.transform.position.x], eax
+
+    mov eax, [y]
+    mov [esi + Object.transform.position.y], eax
+
+    mov eax, [z]
+    mov [esi + Object.transform.position.z], eax
+
+    ret
+endp
+
+proc Object.SetScale uses esi,\
+               object, x, y, z
+
+    mov esi, [object]
+
+    mov eax, [x]
+    mov [esi + Object.transform.scale.x], eax
+
+    mov eax, [y]
+    mov [esi + Object.transform.scale.y], eax
+
+    mov eax, [z]
+    mov [esi + Object.transform.scale.z], eax
+
+    ret
+endp
+
+proc Object.SetPositionV uses esi edi,\
+               object, v
+
+    mov     esi, [v]
+    mov     edi, [object]
+    add     edi, Object.transform.position
+    mov     ecx, 12
+    rep     movsb  
+    ret
+endp

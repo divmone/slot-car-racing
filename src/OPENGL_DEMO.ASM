@@ -28,7 +28,7 @@
 
 ; fpu
         toRadian        GLfloat         180.0
-
+        pi              dd              3.14159
         step           GLfloat           5.0
         stepp           GLfloat         1.0
         steppp          GLfloat         0.05
@@ -112,21 +112,21 @@
         cubeSpline      Spline          4, cubePoints, 1, 6.0
 
 
-        sRotation1      Vector3         0.0, 90.0, 0.0
-        sRotation1Prev  Vector3         0.0, 0.0, 0.0
-        sRotation1Next  Vector3         0.0, 0.0, 0.0
+        sRotation1      Vector3         0.0, 0.0, 0.0
+        sRotation1Prev  Vector3         0.0, 180.0, 0.0
+        sRotation1Next  Vector3         0.0, 125.0, 0.0
         
-        sRotation2      Vector3         0.0, 0.0, 0.0
-        sRotation2Prev  Vector3         0.0, 0.0, 0.0
-        sRotation2Next  Vector3         0.0, 0.0, 0.0
+        sRotation2      Vector3         0.0, 125.0, 0.0
+        sRotation2Prev  Vector3         0.0, 125.0, 0.0
+        sRotation2Next  Vector3         0.0, 125.0, 0.0
 
-        sRotation3      Vector3         0.0, 180.0, 0.0
-        sRotation3Prev  Vector3         0.0, 0.0, 0.0
-        sRotation3Next  Vector3         0.0, 0.0, 0.0
+        sRotation3      Vector3         0.0, 125.0, 0.0
+        sRotation3Prev  Vector3         0.0, 125.0, 0.0
+        sRotation3Next  Vector3         0.0, 125.0, 0.0
 
-        sRotation4      Vector3         0.0, 0.0, 0.0
+        sRotation4      Vector3         0.0, 180.0, 0.0
         sRotation4Prev  Vector3         0.0, 0.0, 0.0
-        sRotation4Next  Vector3         0.0, 90.0, 0.0
+        sRotation4Next  Vector3         0.0, 180.0, 0.0
 
         sPoints:     Spline.Point    sRotation1, sRotation1Prev, sRotation1Next, 2.0
                      Spline.Point    sRotation2, sRotation2Prev, sRotation2Next, 1.0
@@ -140,12 +140,28 @@
         lastTime        dd              ?
         currentTime     dd              ?
         programTime     dd              ?   
-        nprogramTime     dd              ?   
-        oneSecond       GLfloat         1000.0   
-        ten             dd              0.1   
+        nprogramTime    dd              ?   
 
+        oneSecond       GLfloat         1000.0   
+        ten             dd              10.0
+        cosAngle             dd                ?
+        tempPosition     Vector3         0.0, 0.0, 0.0
+        tempPosition1    Vector3         0.0, 0.0, 0.0 
+        tempPosition2    Vector3         0.0, 0.0, 0.0      
+        directionVector Vector3         
+        rAngle          dd              0.0  
+        v1Length         dd              0.0
+        v2Length         dd              0.0
+        productLenght    dd              0.0
+        oneF            dd              1.0
+        tempV           dd              0.0
+
+        tempValue       dd              ?
+        one             dd              0.2     
         rVector         Vector3         0.0, 1.0, 0.0                                                     
         ninety          GLfloat         90.0
+
+        tangentVector   Vector3         
 
         include         "Init.asm"
         include         "Mesh.asm"
