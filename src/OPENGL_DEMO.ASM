@@ -111,38 +111,13 @@
 
         cubeSpline      Spline          4, cubePoints, 1, 6.0
 
-
-        sRotation1      Vector3         0.0, 0.0, 0.0
-        sRotation1Prev  Vector3         0.0, 180.0, 0.0
-        sRotation1Next  Vector3         0.0, 125.0, 0.0
-        
-        sRotation2      Vector3         0.0, 125.0, 0.0
-        sRotation2Prev  Vector3         0.0, 125.0, 0.0
-        sRotation2Next  Vector3         0.0, 125.0, 0.0
-
-        sRotation3      Vector3         0.0, 125.0, 0.0
-        sRotation3Prev  Vector3         0.0, 125.0, 0.0
-        sRotation3Next  Vector3         0.0, 125.0, 0.0
-
-        sRotation4      Vector3         0.0, 180.0, 0.0
-        sRotation4Prev  Vector3         0.0, 0.0, 0.0
-        sRotation4Next  Vector3         0.0, 180.0, 0.0
-
-        sPoints:     Spline.Point    sRotation1, sRotation1Prev, sRotation1Next, 2.0
-                     Spline.Point    sRotation2, sRotation2Prev, sRotation2Next, 1.0
-                     Spline.Point    sRotation3, sRotation3Prev, sRotation3Next, 2.0
-                     Spline.Point    sRotation4, sRotation4Prev, sRotation4Next, 1.0
-
-        rotateSpline      Spline          4, sPoints, 1, 6.0
-
-
-        startTime       dd              ?
+        startTime       dd              0.0
         lastTime        dd              ?
         currentTime     dd              ?
         programTime     dd              ?   
         nprogramTime    dd              ?   
 
-        oneSecond       GLfloat         1000.0   
+        oneSecond       GLfloat         500.0   
         ten             dd              10.0
         cosAngle             dd                ?
         tempPosition     Vector3         0.0, 0.0, 0.0
@@ -160,7 +135,9 @@
         one             dd              0.2     
         rVector         Vector3         0.0, 1.0, 0.0                                                     
         ninety          GLfloat         90.0
-
+        null            dd              0.0
+        epsilon         dd              0.0
+        mepsilon         dd              -0.8
         tangentVector   Vector3         
 
         include         "Init.asm"
@@ -347,9 +324,9 @@ proc WindowProc uses ebx,\
         jmp .ReturnZero
 
 .Destroy:
-        invoke HeapFree, [hHeap]
+        invoke HeapDestroy, [hHeap]
         invoke CloseHandle, [logFile]
-        invoke  ExitProcess, ebx
+        invoke ExitProcess, ebx
 
 .ReturnZero:
         xor     eax, eax

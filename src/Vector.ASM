@@ -494,115 +494,23 @@ proc Vector3.SubValue uses esi,\
      ret
 endp
 
-
-proc RotateCamera uses ebx ecx edx,\
-     cameraPos, targetPos,upVec, angle
-
-    locals
-        deltaX  GLfloat ?
-        deltaZ  GLfloat ?
-        radius  GLfloat ?
-        sinA    GLfloat ?
-        cosA    GLfloat ?
-    endl
-
-    fld     [cameraPos + Vector3.x]
-    fsub    [targetPos + Vector3.x]
-    fstp    [deltaX]
-
-    fld     [cameraPos  + Vector3.z]
-    fsub    [targetPos  + Vector3.z]
-    fstp    [deltaZ]
-
-    fld     [deltaX]
-    fmul    [deltaX]
-    fld     [deltaZ]
-    fmul    [deltaZ]
-    faddp   st1, st0
-    fsqrt
-    fstp    [radius]
-
-    fld     [angle]
-    fsin
-    fstp    [sinA]
-
-    fld     [angle]
-    fcos
-    fstp    [cosA]
-
-
-    fld     [radius]
-    fmul    [cosA]
-    fadd    [targetPos  + Vector3.x]
-    fstp    [cameraPos  + Vector3.x]
-
-    fld     [radius]
-    fmul    [sinA]
-    fadd    [targetPos  + Vector3.z]
-    fstp    [cameraPos  + Vector3.z]
-
-    ret
-endp
-
-
-proc ksjhfv
-template <typename T> 
-GLM_FUNC_QUALIFIER detail::tmat4x4<T> rotate
-(
-    detail::tmat4x4<T> const & m,
-    T const & angle, 
-    detail::tvec3<T> const & v
-)
-{
-    T a = radians(angle);
-    T c = cos(a);
-    T s = sin(a);
-
-    detail::tvec3<T> axis = normalize(v);
-
-    detail::tvec3<T> temp = (T(1) - c) * axis;
-
-    detail::tmat4x4<T> Rotate(detail::tmat4x4<T>::null);
-    Rotate[0][0] = c + temp[0] * axis[0];
-    Rotate[0][1] = 0 + temp[0] * axis[1] + s * axis[2];
-    Rotate[0][2] = 0 + temp[0] * axis[2] - s * axis[1];
-
-    Rotate[1][0] = 0 + temp[1] * axis[0] - s * axis[2];
-    Rotate[1][1] = c + temp[1] * axis[1];
-    Rotate[1][2] = 0 + temp[1] * axis[2] + s * axis[0];
-
-    Rotate[2][0] = 0 + temp[2] * axis[0] + s * axis[1];
-    Rotate[2][1] = 0 + temp[2] * axis[1] - s * axis[0];
-    Rotate[2][2] = c + temp[2] * axis[2];
-
-    detail::tmat4x4<T> Result(detail::tmat4x4<T>::null);
-    Result[0] = m[0] * Rotate[0][0] + m[1] * Rotate[0][1] + m[2] * Rotate[0][2];
-    Result[1] = m[0] * Rotate[1][0] + m[1] * Rotate[1][1] + m[2] * Rotate[1][2];
-    Result[2] = m[0] * Rotate[2][0] + m[1] * Rotate[2][1] + m[2] * Rotate[2][2];
-    Result[3] = m[3];
-    return Result;
-}
-ret66         vf5
-endp
-
-
 proc Vector3.Dup uses edi esi, Vec1, Vec2
-  locals
-    res   dd    ?
-  endl
-  mov esi, [Vec1]
-  mov edi, [Vec2]
+     locals
+          res   dd    ?
+     endl
+     mov esi, [Vec1]
+     mov edi, [Vec2]
   
-  fld  dword[esi]
-  fmul dword[edi]
-  fld  dword[esi + 4]
-  fmul dword[edi + 4]
-  faddp
-  fld  dword[esi + 8]
-  fmul dword[edi + 8]
-  faddp
-  fstp [res]
-  mov eax, [res]
+     fld  dword[esi]
+     fmul dword[edi]
+     fld  dword[esi + 4]
+     fmul dword[edi + 4]
+     faddp
+     fld  dword[esi + 8]
+     fmul dword[edi + 8]
+     faddp
+     fstp [res]
+     mov eax, [res]
 
   ret
 endp

@@ -9,6 +9,7 @@ struct Object
     transform Transform 
     VAO  GLuint ?
     texture GLuint ?
+    matrix Matrix4x4 
     ;objFileName  dd ?
     ;texFileName  dd ?
 ends

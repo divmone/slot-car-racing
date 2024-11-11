@@ -62,9 +62,6 @@ proc Matrix.Projection uses edi,\
         fmul    [zFar]
         fdiv    [deltaZ]
         fstp    [edi + Matrix4x4.m43]
-
-        ;invoke  glMultMatrixf, edi
-
         ret
 endp  
 
@@ -78,6 +75,8 @@ proc Matrix.LookAt uses esi edi ebx,\
                 xAxis   Vector3
                 yAxis   Vector3
         endl
+
+        invoke  glLoadIdentity
 
         mov     edi, view
         mov     ecx, 4 * 4
@@ -162,6 +161,9 @@ proc Matrix.LookAt uses esi edi ebx,\
         fstp    [temp]
         push    [temp]
         invoke  glTranslatef
+
+        ;invoke  glRotatef, 135.0, 0.0, 1.0, 0.0
+        invoke glGetFloatv, GL_MODELVIEW_MATRIX, view
 
         ret
 endp         

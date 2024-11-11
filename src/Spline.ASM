@@ -82,19 +82,31 @@ proc Spline.GetPoint uses esi edi ebx,\
         ret
 endp
 
-proc Spline.GetTangentVector uses esi edi,\
-        spline, result, time
+proc Spline.GetRotation uses esi edi,\ 
+        spline, currentV, time
 
         locals
                 prevPoint Vector3 
                 nextPoint Vector3 
-                eps       dd    0.1
+                currentPoint Vector3
+                dupValue dd ?
+                eps       dd    0.01
+                meps      dd    0.01
                 prevTime      dd    ?
                 nextTime      dd    ?
+                one dd 1.0
+                toDegree dd 180.0
+                temp dd ?
         endl
 
+        lea eax, [currentPoint]
+        mov edi, eax
+        mov esi, car.matrix.m11
+        mov ecx, 3
+        rep movsd
+
         fld [time]
-        fsub [eps]
+        fsub [meps]
         fstp [prevTime]
 
         fld [time]
@@ -107,14 +119,39 @@ proc Spline.GetTangentVector uses esi edi,\
         lea eax, [nextPoint]
         stdcall Spline.GetPoint, [spline], eax, [nextTime] 
 
-        lea eax, [prevPoint]
-        lea ecx, [nextPoint]
-        stdcall Vector3.Sub, ecx, eax
-
-        mov edi, [result]
         lea eax, [nextPoint]
-        mov esi, eax
-        mov ecx, 3
-        rep movsd 
+        lea ecx, [prevPoint]
+
+        stdcall Vector3.Sub, eax, ecx
+
+        lea eax, [currentPoint]
+        stdcall Vector3.Normalize, eax
+
+        lea eax, [nextPoint]
+        stdcall Vector3.Normalize, eax
+
+        lea eax, [currentPoint]
+        lea ecx, [nextPoint]
+
+        stdcall Vector3.Dup, eax, ecx
+        mov [dupValue], eax
+
+
+        fld [dupValue]
+        
+        fld st0
+        fmul st0, st0
+        fsubr [one] 
+        fsqrt
+        fxch
+        fpatan
+
+        fmul [toDegree]
+        fldpi
+        fdivr st0, st1
+        fchs
+        fadd [car.transform.rotation.y]
+        fstp [car.transform.rotation.y]
+
         ret
 endp
