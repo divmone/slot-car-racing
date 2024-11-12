@@ -88,9 +88,8 @@ proc Spline.GetRotation uses esi edi,\
         locals
                 prevPoint Vector3 
                 nextPoint Vector3 
+                nextPoint2 Vector3 
                 currentPoint Vector3
-                projectionXY Vector3
-                projectionXZ Vector3
                 dupValue dd ?
                 eps       dd    0.4
                 meps      dd    0.4
@@ -103,26 +102,9 @@ proc Spline.GetRotation uses esi edi,\
 
         lea eax, [currentPoint]
         mov edi, eax
-        mov esi, car.matrix.m31
+        mov esi, car.matrix.m11
         mov ecx, 3
         rep movsd
-
-        lea eax, [projectionXY]
-        mov edi, eax
-        lea ecx, [currentPoint]
-        mov esi, ecx
-        mov ecx, 3
-        rep movsd
-
-        lea eax, [projectionXZ]
-        mov edi, eax
-        lea ecx, [currentPoint]
-        mov esi, ecx
-        mov ecx, 3
-        rep movsd
-
-        mov [projectionXY + Vector3.y], 0.0
-        mov [projectionXZ + Vector3.z], 0.0
 
         fld [time]
         fsub [meps]
@@ -143,62 +125,175 @@ proc Spline.GetRotation uses esi edi,\
 
         stdcall Vector3.Sub, eax, ecx
 
-        mov [nextPoint + Vector3.y], 0.0
-
-        lea eax, [projectionXY]
-        stdcall Vector3.Normalize, eax
-
-        lea eax, [projectionXZ]
-        stdcall Vector3.Normalize, eax
-
         lea eax, [nextPoint]
+        lea ecx, [currentPoint]
+        stdcall Vector3.GetAngleXZ, eax, ecx
+
+       ; stdcall Vector3.GetAngleYZ, eax, ecx
+
+        ;lea ecx, [nextPoint]
+        ;lea eax, [currentPoint3]
+        ;stdcall Vector3.GetAngleYZ, eax, ecx
+
+        ret
+endp
+
+proc Vector3.GetAngleXZ uses edi esi, v1, v2
+
+        locals
+                vec1  Vector3
+                vec2  Vector3
+                dupValue dd ?
+                one dd 1.0
+                toDegree dd 180.0
+                zero dd 0.0
+        endl
+
+        lea eax, [vec1]
+        mov edi, eax
+        mov esi, [v1]
+        mov ecx, 3
+        rep movsd
+
+        lea eax, [vec2]
+        mov edi, eax
+        mov esi, [v2]
+        mov ecx, 3
+        rep movsd
+
+        lea eax, [vec1]
         stdcall Vector3.Normalize, eax
 
-        lea eax, [projectionXY]
-        lea ecx, [nextPoint]
+        lea eax, [vec2]
+        stdcall Vector3.Normalize, eax
 
+        lea eax, [vec1]
+        lea ecx, [vec2]
         stdcall Vector3.Dup, eax, ecx
         mov [dupValue], eax
 
-
-        fld [dupValue]
-        
+        finit
+        fld [dupValue]    
         fld st0
         fmul st0, st0
         fsubr [one] 
         fsqrt
         fxch
         fpatan
-
         fmul [toDegree]
         fldpi
         fdivr st0, st1
         ;fchs
         fsubr [car.transform.rotation.y]
         fstp [car.transform.rotation.y]
+@@:
+        ret
+endp
 
-        
-        lea eax, [projectionXZ]
-        lea ecx, [nextPoint]
+proc Vector3.GetAngleXY uses edi esi, v1, v2
+
+        locals
+                vec1  Vector3
+                vec2  Vector3
+                dupValue dd ?
+                one dd 1.0
+                toDegree dd 180.0
+                zero dd 0.0
+        endl
+
+        lea eax, [vec1]
+        mov edi, eax
+        mov esi, [v1]
+        mov ecx, 3
+        rep movsd
+
+        lea eax, [vec2]
+        mov edi, eax
+        mov esi, [v2]
+        mov ecx, 3
+        rep movsd
+
+        ;mov [vec1 + Vector3.z], 0.0
+        ;mov [vec2 + Vector3.z], 0.0
+
+        lea eax, [vec1]
+        stdcall Vector3.Normalize, eax
+
+        lea eax, [vec2]
+        stdcall Vector3.Normalize, eax
+
+        lea eax, [vec1]
+        lea ecx, [vec2]
 
         stdcall Vector3.Dup, eax, ecx
         mov [dupValue], eax
 
-        ;fld [dupValue]
-        
-        ;fld st0
-        ;fmul st0, st0
-        ;fsubr [one] 
-        ;fsqrt
-        ;fxch
-        ;fpatan
-
-        ;fmul [toDegree]
-        ;fldpi
-        ;fdivr st0, st1
-        ;fchs
+        finit
+        fld [dupValue]    
+        fld st0
+        fmul st0, st0
+        fsubr [one] 
+        fsqrt
+        fxch
+        fpatan
+        fmul [toDegree]
+        fldpi
+        fdivr st0, st1
         ;fsubr [car.transform.rotation.z]
-        ;fstp [car.transform.rotation.z]
+        fstp [car.transform.rotation.z]
+@@:
+
+        ret
+endp
+
+proc Vector3.GetAngleYZ uses edi esi, v1, v2
+
+        locals
+                vec1  Vector3
+                vec2  Vector3
+                dupValue dd ?
+                one dd 1.0
+                toDegree dd 180.0
+                zero dd 10.0
+        endl
+
+        lea eax, [vec1]
+        mov edi, eax
+        mov esi, [v1]
+        mov ecx, 3
+        rep movsd
+
+        lea eax, [vec2]
+        mov edi, eax
+        mov esi, [v2]
+        mov ecx, 3
+        rep movsd
+
+        lea eax, [vec1]
+        stdcall Vector3.Normalize, eax
+
+        lea eax, [vec2]
+        stdcall Vector3.Normalize, eax
+
+        lea eax, [vec1]
+        lea ecx, [vec2]
+        stdcall Vector3.Dup, eax, ecx
+        mov [dupValue], eax
+
+        finit
+
+        fld [dupValue]    
+        fld st0
+        fmul st0, st0
+        fsubr [one] 
+        fsqrt
+        fxch
+        fpatan
+        fmul [toDegree]
+        fldpi
+        fdivr st0, st1
+        ;fchs
+        fstp [car.transform.rotation.x]
 
         ret
 endp

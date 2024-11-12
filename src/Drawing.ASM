@@ -21,11 +21,6 @@ proc Draw uses esi
         
         stdcall Matrix.LookAt, cameraPosition, targetPosition, upVector 
         
-       
-        stdcall Vector3.Translate, oTurn, [angleX], [angleZ], [angleY]
-        
-
-
         stdcall Object.Draw, car
         stdcall Object.Draw, table
         stdcall Object.Draw, sphere

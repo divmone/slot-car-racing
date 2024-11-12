@@ -497,17 +497,18 @@ endp
 proc Vector3.Dup uses edi esi, Vec1, Vec2
      locals
           res   dd    ?
+          zero dd 0.0
      endl
      mov esi, [Vec1]
      mov edi, [Vec2]
   
-     fld  dword[esi]
-     fmul dword[edi]
-     fld  dword[esi + 4]
-     fmul dword[edi + 4]
+     fld  dword[esi + Vector3.x]
+     fmul dword[edi + Vector3.x]
+     fld  dword[esi + Vector3.y]
+     fmul dword[edi + Vector3.y]
      faddp
-     fld  dword[esi + 8]
-     fmul dword[edi + 8]
+     fld  dword[esi + Vector3.z]
+     fmul dword[edi + Vector3.z]
      faddp
      fstp [res]
      mov eax, [res]

@@ -88,19 +88,19 @@
         trackPointPosition3 Vector3 0.0, 0.0, 0.0
         trackPointPosition4 Vector3 0.0, 0.0, 0.0
 
-        cameraPosition1 Vector3         50.0, 0.0, 0.0
-        cameraDirPrev1  Vector3         50.0, 0.0, 60.66
+        cameraPosition1 Vector3         50.0, 50.0, 0.0
+        cameraDirPrev1  Vector3         50.0, 50.0, 60.66
         cameraDirNext1  Vector3         50.0, 0.0, -60.66
 
-        cameraPosition2 Vector3         -50.0, 0.0, 0.0
-        cameraDirPrev2  Vector3         -50.0, 0.0, -60.66
+        cameraPosition2 Vector3         -50.0, 30.0, 0.0
+        cameraDirPrev2  Vector3         -50.0, 60.0, -60.66
         cameraDirNext2  Vector3         -50.0, 0.0, 60.66
 
         cameraPosition3 Vector3         -45.0, 0.0, -90.0
         cameraDirPrev3  Vector3          0.0, 0.0, -90.0 
         cameraDirNext3  Vector3          -45.0, 0.0, 0.0
 
-        cameraPosition4 Vector3         -45.0, 0.0, 90.0
+        cameraPosition4 Vector3         -45.0, 40.0, 90.0
         cameraDirPrev4  Vector3          -45.0, 0.0, 0.0
         cameraDirNext4  Vector3          0.0, 0.0, 90.0
 
