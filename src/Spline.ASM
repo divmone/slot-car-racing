@@ -89,9 +89,11 @@ proc Spline.GetRotation uses esi edi,\
                 prevPoint Vector3 
                 nextPoint Vector3 
                 currentPoint Vector3
+                projectionXY Vector3
+                projectionXZ Vector3
                 dupValue dd ?
-                eps       dd    0.01
-                meps      dd    0.01
+                eps       dd    0.4
+                meps      dd    0.4
                 prevTime      dd    ?
                 nextTime      dd    ?
                 one dd 1.0
@@ -101,9 +103,26 @@ proc Spline.GetRotation uses esi edi,\
 
         lea eax, [currentPoint]
         mov edi, eax
-        mov esi, car.matrix.m11
+        mov esi, car.matrix.m31
         mov ecx, 3
         rep movsd
+
+        lea eax, [projectionXY]
+        mov edi, eax
+        lea ecx, [currentPoint]
+        mov esi, ecx
+        mov ecx, 3
+        rep movsd
+
+        lea eax, [projectionXZ]
+        mov edi, eax
+        lea ecx, [currentPoint]
+        mov esi, ecx
+        mov ecx, 3
+        rep movsd
+
+        mov [projectionXY + Vector3.y], 0.0
+        mov [projectionXZ + Vector3.z], 0.0
 
         fld [time]
         fsub [meps]
@@ -124,13 +143,18 @@ proc Spline.GetRotation uses esi edi,\
 
         stdcall Vector3.Sub, eax, ecx
 
-        lea eax, [currentPoint]
+        mov [nextPoint + Vector3.y], 0.0
+
+        lea eax, [projectionXY]
+        stdcall Vector3.Normalize, eax
+
+        lea eax, [projectionXZ]
         stdcall Vector3.Normalize, eax
 
         lea eax, [nextPoint]
         stdcall Vector3.Normalize, eax
 
-        lea eax, [currentPoint]
+        lea eax, [projectionXY]
         lea ecx, [nextPoint]
 
         stdcall Vector3.Dup, eax, ecx
@@ -149,9 +173,32 @@ proc Spline.GetRotation uses esi edi,\
         fmul [toDegree]
         fldpi
         fdivr st0, st1
-        fchs
-        fadd [car.transform.rotation.y]
+        ;fchs
+        fsubr [car.transform.rotation.y]
         fstp [car.transform.rotation.y]
+
+        
+        lea eax, [projectionXZ]
+        lea ecx, [nextPoint]
+
+        stdcall Vector3.Dup, eax, ecx
+        mov [dupValue], eax
+
+        ;fld [dupValue]
+        
+        ;fld st0
+        ;fmul st0, st0
+        ;fsubr [one] 
+        ;fsqrt
+        ;fxch
+        ;fpatan
+
+        ;fmul [toDegree]
+        ;fldpi
+        ;fdivr st0, st1
+        ;fchs
+        ;fsubr [car.transform.rotation.z]
+        ;fstp [car.transform.rotation.z]
 
         ret
 endp
