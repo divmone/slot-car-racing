@@ -93,8 +93,8 @@
         cameraDirNext1  Vector3         50.0, 0.0, -60.66
 
         cameraPosition2 Vector3         -50.0, 0.0, 0.0
-        cameraDirPrev2  Vector3         -50.0, 0.0, -60.66
-        cameraDirNext2  Vector3         -50.0, 0.0, 60.66
+        cameraDirPrev2  Vector3         -50.0, 100.0, -60.66
+        cameraDirNext2  Vector3         -50.0, 100.0, 60.66
 
         cameraPosition3 Vector3         -45.0, 0.0, -90.0
         cameraDirPrev3  Vector3          0.0, 0.0, -90.0 
@@ -139,6 +139,9 @@
         epsilon         dd              0.0
         mepsilon         dd              -0.8
         tangentVector   Vector3         
+        vec1 Vector3
+        vec2 Vector3
+        content db 108 dup(0) 
 
         include         "Init.asm"
         include         "Mesh.asm"

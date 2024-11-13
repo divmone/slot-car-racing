@@ -127,13 +127,14 @@ proc Spline.GetRotation uses esi edi,\
 
         stdcall Vector3.Sub, eax, ecx
 
-        lea eax, [nextPoint]
-        lea ecx, [currentPoint]
+        lea ecx, [nextPoint]
+        lea eax, [currentPoint]
         stdcall Vector3.GetAngleXZ, eax, ecx
 
-        ;lea eax, [nextPoint]
-        ;lea ecx, [currentPoint]
-        ;stdcall Vector3.GetAngleXZ, eax, ecx
+        lea eax, [nextPoint]
+        lea ecx, [car.matrix.m21]
+        stdcall Vector3.GetAngleXY, eax, ecx
+
 
         ret
 endp
@@ -141,38 +142,26 @@ endp
 proc Vector3.GetAngleXZ uses edi esi, v1, v2
 
         locals
-                vec1  Vector3
-                vec2  Vector3
-                dupValue dd ?
+                dupValue dd 0.0
                 one dd 1.0
                 toDegree dd 180.0
         endl
 
-        lea eax, [vec1]
-        mov edi, eax
-        mov esi, [v1]
-        mov ecx, 3
-        rep movsd
+        stdcall Vector3.Copy, vec1, [v1]
 
-        lea eax, [vec2]
-        mov edi, eax
-        mov esi, [v2]
-        mov ecx, 3
-        rep movsd
-  
-        lea eax, [vec1]
-        stdcall Vector3.Normalize, eax
+        stdcall Vector3.Copy, vec2, [v2]
 
-        lea eax, [vec2]
-        stdcall Vector3.Normalize, eax
+        mov dword[vec1 + Vector3.y], 0.0
+        mov dword[vec2 + Vector3.y], 0.0
 
-        lea eax, [vec1]
-        lea ecx, [vec2]
+        stdcall Vector3.Normalize, vec1
 
-        stdcall Vector3.Dup, eax, ecx
+        stdcall Vector3.Normalize, vec2
+
+        stdcall Vector3.Dup, vec1, vec2
+
         mov [dupValue], eax
 
-        finit
         fld [dupValue]    
         fld st0
         fmul st0, st0
@@ -183,51 +172,33 @@ proc Vector3.GetAngleXZ uses edi esi, v1, v2
         fmul [toDegree]
         fldpi
         fdivr st0, st1
-        ;fchs
+        fstp st1
         fsubr [car.transform.rotation.y]
         fstp [car.transform.rotation.y]
         ret
 endp
 
 proc Vector3.GetAngleXY uses edi esi, v1, v2
-
+ 
         locals
-                vec1  Vector3
-                vec2  Vector3
-                dupValue dd ?
+                dupValue dd 0.0
                 one dd 1.0
                 toDegree dd 180.0
-                zero dd 0.0
         endl
 
-        lea eax, [vec1]
-        mov edi, eax
-        mov esi, [v1]
-        mov ecx, 3
-        rep movsd
+        stdcall Vector3.Copy, vec1, [v1]
 
-        lea eax, [vec2]
-        mov edi, eax
-        mov esi, [v2]
-        mov ecx, 3
-        rep movsd
+        stdcall Vector3.Copy, vec2, [v2]
 
-        mov dword[vec1 + 8], 0.0
-        mov dword[vec2 + 8], 0.0
+        
+        stdcall Vector3.Normalize, vec1
 
-        lea eax, [vec1]
-        stdcall Vector3.Normalize, eax
+        stdcall Vector3.Normalize, vec2
 
-        lea eax, [vec2]
-        stdcall Vector3.Normalize, eax
+        stdcall Vector3.Dup, vec1, vec2
 
-        lea eax, [vec1]
-        lea ecx, [vec2]
-
-        stdcall Vector3.Dup, eax, ecx
         mov [dupValue], eax
 
-        finit
         fld [dupValue]    
         fld st0
         fmul st0, st0
@@ -238,9 +209,9 @@ proc Vector3.GetAngleXY uses edi esi, v1, v2
         fmul [toDegree]
         fldpi
         fdivr st0, st1
-        ;fsubr [car.transform.rotation.z]
+        fstp st1
+        fsubr [ninety]
         fstp [car.transform.rotation.z]
-@@:
 
         ret
 endp
