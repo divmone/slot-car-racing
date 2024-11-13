@@ -14,7 +14,7 @@ proc Draw uses esi
         
         stdcall Spline.GetRotation, cubeSpline, car.transform.position, [programTime]
         ;stdcall Vector3.RotateY, car.transform.position, 1.0, car.transform.position
-.Skip:
+.Skip:                                                                           
         invoke  glClearColor, 0.6, 0.6, 1.0, 1.0
         invoke  glClear, GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT
 
@@ -62,7 +62,7 @@ proc Object.Draw uses esi edi,\
       
         invoke glUniform3fv, [viewPosLocation], 1, cameraPosition
        
-        invoke glUniform3fv, [lightPosLocation], 1, cameraPosition;sphere.transform.position
+        invoke glUniform3fv, [lightPosLocation], 1, sphere.transform.position
         invoke glUniform3fv, [objectColorLocation], 1, objectColor
         invoke glUniform3fv, [lightColorLocation], 1, lightColor
 @@:     

@@ -45,7 +45,7 @@ proc Init uses esi
         stdcall Object.Create, sphere, fileNameS, textPathS
 
 
-        stdcall Object.SetPositionV, sphere, tempPosition
+        stdcall Object.SetPosition, sphere, 0.0, 50.0, 0.0
         stdcall Object.SetPosition, car, 10.0, 0.0, 10.0        
         stdcall Object.SetScale, car, 10.0, 10.0, 10.0
 

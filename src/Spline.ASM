@@ -90,6 +90,8 @@ proc Spline.GetRotation uses esi edi,\
                 nextPoint Vector3 
                 nextPoint2 Vector3 
                 currentPoint Vector3
+                currentPoint2 Vector3
+                currentPoint3 Vector3
                 dupValue dd ?
                 eps       dd    0.4
                 meps      dd    0.4
@@ -129,11 +131,9 @@ proc Spline.GetRotation uses esi edi,\
         lea ecx, [currentPoint]
         stdcall Vector3.GetAngleXZ, eax, ecx
 
-       ; stdcall Vector3.GetAngleYZ, eax, ecx
-
-        ;lea ecx, [nextPoint]
-        ;lea eax, [currentPoint3]
-        ;stdcall Vector3.GetAngleYZ, eax, ecx
+        ;lea eax, [nextPoint]
+        ;lea ecx, [currentPoint]
+        ;stdcall Vector3.GetAngleXZ, eax, ecx
 
         ret
 endp
@@ -146,7 +146,6 @@ proc Vector3.GetAngleXZ uses edi esi, v1, v2
                 dupValue dd ?
                 one dd 1.0
                 toDegree dd 180.0
-                zero dd 0.0
         endl
 
         lea eax, [vec1]
@@ -160,7 +159,7 @@ proc Vector3.GetAngleXZ uses edi esi, v1, v2
         mov esi, [v2]
         mov ecx, 3
         rep movsd
-
+  
         lea eax, [vec1]
         stdcall Vector3.Normalize, eax
 
@@ -169,6 +168,7 @@ proc Vector3.GetAngleXZ uses edi esi, v1, v2
 
         lea eax, [vec1]
         lea ecx, [vec2]
+
         stdcall Vector3.Dup, eax, ecx
         mov [dupValue], eax
 
@@ -186,7 +186,6 @@ proc Vector3.GetAngleXZ uses edi esi, v1, v2
         ;fchs
         fsubr [car.transform.rotation.y]
         fstp [car.transform.rotation.y]
-@@:
         ret
 endp
 
@@ -213,8 +212,8 @@ proc Vector3.GetAngleXY uses edi esi, v1, v2
         mov ecx, 3
         rep movsd
 
-        ;mov [vec1 + Vector3.z], 0.0
-        ;mov [vec2 + Vector3.z], 0.0
+        mov dword[vec1 + 8], 0.0
+        mov dword[vec2 + 8], 0.0
 
         lea eax, [vec1]
         stdcall Vector3.Normalize, eax
@@ -269,6 +268,9 @@ proc Vector3.GetAngleYZ uses edi esi, v1, v2
         mov ecx, 3
         rep movsd
 
+        mov dword[vec1], 0.0
+        mov dword[vec2], 0.0
+
         lea eax, [vec1]
         stdcall Vector3.Normalize, eax
 
@@ -293,7 +295,44 @@ proc Vector3.GetAngleYZ uses edi esi, v1, v2
         fldpi
         fdivr st0, st1
         ;fchs
+        ;fadd [car.transform.rotation.x]
         fstp [car.transform.rotation.x]
 
         ret
+endp
+
+proc Vector3.DupXY uses edi esi, Vec1, Vec2
+     locals
+          res   dd    ?
+     endl
+     mov esi, [Vec1]
+     mov edi, [Vec2]
+  
+     fld  dword[esi]
+     fmul dword[edi]
+     fld  dword[esi + 4]
+     fmul dword[edi + 4]
+     fadd st0, st1
+     fstp [res]
+     mov eax, [res]
+
+  ret
+endp
+
+proc Vector3.DupXZ uses edi esi, Vec1, Vec2
+     locals
+          res   dd    ?
+     endl
+     mov esi, [Vec1]
+     mov edi, [Vec2]
+  
+     fld  dword[esi]
+     fmul dword[edi]
+     fld  dword[esi + 8]
+     fmul dword[edi + 8]
+     fadd st0, st1
+     fstp [res]
+     mov eax, [res]
+
+  ret
 endp
