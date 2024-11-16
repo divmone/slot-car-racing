@@ -11,11 +11,10 @@ proc Draw uses esi
         jle     .Skip
 
         stdcall Spline.GetPoint, cubeSpline, car.transform.position, [programTime] 
-        
-        stdcall Spline.GetRotation, cubeSpline, car.transform.position, [programTime]
-        ;stdcall Vector3.RotateY, car.transform.position, 1.0, car.transform.position
+        stdcall Spline.GetRotation, cubeSpline, car.transform.position, [programTime]      
 .Skip:                                                                           
         invoke  glClearColor, 0.6, 0.6, 1.0, 1.0
+
         invoke  glClear, GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT
 
         

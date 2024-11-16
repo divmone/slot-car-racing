@@ -15,7 +15,7 @@ struct Object
 ends
 
 car Object 0,0,0,0
-fileName        db              "../models/gtr.obj",0
+fileName        db              "../models/gtr1.obj",0
 textPath        db              "../textures/gt-r.bmp", 0
 
 nissan Object 
@@ -29,3 +29,6 @@ textPathT        db              "../textures/images.bmp", 0
 sphere Object
 fileNameS        db             "../models/sphere.obj",0 
 textPathS        db             "../textures/light.bmp", 0
+
+
+musicPath  db "../audio/goida.wav",0

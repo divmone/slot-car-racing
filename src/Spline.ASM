@@ -88,28 +88,16 @@ proc Spline.GetRotation uses esi edi,\
         locals
                 prevPoint Vector3 
                 nextPoint Vector3 
-                nextPoint2 Vector3 
-                currentPoint Vector3
-                currentPoint2 Vector3
-                currentPoint3 Vector3
                 dupValue dd ?
-                eps       dd    0.4
-                meps      dd    0.4
+                eps       dd    0.01
                 prevTime      dd    ?
                 nextTime      dd    ?
                 one dd 1.0
                 toDegree dd 180.0
-                temp dd ?
         endl
 
-        lea eax, [currentPoint]
-        mov edi, eax
-        mov esi, car.matrix.m11
-        mov ecx, 3
-        rep movsd
-
         fld [time]
-        fsub [meps]
+        fsub [eps]
         fstp [prevTime]
 
         fld [time]
@@ -126,16 +114,12 @@ proc Spline.GetRotation uses esi edi,\
         lea ecx, [prevPoint]
 
         stdcall Vector3.Sub, eax, ecx
-
-        lea ecx, [nextPoint]
-        lea eax, [currentPoint]
-        stdcall Vector3.GetAngleXZ, eax, ecx
-
+        
         lea eax, [nextPoint]
-        lea ecx, [car.matrix.m21]
-        stdcall Vector3.GetAngleXY, eax, ecx
 
+        stdcall Vector3.GetAngleXZ, eax, car.matrix.m11
 
+        
         ret
 endp
 
@@ -151,9 +135,6 @@ proc Vector3.GetAngleXZ uses edi esi, v1, v2
 
         stdcall Vector3.Copy, vec2, [v2]
 
-        mov dword[vec1 + Vector3.y], 0.0
-        mov dword[vec2 + Vector3.y], 0.0
-
         stdcall Vector3.Normalize, vec1
 
         stdcall Vector3.Normalize, vec2
@@ -161,7 +142,6 @@ proc Vector3.GetAngleXZ uses edi esi, v1, v2
         stdcall Vector3.Dup, vec1, vec2
 
         mov [dupValue], eax
-
         fld [dupValue]    
         fld st0
         fmul st0, st0
@@ -210,7 +190,8 @@ proc Vector3.GetAngleXY uses edi esi, v1, v2
         fldpi
         fdivr st0, st1
         fstp st1
-        fsubr [ninety]
+
+        ;fsubr [car.transform.rotation.z]
         fstp [car.transform.rotation.z]
 
         ret

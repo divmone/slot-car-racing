@@ -28,7 +28,6 @@ extensionAddresses:
         glBindAttribLocation    dd      ?
         glUniform3fv            dd      ?
         glGenerateMipmap        dd      ?
-
 extensionNames:
         db      "glBufferData",0
         db      "glGenBuffers", 0
@@ -59,6 +58,7 @@ extensionNames:
         db      "glBindAttribLocation",0
         db      "glUniform3fv",0
         db      "glGenerateMipmap", 0
+
         db      0
 
 define GL_FRAGMENT_SHADER                0x8B30
