@@ -7,6 +7,7 @@ entry   WinMain
         include         "api\user32.inc"
         include         "api\gdi32.inc"
         include         "api\opengl.inc"
+        include         "api\winmm.inc"
 
         include         "Mesh.inc"
         include         "Vector.inc"
@@ -92,6 +93,8 @@ data import
         library kernel32,       "KERNEL32.DLL",\
                 user32,         "USER32.DLL",\
                 gdi32,          "GDI32.DLL",\
-                opengl32,       "OPENGL32.DLL"
+                opengl32,       "OPENGL32.DLL",\
+                winmm,          "WINMM.DLL"
+
 
 end data

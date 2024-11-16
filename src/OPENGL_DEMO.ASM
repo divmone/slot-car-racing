@@ -28,7 +28,7 @@
 
 ; fpu
         toRadian        GLfloat         180.0
-
+        pi              dd              3.14159
         step           GLfloat           5.0
         stepp           GLfloat         1.0
         steppp          GLfloat         0.05
@@ -88,7 +88,7 @@
         trackPointPosition3 Vector3 0.0, 0.0, 0.0
         trackPointPosition4 Vector3 0.0, 0.0, 0.0
 
-        cameraPosition1 Vector3         45.0, 0.0, 90.0
+          cameraPosition1 Vector3        45.0, 0.0, 90.0
         cameraDirPrev1  Vector3         0.0, 0.0, 90.0
         cameraDirNext1  Vector3         45.0, 0.0, 0.0
 
@@ -111,41 +111,38 @@
 
         cubeSpline      Spline          4, cubePoints, 1, 6.0
 
-
-        sRotation1      Vector3         0.0, 90.0, 0.0
-        sRotation1Prev  Vector3         0.0, 0.0, 0.0
-        sRotation1Next  Vector3         0.0, 0.0, 0.0
-        
-        sRotation2      Vector3         0.0, 0.0, 0.0
-        sRotation2Prev  Vector3         0.0, 0.0, 0.0
-        sRotation2Next  Vector3         0.0, 0.0, 0.0
-
-        sRotation3      Vector3         0.0, 180.0, 0.0
-        sRotation3Prev  Vector3         0.0, 0.0, 0.0
-        sRotation3Next  Vector3         0.0, 0.0, 0.0
-
-        sRotation4      Vector3         0.0, 0.0, 0.0
-        sRotation4Prev  Vector3         0.0, 0.0, 0.0
-        sRotation4Next  Vector3         0.0, 90.0, 0.0
-
-        sPoints:     Spline.Point    sRotation1, sRotation1Prev, sRotation1Next, 2.0
-                     Spline.Point    sRotation2, sRotation2Prev, sRotation2Next, 1.0
-                     Spline.Point    sRotation3, sRotation3Prev, sRotation3Next, 2.0
-                     Spline.Point    sRotation4, sRotation4Prev, sRotation4Next, 1.0
-
-        rotateSpline      Spline          4, sPoints, 1, 6.0
-
-
-        startTime       dd              ?
+        startTime       dd              0.0
         lastTime        dd              ?
         currentTime     dd              ?
         programTime     dd              ?   
-        nprogramTime     dd              ?   
-        oneSecond       GLfloat         1000.0   
-        ten             dd              0.1   
+        nprogramTime    dd              ?   
 
+        oneSecond       GLfloat         500.0   
+        ten             dd              10.0
+        cosAngle             dd                ?
+        tempPosition     Vector3         0.0, 0.0, 0.0
+        tempPosition1    Vector3         0.0, 0.0, 0.0 
+        tempPosition2    Vector3         0.0, 0.0, 0.0      
+        directionVector Vector3         
+        rAngle          dd              0.0  
+        v1Length         dd              0.0
+        v2Length         dd              0.0
+        productLenght    dd              0.0
+        oneF            dd              1.0
+        tempV           dd              0.0
+
+        tempValue       dd              ?
+        one             dd              0.2     
         rVector         Vector3         0.0, 1.0, 0.0                                                     
         ninety          GLfloat         90.0
+        null            dd              0.0
+        epsilon         dd              0.0
+        mepsilon         dd              -0.8
+        tangentVector   Vector3         
+        vec1 Vector3
+        vec2 Vector3
+        content db 108 dup(0) 
+        temp dd ?
 
         include         "Init.asm"
         include         "Mesh.asm"
@@ -163,6 +160,7 @@
         include         "BMP.asm"
         include         "OBJ.asm"
         include         "Object.asm"
+        include         "Game.asm"
 
 proc WinMain
 
@@ -186,7 +184,7 @@ proc WindowProc uses ebx,\
      hWnd, uMsg, wParam, lParam
 
         xor     ebx, ebx
-
+       
         switch  [uMsg]
         case    .Paint,         WM_PAINT
         case    .Destroy,       WM_DESTROY
@@ -331,9 +329,9 @@ proc WindowProc uses ebx,\
         jmp .ReturnZero
 
 .Destroy:
-        invoke HeapFree, [hHeap]
+        invoke HeapDestroy, [hHeap]
         invoke CloseHandle, [logFile]
-        invoke  ExitProcess, ebx
+        invoke ExitProcess, ebx
 
 .ReturnZero:
         xor     eax, eax

@@ -62,23 +62,23 @@ proc Matrix.Projection uses edi,\
         fmul    [zFar]
         fdiv    [deltaZ]
         fstp    [edi + Matrix4x4.m43]
-
-        ;invoke  glMultMatrixf, edi
-
         ret
 endp  
 
+
 proc Matrix.LookAt uses esi edi ebx,\
-     camera, target, up, matrix
+     camera, target, up
 
         locals
                 temp    dd              ?
-                ;matrix  Matrix4x4
-                forw    Vector3
-                side    Vector3
+                zAxis   Vector3
+                xAxis   Vector3
+                yAxis   Vector3
         endl
 
-        mov     edi, [matrix]
+        invoke  glLoadIdentity
+
+        mov     edi, view
         mov     ecx, 4 * 4
         xor     eax, eax
         rep     stosd
@@ -89,32 +89,34 @@ proc Matrix.LookAt uses esi edi ebx,\
 
         fld     [edi + Vector3.x]
         fsub    [esi + Vector3.x]
-        fstp    [forw.x]
+        fstp    [zAxis.x]
 
         fld     [edi + Vector3.y]
         fsub    [esi + Vector3.y]
-        fstp    [forw.y]
+        fstp    [zAxis.y]
 
         fld     [edi + Vector3.z]
         fsub    [esi + Vector3.z]
-        fstp    [forw.z]
+        fstp    [zAxis.z]
 
-        lea     eax, [forw]
+        lea     eax, [zAxis]
         stdcall Vector3.Normalize, eax
 
-        lea     eax, [forw]
-        lea     ecx, [side]
+        lea     eax, [zAxis]
+        lea     ecx, [xAxis]
         stdcall Vector3.Cross, eax, ebx, ecx
 
-        lea     eax, [side]
+        lea     eax, [xAxis]
         stdcall Vector3.Normalize, eax
 
-        lea     eax, [side]
-        lea     ecx, [forw]
+        lea     eax, [xAxis]
+        lea     ecx, [zAxis]
+        lea     ebx, [yAxis]
         stdcall Vector3.Cross, eax, ecx, ebx
 
-        lea     esi, [side]
-        mov     edi, [matrix]
+        lea     esi, [xAxis]
+
+        mov     edi, view
         fld     [esi + Vector3.x]
         fstp    [edi + Matrix4x4.m11]
         fld     [esi + Vector3.y]
@@ -129,7 +131,7 @@ proc Matrix.LookAt uses esi edi ebx,\
         fld     [ebx + Vector3.z]
         fstp    [edi + Matrix4x4.m32]
 
-        lea     esi, [forw]
+        lea     esi, [zAxis]
         fld     [esi + Vector3.x]
         fchs
         fstp    [edi + Matrix4x4.m13]
@@ -143,7 +145,6 @@ proc Matrix.LookAt uses esi edi ebx,\
         fld1
         fstp    [edi + Matrix4x4.m44]
 
- 
         invoke  glMultMatrixf, edi
 
         mov     esi, [camera]
@@ -155,18 +156,17 @@ proc Matrix.LookAt uses esi edi ebx,\
         fchs
         fstp    [temp]
         push    [temp]
-        fld     [esi + Vector3.z]
+        fld     [esi + Vector3.x]
         fchs
         fstp    [temp]
         push    [temp]
         invoke  glTranslatef
 
-        push edi
-        memcpy  view, edi, 64
-        pop edi
+        invoke  glRotatef, 135.0, 0.0, 1.0, 0.0
+        invoke glGetFloatv, GL_MODELVIEW_MATRIX, view
 
         ret
-endp
+endp         
 
 proc Matrix.GetAxis  uses esi edi ebx,\
      camera, target, up, xAx, yAx, zAx
