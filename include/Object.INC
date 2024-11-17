@@ -10,6 +10,7 @@ struct Object
     VAO  GLuint ?
     texture GLuint ?
     matrix Matrix4x4 
+    rmatrix Matrix4x4 
     ;objFileName  dd ?
     ;texFileName  dd ?
 ends

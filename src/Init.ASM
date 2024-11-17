@@ -38,7 +38,7 @@ proc Init uses esi
         stdcall Glext.LoadFunctions
         stdcall Glext.CreateShaders  
         
-        invoke  PlaySound, musicPath, NULL,0x0008 or 0x00020000 or 0x0001
+        ;invoke  PlaySound, musicPath, NULL,0x0008 or 0x00020000 or 0x0001
         
         stdcall Object.Create, car, fileName, textPath
         stdcall Object.Create, nissan, fileNameN, textPathN

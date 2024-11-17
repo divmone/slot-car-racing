@@ -104,20 +104,18 @@
         cameraDirPrev4  Vector3          -45.0, 0.0, 0.0
         cameraDirNext4  Vector3          0.0, 0.0, 90.0
 
-        cubePoints:     Spline.Point    cameraPosition1, cameraDirPrev1, cameraDirNext1, 2.0
-                        Spline.Point    cameraPosition2, cameraDirPrev2, cameraDirNext2, 1.0
-                        Spline.Point    cameraPosition3, cameraDirPrev3, cameraDirNext3, 2.0
-                        Spline.Point    cameraPosition4, cameraDirPrev4, cameraDirNext4, 1.0
+        cubePoints:     Spline.Point    cameraPosition1, cameraDirPrev1, cameraDirNext1, 1.0
+                        Spline.Point    cameraPosition2, cameraDirPrev2, cameraDirNext2, 0.5
+                        Spline.Point    cameraPosition3, cameraDirPrev3, cameraDirNext3, 1.0
+                        Spline.Point    cameraPosition4, cameraDirPrev4, cameraDirNext4, 0.5
 
-        cubeSpline      Spline          4, cubePoints, 1, 6.0
+        cubeSpline      Spline          4, cubePoints, 1, 3.0
 
         startTime       dd              0.0
-        lastTime        dd              ?
-        currentTime     dd              ?
         programTime     dd              ?   
         nprogramTime    dd              ?   
 
-        oneSecond       GLfloat         500.0   
+        oneSecond       GLfloat         1000.0   
         ten             dd              10.0
         cosAngle             dd                ?
         tempPosition     Vector3         0.0, 0.0, 0.0
@@ -141,7 +139,7 @@
         tangentVector   Vector3         
         vec1 Vector3
         vec2 Vector3
-        content db 108 dup(0) 
+        ;content db 108 dup(0) 
         temp dd ?
 
         include         "Init.asm"
@@ -161,6 +159,8 @@
         include         "OBJ.asm"
         include         "Object.asm"
         include         "Game.asm"
+        include         "TimeManager.asm"
+        include         "Quaternion.asm"
 
 proc WinMain
 

@@ -7,12 +7,12 @@ proc Draw uses esi
         fild    [programTime]
         fdiv    [oneSecond]
         fstp    [programTime]
+       ;jle     .Skip
 
-        jle     .Skip
+        ;stdcall TimeManager.UpdateFPS
 
         stdcall Spline.GetPoint, cubeSpline, car.transform.position, [programTime] 
-        stdcall Spline.GetRotation, cubeSpline, car.transform.position, [programTime]      
-.Skip:                                                                           
+        stdcall Spline.GetRotation, cubeSpline, car.transform.position, [programTime]                                                                               
         invoke  glClearColor, 0.6, 0.6, 1.0, 1.0
 
         invoke  glClear, GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT
@@ -21,10 +21,12 @@ proc Draw uses esi
         stdcall Matrix.LookAt, cameraPosition, targetPosition, upVector 
         
         stdcall Object.Draw, car
-        stdcall Object.Draw, table
-        stdcall Object.Draw, sphere
+        ;stdcall Object.Draw, table
+        ;stdcall Object.Draw, sphere
 
         invoke  SwapBuffers, [hdc]
+        
+
         ret
 endp
 
@@ -35,13 +37,14 @@ proc Object.Draw uses esi edi,\
 
         mov esi, [objPtr]
         add esi, Object.transform.position
-        stdcall Matrix.CreatePosition, esi, position
+        stdcall Matrix.CreatePosition, esi, position  
         add esi, 12
-        stdcall Matrix.CreateTurn, esi
+        ;stdcall Matrix.CreateTurn, [objPtr], esi     
         add esi, 12
         stdcall Matrix.CreateScale, esi, scale
-
-        stdcall Matrix.Multiply4x4, scale, turn, model 
+        mov esi, [objPtr]
+        add esi, Object.rmatrix
+        stdcall Matrix.Multiply4x4, scale, esi, model 
         stdcall Matrix.Multiply4x4, model, position, model 
 
         

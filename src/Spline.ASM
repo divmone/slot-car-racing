@@ -86,6 +86,7 @@ proc Spline.GetRotation uses esi edi,\
         spline, currentV, time
 
         locals
+                axis Vector3
                 prevPoint Vector3 
                 nextPoint Vector3 
                 dupValue dd ?
@@ -115,15 +116,25 @@ proc Spline.GetRotation uses esi edi,\
 
         stdcall Vector3.Sub, eax, ecx
         
+        
+
+        ;
+        lea eax, [nextPoint]
+        lea esi, [axis]
+        stdcall Vector3.Cross, eax, car.matrix.m11, esi
+        
         lea eax, [nextPoint]
 
-        stdcall Vector3.GetAngleXZ, eax, car.matrix.m11
+        stdcall Vector3.GetAngle, eax, car.matrix.m11
 
+        stdcall Quaternion.CreateFromAxisAngle, 0.0, 1.0, 0.0, eax
         
+        stdcall Quaternion.CreateMatrix, car.rmatrix
+
         ret
 endp
 
-proc Vector3.GetAngleXZ uses edi esi, v1, v2
+proc Vector3.GetAngle uses edi esi, v1, v2
 
         locals
                 dupValue dd 0.0
@@ -153,8 +164,8 @@ proc Vector3.GetAngleXZ uses edi esi, v1, v2
         fldpi
         fdivr st0, st1
         fstp st1
-        fsubr [car.transform.rotation.y]
-        fstp [car.transform.rotation.y]
+        fstp [dupValue]
+        mov eax, [dupValue]
         ret
 endp
 
@@ -253,6 +264,7 @@ proc Vector3.GetAngleYZ uses edi esi, v1, v2
         ret
 endp
 
+
 proc Vector3.DupXY uses edi esi, Vec1, Vec2
      locals
           res   dd    ?
@@ -288,3 +300,5 @@ proc Vector3.DupXZ uses edi esi, Vec1, Vec2
 
   ret
 endp
+
+

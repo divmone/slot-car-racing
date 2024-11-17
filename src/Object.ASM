@@ -131,18 +131,17 @@ endp
 
 proc Object.InitModelMatrix uses esi edi,\
                         objPtr
+        
         mov esi, [objPtr]
         add esi, Object.transform.position
-        stdcall Matrix.CreatePosition, esi, position
+        stdcall Matrix.CreatePosition, esi, position  
         add esi, 12
-        stdcall Matrix.CreateTurn, esi
+        stdcall Matrix.CreateTurn, [objPtr], esi     
         add esi, 12
         stdcall Matrix.CreateScale, esi, scale
-
-        stdcall Matrix.Multiply4x4, scale, turn, model 
+        stdcall Matrix.Multiply4x4, scale, car.rmatrix, model 
         stdcall Matrix.Multiply4x4, model, position, model 
 
-        
         mov edi, [objPtr]
         add edi, Object.matrix
         mov esi, model

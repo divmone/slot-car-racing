@@ -1,6 +1,6 @@
 proc Log.Create uses edi esi ebx eax
 
-   ; invoke  AllocConsole
+    ;invoke  AllocConsole
     invoke  GetStdHandle,  STD_OUTPUT_HANDLE
     mov     [hConsole], eax
 
@@ -14,7 +14,7 @@ endp
 
 proc Log.Console  buffer, length
    
-    ;invoke  WriteConsole, [hConsole], [buffer], [length], ebx, ebx
+    invoke  WriteConsole, [hConsole], [buffer], [length], ebx, ebx
 
     ret
 endp
@@ -29,7 +29,7 @@ endp
 
 proc Log buffer, length
     
-   ; stdcall Log.Console, [buffer], [length]
+    ; stdcall Log.Console, [buffer], [length]
    ; stdcall Log.File, [buffer], [length]
 
     ret

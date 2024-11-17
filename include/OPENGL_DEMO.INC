@@ -26,6 +26,8 @@ entry   WinMain
         include         "Shader.inc"
         include         "Object.inc"
         include         "Controller.inc"
+        include         "TimeManager.inc"
+        include         "Quaternion.inc"
 
 macro switch value
 {

@@ -348,7 +348,7 @@ proc Matrix.CreatePosition uses esi edi, posV, positionM
 endp
 
 
-proc Matrix.CreateTurn uses esi edi , turnV
+proc Matrix.CreateTurn uses esi edi , objPtr, turnV
 
     locals
        a  dd  ?
@@ -357,7 +357,8 @@ proc Matrix.CreateTurn uses esi edi , turnV
        PiDegree dd 180.0
     endl
     mov esi, [turnV]
-
+    mov edi ,[objPtr]
+    add edi, Object.rmatrix
     fldpi
     fmul  dword [esi]
     fdiv  [PiDegree]
@@ -379,7 +380,7 @@ proc Matrix.CreateTurn uses esi edi , turnV
     fld  [c]
     fcos
     fmulp
-    fstp  dword[turn + 0]
+    fstp  dword[edi + 0]
 
     fld  [c]
     fsin
@@ -387,11 +388,11 @@ proc Matrix.CreateTurn uses esi edi , turnV
     fcos
     fmulp
     fchs
-    fstp  dword[turn + 4]
+    fstp  dword[edi + 4]
 
     fld  [b]
     fsin
-    fstp  dword[turn + 8]
+    fstp  dword[edi + 8]
 
     fld  [a]
     fsin
@@ -407,7 +408,7 @@ proc Matrix.CreateTurn uses esi edi , turnV
     fcos
     fmulp
     faddp
-    fstp  dword[turn + 16]
+    fstp  dword[edi + 16]
 
     fld  [a]
     fcos
@@ -423,7 +424,7 @@ proc Matrix.CreateTurn uses esi edi , turnV
     fsin
     fmulp
     fsubp
-    fstp  dword[turn + 20]
+    fstp  dword[edi + 20]
 
     fld  [a]
     fsin
@@ -431,7 +432,7 @@ proc Matrix.CreateTurn uses esi edi , turnV
     fcos
     fmulp
     fchs
-    fstp  dword[turn + 24]
+    fstp  dword[edi + 24]
 
     fld  [a]
     fsin
@@ -447,7 +448,7 @@ proc Matrix.CreateTurn uses esi edi , turnV
     fcos
     fmulp
     fsubp
-    fstp  dword[turn + 32]
+    fstp  dword[edi + 32]
 
     fld  [a]
     fsin
@@ -463,17 +464,17 @@ proc Matrix.CreateTurn uses esi edi , turnV
     fcos
     fmulp
     faddp
-    fstp dword [turn + 36]
+    fstp dword [edi + 36]
 
     fld  [a]
     fcos
     fld  [b]
     fcos
     fmulp
-    fstp  dword[turn + 40]
+    fstp  dword[edi + 40]
 
     fld1
-    fstp dword[turn + 60]
+    fstp dword[edi + 60]
   ret
 endp
 
