@@ -1,3 +1,10 @@
+struct quaternion
+    x dd 0.0
+    y dd 0.0
+    z dd 0.0
+    w dd 0.0
+ends
+
 struct Transform
     position Vector3
     rotation Vector3
@@ -9,6 +16,7 @@ struct Object
     transform Transform 
     VAO  GLuint ?
     texture GLuint ?
+    q quaternion
     matrix Matrix4x4 
     rmatrix Matrix4x4 
     ;objFileName  dd ?

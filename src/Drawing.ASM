@@ -38,9 +38,9 @@ proc Object.Draw uses esi edi,\
         mov esi, [objPtr]
         add esi, Object.transform.position
         stdcall Matrix.CreatePosition, esi, position  
-        add esi, 12
+        add esi, 24
         ;stdcall Matrix.CreateTurn, [objPtr], esi     
-        add esi, 12
+        ;add esi, 12
         stdcall Matrix.CreateScale, esi, scale
         mov esi, [objPtr]
         add esi, Object.rmatrix

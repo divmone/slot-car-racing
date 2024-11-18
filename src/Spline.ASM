@@ -95,6 +95,7 @@ proc Spline.GetRotation uses esi edi,\
                 nextTime      dd    ?
                 one dd 1.0
                 toDegree dd 180.0
+                angle dd 0.0
         endl
 
         fld [time]
@@ -117,21 +118,38 @@ proc Spline.GetRotation uses esi edi,\
         stdcall Vector3.Sub, eax, ecx
         
         
-
-        ;
-        lea eax, [nextPoint]
         lea esi, [axis]
-        stdcall Vector3.Cross, eax, car.matrix.m11, esi
-        
         lea eax, [nextPoint]
 
+
+        stdcall Vector3.Cross, car.matrix.m11, eax, esi
+
+        lea eax, [nextPoint]
         stdcall Vector3.GetAngle, eax, car.matrix.m11
+        mov [angle], eax
 
-        stdcall Quaternion.CreateFromAxisAngle, 0.0, 1.0, 0.0, eax
-        
-        stdcall Quaternion.CreateMatrix, car.rmatrix
+        stdcall Vector3.Normalize, esi
 
+        stdcall Quaternion.CreateFromAxisAngle, [esi], [esi + 4], [esi + 8], [angle]
+
+        stdcall Quaternion.CreateMatrix, tempMatrix
+
+        stdcall Matrix.Multiply4x4, tempMatrix,  car.rmatrix, car.rmatrix
+
+        ;stdcall Matrix.Normalize, car.rmatrix
         ret
+endp
+
+proc Matrix.Normalize uses esi edi,\ 
+        matrix
+
+    lea esi, [matrix]
+    stdcall Vector3.Normalize, esi        ; Нормализуем 1-ю строку
+    add esi, 16
+    stdcall Vector3.Normalize, esi        ; Нормализуем 2-ю строку
+    add esi, 16
+    stdcall Vector3.Normalize, esi        ; Нормализуем 3-ю строку
+    ret
 endp
 
 proc Vector3.GetAngle uses edi esi, v1, v2
