@@ -277,7 +277,7 @@ proc Matrix.Rotate uses edi ,\
         ret
 endp
 
-proc Matrix.CreateModel uses esi edi, pos, turnC, scaleC
+proc Matrix.CreateModel2 uses esi edi, pos, turnC, scaleC
 
     stdcall Matrix.CreatePosition, [pos]
     stdcall Matrix.CreateScale, [scaleC]
@@ -358,7 +358,6 @@ proc Matrix.CreateTurn uses esi edi , objPtr, turnV
     endl
     mov esi, [turnV]
     mov edi ,[objPtr]
-    add edi, Object.rmatrix
     fldpi
     fmul  dword [esi]
     fdiv  [PiDegree]
@@ -536,4 +535,35 @@ proc Matrix.Multiply4x4 uses ebx ecx edx, matrix1, matrix2, matrix_res
    jnz gf_MatrixMultiply4x4.LoopA1
 
   ret
+endp
+
+proc Matrix.CreateModel uses esi , objPtr
+    mov esi, [objPtr]
+    add esi, Object.transform.position
+    stdcall Matrix.CreatePosition, esi, position 
+
+    mov esi, [objPtr]
+    add esi, Object.transform.scale
+    stdcall Matrix.CreateScale, esi, scale
+
+
+    stdcall Quaternion.CreateFromAxisAngle, [objPtr], 0.0, 1.0, 0.0, 90.0
+
+    stdcall Quaternion.CreateMatrix, [objPtr], turn
+        
+    ;stdcall Matrix.CreateTurn, turn, esi
+
+    stdcall Matrix.Multiply4x4, scale, turn, model 
+    stdcall Matrix.Multiply4x4, model, position, model 
+
+    mov edi, [objPtr]
+    add edi, Object.matrix
+    mov esi, model
+    mov ecx, 16
+    rep movsd
+
+
+
+
+    ret
 endp

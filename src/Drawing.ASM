@@ -9,7 +9,7 @@ proc Draw uses esi
         fstp    [programTime]
        ;jle     .Skip
 
-        ;stdcall TimeManager.UpdateFPS
+        stdcall Tick
 
         stdcall Spline.GetPoint, cubeSpline, car.transform.position, [programTime] 
         stdcall Spline.GetRotation, cubeSpline, car.transform.position, [programTime]                                                                               
@@ -21,6 +21,7 @@ proc Draw uses esi
         stdcall Matrix.LookAt, cameraPosition, targetPosition, upVector 
         
         stdcall Object.Draw, car
+        
         ;stdcall Object.Draw, table
         ;stdcall Object.Draw, sphere
 
@@ -35,26 +36,8 @@ proc Object.Draw uses esi edi,\
 
         memcpy tempMatrix, MVP, sizeof.Matrix4x4
 
-        mov esi, [objPtr]
-        add esi, Object.transform.position
-        stdcall Matrix.CreatePosition, esi, position  
-        add esi, 24
-        ;stdcall Matrix.CreateTurn, [objPtr], esi     
-        ;add esi, 12
-        stdcall Matrix.CreateScale, esi, scale
-        mov esi, [objPtr]
-        add esi, Object.rmatrix
-        stdcall Matrix.Multiply4x4, scale, esi, model 
-        stdcall Matrix.Multiply4x4, model, position, model 
+        stdcall Matrix.CreateModel, [objPtr]
 
-        
-        mov edi, [objPtr]
-        add edi, Object.matrix
-        mov esi, model
-        mov ecx, 16
-        rep movsd
-
-        
         stdcall Matrix.Multiply4x4, view, projection, PV
         stdcall Matrix.Multiply4x4, model, PV, MVP
 
@@ -92,15 +75,6 @@ endp
 proc Tick
     fld     [angle]        
     fadd    [stepp]        
-    fcom   [circleD]      
-    fstsw   ax              
-    sahf                    
-    ja     @F  
     fstp    [angle]         
-    ret
-
-@@:
-    fstp    [angle]        
-    mov     [angle], 0.0
     ret
 endp

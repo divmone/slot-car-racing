@@ -11,6 +11,7 @@
         
         circleD         GLfloat         10.0
         
+        tempAngle       GLfloat         0.0
         lightAngle      GLfloat         1.0
         angle           GLfloat         0.0
 ;transform
@@ -273,12 +274,12 @@ proc WindowProc uses ebx,\
         jmp     .ReturnZero
 
 .RotateLeft:
-        stdcall Float.AddValue, car.transform.rotation.y, [step]
+        stdcall Float.AddValue, angleX, [step]
         jmp     .ReturnZero
 
 
 .RotateRight:
-        stdcall Float.SubValue, car.transform.rotation.y, [step]
+        stdcall Float.SubValue, angleX, [step]
         jmp     .ReturnZero
 
 .RotateRightC:

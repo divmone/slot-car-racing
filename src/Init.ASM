@@ -49,7 +49,11 @@ proc Init uses esi
         stdcall Object.SetPosition, car, 10.0, 0.0, 10.0        
         stdcall Object.SetScale, car, 10.0, 10.0, 10.0
         stdcall Object.InitModelMatrix, car
+        
+        stdcall Quaternion.CreateFromAxisAngle, car, 0.0, 0.0, 0.0, 0.0
 
+        stdcall Quaternion.CreateMatrix,car,  car.rmatrix
+        
         invoke  glShadeModel, GL_SMOOTH
         invoke  glHint, GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST
         invoke  glEnable, GL_DEPTH_TEST

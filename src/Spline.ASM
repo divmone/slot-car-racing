@@ -122,23 +122,25 @@ proc Spline.GetRotation uses esi edi,\
         lea eax, [nextPoint]
 
 
-        stdcall Vector3.Cross, car.matrix.m11, eax, esi
+        stdcall Vector3.Cross, car.matrix.m11, eax,  esi
 
         lea eax, [nextPoint]
-        stdcall Vector3.GetAngle, eax, car.matrix.m11
+        stdcall Vector3.GetAngle, eax,  car.matrix.m11
         mov [angle], eax
 
         stdcall Vector3.Normalize, esi
 
-        stdcall Quaternion.CreateFromAxisAngle, [esi], [esi + 4], [esi + 8], [angle]
+        ;stdcall Quaternion.CreateFromAxisAngle, car,  [esi], [esi + 4], [esi + 8], [angle]
 
-        stdcall Quaternion.CreateMatrix, tempMatrix
-
-        stdcall Matrix.Multiply4x4, tempMatrix,  car.rmatrix, car.rmatrix
-
-        ;stdcall Matrix.Normalize, car.rmatrix
+        ;stdcall Quaternion.CreateMatrix, car.rmatrix    
+        
+        ;stdcall Matrix.Multiply4x4, car.rmatrix, tempMatrix2, car.rmatrix
         ret
 endp
+
+ ;stdcall Matrix.Multiply4x4, tempMatrix,  car.rmatrix, car.rmatrix
+
+        ;stdcall Matrix.Normalize, car.rmatrix
 
 proc Matrix.Normalize uses esi edi,\ 
         matrix

@@ -80,6 +80,13 @@ proc Object.Create uses esi edi ,\
     mov [esi + Object.transform.scale.x], 1.0
     mov [esi + Object.transform.scale.y], 1.0
     mov [esi + Object.transform.scale.z], 1.0
+
+    mov [esi + Object.q.x], 0.0
+    mov [esi + Object.q.y], 0.0
+    mov [esi + Object.q.z], 0.0
+    mov [esi + Object.q.w], 0.0
+
+
     
     ret
 endp
@@ -115,6 +122,8 @@ proc Object.SetScale uses esi,\
     mov eax, [z]
     mov [esi + Object.transform.scale.z], eax
 
+
+    
     ret
 endp
 
@@ -136,10 +145,10 @@ proc Object.InitModelMatrix uses esi edi,\
         add esi, Object.transform.position
         stdcall Matrix.CreatePosition, esi, position  
         add esi, 12
-        stdcall Matrix.CreateTurn, [objPtr], esi     
+        stdcall Matrix.CreateTurn, turn, esi     
         add esi, 12
         stdcall Matrix.CreateScale, esi, scale
-        stdcall Matrix.Multiply4x4, scale, car.rmatrix, model 
+        stdcall Matrix.Multiply4x4, scale, turn, model 
         stdcall Matrix.Multiply4x4, model, position, model 
 
         mov edi, [objPtr]

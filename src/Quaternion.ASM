@@ -1,8 +1,12 @@
-proc Quaternion.CreateFromAxisAngle X, Y, Z, degree
+proc Quaternion.CreateFromAxisAngle uses esi, objPtr, X, Y, Z, degree
     locals
         angle GLfloat ?
         toRadian GLfloat 180.0
         two GLfloat 2.0
+        x GLfloat 0.0
+        y GLfloat 0.0
+        z GLfloat 0.0
+        w GLfloat 0.0
     endl
 
     fld [degree]
@@ -27,6 +31,19 @@ proc Quaternion.CreateFromAxisAngle X, Y, Z, degree
     fmul [Z]
     fstp [z]
 
+    mov esi, [objPtr]
+    mov eax, [x]
+    mov [esi + Object.q.x], eax
+
+    mov eax, [y]
+    mov [esi + Object.q.y], eax
+
+    mov eax, [z]
+    mov [esi + Object.q.z], eax
+
+    mov eax, [w]
+    mov [esi + Object.q.w], eax
+
     ret
 endp
 
@@ -36,11 +53,26 @@ endp
 ;pMatrix[ 3] = 0.0f; 
 
 proc Quaternion.CreateMatrix uses esi edi,\
-                    matrix
+                    objPtr, matrix
     locals 
         two GLfloat 2.0
         one dd 1.0
+        x GLfloat 0.0
+        y GLfloat 0.0
+        z GLfloat 0.0
+        w GLfloat 0.0
     endl
+    mov esi, [objPtr]
+
+    mov eax, [esi + Object.q.x]
+    mov [x], eax
+    mov eax, [esi + Object.q.y]
+    mov [y], eax
+    mov eax, [esi + Object.q.z]
+    mov [z], eax
+    mov eax, [esi + Object.q.w]
+    mov [w], eax
+
     mov esi, [matrix]
 
     fld [y]   ;1 - 2(yy +zz)
