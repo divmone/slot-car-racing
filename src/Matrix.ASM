@@ -547,7 +547,7 @@ proc Matrix.CreateModel uses esi , objPtr
     stdcall Matrix.CreateScale, esi, scale
 
 
-    stdcall Quaternion.CreateFromAxisAngle, [objPtr], 0.0, 1.0, 0.0, 90.0
+    ;stdcall Quaternion.CreateFromAxisAngle, [objPtr], 0.0, 1.0, 0.0, 90.0
 
     stdcall Quaternion.CreateMatrix, [objPtr], turn
         

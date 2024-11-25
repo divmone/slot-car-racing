@@ -71,11 +71,14 @@
         oTurn2           Vector3         0.0,  0.0,  0.0
         oPos2            Vector3         0.0,  0.0,  0.0
         objectColor     Vector3          1.0, 0.0, 0.0
-
+        aspect1     dd  ?
 
         nPos Vector3
         negPosition Matrix4x4
         backPosition Matrix4x4
+
+        menuPosition    Vector3         200.0, 100.0, 100.0
+        menuTargetPosition  Vector3     0.0, 0.0, 0.0
 
         cameraPosition  Vector3         100.0, 100.0, 100.0
         targetPosition  Vector3         0.0, 0.0, 0.0
@@ -89,7 +92,7 @@
         trackPointPosition3 Vector3 0.0, 0.0, 0.0
         trackPointPosition4 Vector3 0.0, 0.0, 0.0
 
-          cameraPosition1 Vector3        45.0, 0.0, 90.0
+        cameraPosition1 Vector3        45.0, 0.0, 90.0
         cameraDirPrev1  Vector3         0.0, 0.0, 90.0
         cameraDirNext1  Vector3         45.0, 0.0, 0.0
 
@@ -140,8 +143,10 @@
         tangentVector   Vector3         
         vec1 Vector3
         vec2 Vector3
+        tempTime dd 0.0
         ;content db 108 dup(0) 
         temp dd ?
+        GAME_MODE dd 0
 
         include         "Init.asm"
         include         "Mesh.asm"
@@ -162,6 +167,7 @@
         include         "Game.asm"
         include         "TimeManager.asm"
         include         "Quaternion.asm"
+        include         "UI.asm"
 
 proc WinMain
 
@@ -197,13 +203,18 @@ proc WindowProc uses ebx,\
 
 .Paint:
 
+        cmp [GAME_MODE], 1
+        je @F
         stdcall Draw
-
+        jmp     .ReturnZero
+@@:
+        stdcall DrawMenu
         jmp     .ReturnZero
 
 .KeyDown:
         switch [wParam]
-        case .Destroy, VK_ESCAPE
+        case .Destroy, 'P'
+        case .GoToMenu, VK_ESCAPE
         case .MoveLeft, VK_A   
         case .MoveRight, VK_D
         case .MoveFront, VK_W
@@ -217,6 +228,9 @@ proc WindowProc uses ebx,\
         case .RotateRightC, VK_RIGHT
         case .RotateUp, VK_UP
         case .RotateDown, VK_DOWN
+        jmp     .ReturnZero
+.GoToMenu:
+        stdcall UI.Pause
         jmp     .ReturnZero
 .MoveUp:
       

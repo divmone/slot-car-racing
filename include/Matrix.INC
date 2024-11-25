@@ -43,13 +43,11 @@ view            Matrix4x4
 
         projection      Matrix4x4  
 
-        tempMatrix2     Matrix4x4   1.0, 0.0, 0.0, 0.0,\
-                                    0.0, 1.0, 0.0, 0.0,\
-                                    0.0, 0.0, 1.0, 0.0,\
-                                    0.0, 0.0, 0.0, 1.0
 
-
-        tempMatrix      Matrix4x4         
+        tempMatrix      Matrix4x4 
+        tempMatrix2      Matrix4x4
+        tempMatrix3      Matrix4x4
+        tempMatrix4      Matrix4x4        
 
 
 

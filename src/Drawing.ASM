@@ -2,9 +2,9 @@ proc Draw uses esi
         invoke  GetTickCount
         mov     [currentTime], eax
         sub     eax, [startTime]
-        mov     [programTime], eax
+        mov     [nprogramTime], eax
 
-        fild    [programTime]
+        fild    [nprogramTime]
         fdiv    [oneSecond]
         fstp    [programTime]
        ;jle     .Skip
@@ -20,10 +20,15 @@ proc Draw uses esi
         
         stdcall Matrix.LookAt, cameraPosition, targetPosition, upVector 
         
-        stdcall Object.Draw, car
+        stdcall Object.Draw, car      
+        stdcall Object.Draw, table
+        stdcall Object.Draw, lamp
+        stdcall Object.Draw, pens
+        stdcall Object.Draw, books
+        stdcall Object.Draw, track
+
+
         
-        ;stdcall Object.Draw, table
-        ;stdcall Object.Draw, sphere
 
         invoke  SwapBuffers, [hdc]
         

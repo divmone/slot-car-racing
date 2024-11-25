@@ -91,6 +91,24 @@ proc Object.Create uses esi edi ,\
     ret
 endp
 
+
+proc Object.SetRotation uses esi,\
+               object, x, y, z
+
+    mov esi, [object]
+
+    mov eax, [x]
+    mov [esi + Object.transform.rotation.x], eax
+
+    mov eax, [y]
+    mov [esi + Object.transform.rotation.y], eax
+
+    mov eax, [z]
+    mov [esi + Object.transform.rotation.z], eax
+
+    ret
+endp
+
 proc Object.SetPosition uses esi,\
                object, x, y, z
 

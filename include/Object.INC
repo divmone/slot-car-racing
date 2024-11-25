@@ -32,12 +32,29 @@ fileNameN        db              "../models/nissan.obj",0
 textPathN        db              "../textures/nissan.bmp", 0
 
 table Object 
-fileNameT        db               "../models/table.obj",0 
-textPathT        db              "../textures/images.bmp", 0
+fileNameT        db               "../models/desk.obj",0 
+textPathT        db              "../textures/8027.bmp", 0
 
 sphere Object
 fileNameS        db             "../models/sphere.obj",0 
 textPathS        db             "../textures/light.bmp", 0
 
+lamp Object
+fileNameL        db             "../models/lamp.obj",0 
+textPathL        db             "../textures/light.bmp", 0
+
+pens Object
+fileNameP        db             "../models/pens.obj",0 
+textPathP        db             "../textures/light.bmp", 0
+
+books Object
+fileNameB        db             "../models/books.obj",0 
+textPathB        db             "../textures/light.bmp", 0
+
+track Object
+fileNameTr     db             "../models/track2.obj",0 
+textPathTr        db             "../textures/images.bmp", 0 
+
+R1 Object
 
 musicPath  db "../audio/goida.wav",0
