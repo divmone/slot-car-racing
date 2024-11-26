@@ -85,7 +85,7 @@
         upVector        Vector3         0.0, 1.0, 0.0
 
         lightPosition  Vector4         5.0, 5.1, 5.0, 1.0
-        lightColor     Vector3         0.99, 0.99, 0.99
+        lightColor     Vector4         0.9, 0.9, 0.9, 1.0
         
         trackPointPosition1 Vector3 0.0, 0.0, 0.0
         trackPointPosition2 Vector3 0.0, 0.0, 0.0
@@ -108,6 +108,8 @@
         cameraDirPrev4  Vector3          -45.0, 0.0, 0.0
         cameraDirNext4  Vector3          0.0, 0.0, 90.0
 
+        lightPosition1 Vector3     0.0, 50.0, 0.0
+        lightPosition2 Vector3     0.0, 0.0, 0.0
         cubePoints:     Spline.Point    cameraPosition1, cameraDirPrev1, cameraDirNext1, 1.0
                         Spline.Point    cameraPosition2, cameraDirPrev2, cameraDirNext2, 0.5
                         Spline.Point    cameraPosition3, cameraDirPrev3, cameraDirNext3, 1.0
@@ -205,10 +207,12 @@ proc WindowProc uses ebx,\
 
         cmp [GAME_MODE], 1
         je @F
+        ;stdcall DrawMenu
         stdcall Draw
+       
         jmp     .ReturnZero
 @@:
-        stdcall DrawMenu
+         stdcall DrawMenu
         jmp     .ReturnZero
 
 .KeyDown:

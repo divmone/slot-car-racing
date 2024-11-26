@@ -39,7 +39,8 @@ endp
 proc Object.Draw uses esi edi,\ 
         objPtr
 
-        memcpy tempMatrix, MVP, sizeof.Matrix4x4
+        invoke glPushMatrix
+        ;memcpy tempMatrix, MVP, sizeof.Matrix4x4
 
         stdcall Matrix.CreateModel, [objPtr]
 
@@ -50,16 +51,16 @@ proc Object.Draw uses esi edi,\
         
         invoke glUniformMatrix4fv, [MVPLocation], 1, GL_FALSE, MVP
       
-        invoke glUniform3fv, [viewPosLocation], 1, cameraPosition
+        invoke glUniform3fv, [viewPosLocation], 1, lightPosition1
        
-        invoke glUniform3fv, [lightPosLocation], 1, sphere.transform.position
+        invoke glUniform3fv, [lightPosLocation], 1, cameraPosition
         invoke glUniform3fv, [objectColorLocation], 1, objectColor
         invoke glUniform3fv, [lightColorLocation], 1, lightColor
 @@:     
         stdcall DrawMesh, [objPtr], [drawingMode]
         invoke  glUseProgram, 0
-        
-        memcpy MVP, tempMatrix, sizeof.Matrix4x4
+        invoke glPopMatrix
+        ;memcpy MVP, tempMatrix, sizeof.Matrix4x4
         ret
 endp  
   

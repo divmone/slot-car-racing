@@ -56,7 +56,7 @@ proc Init uses esi
         stdcall Quaternion.CreateFromAxisAngle, lamp, 0.0, 1.0, 0.0, 90.0
         stdcall Quaternion.CreateFromAxisAngle, pens, 0.0, 1.0, 0.0, 90.0
         stdcall Quaternion.CreateFromAxisAngle, books, 0.0, 1.0, 0.0, 90.0
-        stdcall Quaternion.CreateFromAxisAngle, track, 0.0, 1.0, 0.0, 0.0
+        stdcall Quaternion.CreateFromAxisAngle, track, 0.0, 1.0, 0.0, -90.0
 
         
         stdcall Object.SetPosition, sphere, 0.0, 50.0, 0.0
@@ -64,19 +64,31 @@ proc Init uses esi
         stdcall Object.SetPosition, lamp, 45.0, 50.0, -110.0
         stdcall Object.SetPosition, pens, -30.0, 0.0, 120.0        
         stdcall Object.SetPosition, books, 25.0, 0.0, 110.0 
-        stdcall Object.SetPosition, track, -20.0, 0.0, -30.0 
+        stdcall Object.SetPosition, track, 0.0, -150.0, 50.0 
 
         stdcall Object.SetRotation, track, 0.0, 90.0, 0.0  
         ;stdcall Object.SetScale, car, 10.0, 10.0, 10.0
         stdcall Object.SetScale, books, 0.45, 0.45, 0.45
         stdcall Object.SetScale, table, 50.0, 50.0, 50.0
         stdcall Object.SetScale, pens, 2.0, 2.0, 2.0
+        stdcall Object.SetScale, track, 70.0, 70.0, 70.0
         stdcall Object.SetPosition, table, 7.0, -170.0, 0.0
         stdcall Object.InitModelMatrix, car
         stdcall Quaternion.CreateFromAxisAngle, car, 0.0, 0.0, 0.0, 0.0
 
         stdcall Quaternion.CreateMatrix,car,  car.rmatrix
         stdcall Rectangle.Init, R1
+
+        stdcall Rectangle.Create, -0.2, 0.3, 0.4, 0.2
+        mov [R1.VAO], eax
+
+        stdcall Rectangle.Create, -0.2, 0.0, 0.4, 0.2
+        mov [R2.VAO], eax
+
+        stdcall Rectangle.Create, -0.2, -0.3, 0.4, 0.2
+        mov [R3.VAO], eax
+
+
         invoke  glShadeModel, GL_SMOOTH
         invoke  glHint, GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST
         invoke  glEnable, GL_DEPTH_TEST

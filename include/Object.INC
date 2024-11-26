@@ -52,9 +52,11 @@ fileNameB        db             "../models/books.obj",0
 textPathB        db             "../textures/light.bmp", 0
 
 track Object
-fileNameTr     db             "../models/track2.obj",0 
+fileNameTr     db             "../models/room.obj",0 
 textPathTr        db             "../textures/images.bmp", 0 
 
 R1 Object
+R2 Object
+R3 Object
 
 musicPath  db "../audio/goida.wav",0
