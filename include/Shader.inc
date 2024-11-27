@@ -23,3 +23,18 @@ modelLocation GLint             ?
 
 MVPName db                      "MVP", 0
 MVPLocation GLint               ?
+
+modelName2D db                    "model2D", 0
+modelLocation2D GLint             ?
+
+projectionName db                    "projection2D", 0
+projectionLocation GLint             ?
+
+
+program2D         dd              0
+
+vertexShader2D    GLuint          0
+vshaderFile2D      db             "../shaders/vertex2D.glsl", 0
+
+fragmentShader2D  GLuint          0
+fshaderFile2D     db             "../shaders/fragment2D.glsl", 0        

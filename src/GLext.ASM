@@ -102,6 +102,58 @@ proc Glext.CreateShaders
         ret
 endp
 
+proc Glext.CreateShaders2D
+        invoke  glUseProgram, ebx
+
+        cmp     [program2D], ebx
+        je      @F
+
+        invoke  glDetachShader, [program2D], [fragmentShader2D]
+        invoke  glDeleteShader, [fragmentShader2D]
+        
+        invoke  glDetachShader, [program2D], [vertexShader2D]
+        invoke  glDeleteShader, [vertexShader2D]
+        
+        invoke  glDeleteProgram, [program2D]
+
+@@:
+
+        stdcall Glext.LoadShader, vshaderFile2D, GL_VERTEX_SHADER
+        mov     [vertexShader2D], eax
+
+        cmp     eax, 0
+        je      .Error
+
+
+        stdcall Glext.LoadShader, fshaderFile2D, GL_FRAGMENT_SHADER
+        mov     [fragmentShader2D], eax
+        cmp     eax, ebx
+        je      .Error
+
+ 
+
+        stdcall Glext.CreateProgram2D,  [vertexShader2D], [fragmentShader2D]
+        mov     [program2D], eax
+
+        cmp     eax, ebx
+        je      .Error
+
+      
+
+        jmp     .Return
+
+
+.Error:
+        ;stdcall Log, SHADER_LOADED_FAILED, SHADER_LOADED_FAILED.size 
+        mov     [program2D], ebx
+
+.Return:
+         
+                
+        ret
+endp
+
+
 proc Glext.CreateProgram,\
      vertexShader, fragmentShader
 
@@ -154,6 +206,61 @@ proc Glext.CreateProgram,\
 .Return:
         ret
 endp
+
+
+proc Glext.CreateProgram2D,\
+     vertexShader, fragmentShader
+
+        locals
+                progam  dd      ?
+                linked  dd      ?
+        endl
+
+        invoke  glCreateProgram
+        mov     [program2D], eax
+
+        cmp     [vertexShader], ebx
+        je      @F
+
+        invoke  glAttachShader, [program2D], [vertexShader]
+
+@@:
+        cmp     [fragmentShader], ebx
+        je      @F
+
+        invoke  glAttachShader, [program2D], [fragmentShader]
+
+@@:
+        invoke  glLinkProgram, [program2D]
+
+        lea     eax, [linked]
+        invoke  glGetProgramiv, [program2D], GL_LINK_STATUS, eax
+
+        cmp     [linked], ebx
+        je      @F
+
+        mov     eax, [program2D]
+        jmp     .Return
+
+@@:
+        cmp     [vertexShader], ebx
+        je      @F
+
+        invoke  glDetachShader, [program2D], [vertexShader]
+
+@@:
+        cmp     [fragmentShader], ebx
+        je      @F
+
+        invoke  glDetachShader, [program2D], [fragmentShader]
+
+@@:
+        invoke  glDeleteProgram, [program2D]
+
+.Return:
+        ret
+endp
+
 
 proc Glext.LoadShader,\
      fileName, shaderType

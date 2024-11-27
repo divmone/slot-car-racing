@@ -65,6 +65,66 @@ proc Matrix.Projection uses edi,\
         ret
 endp  
 
+proc Matrix.Ortho uses esi edi,\
+             matrix, left, right, bottom, top, zNear, zFar
+
+  locals
+    two dd 2.0
+    mtwo dd -2.0
+    mone dd -1.0
+  endl
+
+  mov esi, [matrix]
+
+  mov     edi, esi
+  mov     eax, 0
+  mov     ecx, 16
+  rep     stosd
+
+  fld [right]
+  fsub [left]
+  fdivr [two]
+  fstp dword[esi + Matrix4x4.m11]
+
+  fld [top]
+  fsub [bottom]
+  fdivr [two]
+  fstp dword[esi + Matrix4x4.m22]
+
+  fld [zFar]
+  fsub [zNear]
+  fdivr [mtwo]
+  fstp dword[esi + Matrix4x4.m33]
+
+  fld1
+  fstp dword[esi + Matrix4x4.m44]
+
+  fld [right]
+  fadd [left]
+  fld [right]
+  fsub [left]
+  fdivp
+  fmul [mone]
+  fstp dword[esi + Matrix4x4.m14]
+
+  fld [top]
+  fadd [bottom]
+  fld [top]
+  fsub [bottom]
+  fdivp
+  fmul [mone]
+  fstp dword[esi + Matrix4x4.m24]
+
+  fld [zFar]
+  fadd [zNear]
+  fld [zFar]
+  fsub [zNear]
+  fdivp
+  fmul [mone]
+  fstp dword[esi + Matrix4x4.m34]
+
+  ret
+endp
 
 proc Matrix.LookAt uses esi edi ebx,\
      camera, target, up

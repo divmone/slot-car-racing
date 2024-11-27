@@ -31,7 +31,7 @@
         toRadian        GLfloat         180.0
         pi              dd              3.14159
         step           GLfloat           5.0
-        stepp           GLfloat         1.0
+        stepp           GLfloat         0.005
         steppp          GLfloat         0.05
         length          GLfloat         5.0
         pVector         Vector3         0.0, 0.0, 0.0
@@ -275,11 +275,11 @@ proc WindowProc uses ebx,\
 
         jmp     .ReturnZero
 .MoveLeft:
-        stdcall Float.AddValue, car.transform.position.x, [stepp]
+        stdcall Float.AddValue, R1.transform.position.x, [stepp]
         jmp     .ReturnZero
 
 .MoveRight:
-        stdcall Float.SubValue, car.transform.position.x, [stepp]
+        stdcall Float.SubValue, R1.transform.position.x, [stepp]
  
         jmp     .ReturnZero
 

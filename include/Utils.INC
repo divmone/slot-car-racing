@@ -12,4 +12,3 @@ struct SYSTEM_TIME
 ends
 
 systemTime SYSTEM_TIME ?
-

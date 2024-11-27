@@ -59,4 +59,9 @@ R1 Object
 R2 Object
 R3 Object
 
+
+buttonTexture       db             "../textures/verdana.bmp", 0 
+
+textCoords    dd      0.0, 1.0,  1.0, 1.0,  1.0, 0.0, 0.0, 0.0 
+
 musicPath  db "../audio/goida.wav",0

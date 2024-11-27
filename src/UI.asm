@@ -52,41 +52,101 @@ proc Rectangle.Init uses esi, objPtr
 endp
 
 proc DrawMenu
-        invoke  glClearColor, 0.3, 0.3, 1.0, 1.0
-        invoke  glClear, GL_COLOR_BUFFER_BIT
-        
-        invoke glColor3f, 0.0, 0.0, 1.0
-        invoke glBindVertexArray, [R1.VAO]
-                invoke  glDrawArrays, 6, 0, 4
-        invoke glBindVertexArray, 0
+     invoke  glClearColor, 0.3, 0.3, 1.0, 1.0
+     invoke  glClear, GL_COLOR_BUFFER_BIT
+     
 
-        invoke glColor3f, 0.0, 0.0, 1.0
-        invoke glBindVertexArray, [R2.VAO]
-                invoke  glDrawArrays, 6, 0, 4
-        invoke glBindVertexArray, 0
-
-        invoke glColor3f, 0.0, 0.0, 1.0
-        invoke glBindVertexArray, [R3.VAO]
-                invoke  glDrawArrays, 6, 0, 4
-        invoke glBindVertexArray, 0
-
-        invoke  SwapBuffers, [hdc]
-
-
+        stdcall Sprite.Draw, R1
+        stdcall Sprite.Draw, R2
+        stdcall Sprite.Draw, R3
+    invoke  SwapBuffers, [hdc]
     ret
 endp
 
 proc Rectangle.Create uses esi ,\
-                    x, y, width, heigth
+                    objPtr, x, y, width, heigth
 
     locals
       vao dd ?
       vbo dd ?
+      tao dd ?
       buffer dd ?
-
+      char db 0
+      charSize dd 0.0625
+      sixteen dd 16.0
+      x1 dd 0
+      y1 dd 4
+      left dd ?
+      right dd ?
+      top dd ?
+      bottom dd ?
     endl
+    
+    mov [char], '2'
+    xor eax, eax
+    mov al, [char]
+    shr eax, 4
+    mov [y1], eax
+
+    xor eax, eax
+    mov al, [char]
+    and eax, 1111b
+    mov [x1], eax
+
+
+    fild [x1]
+    fmul [charSize]
+    fst [left]
+
+    fadd [charSize]
+
+    fstp [right]
+
+    fild [y1]
+    fmul [charSize]
+    fst [top]
+    fadd [charSize]
+    fstp [bottom]
+
+;0
+   
+
+    mov esi , textCoords
+    mov eax, [left]
+    mov [esi], eax
+
+    add esi, 4
+    mov eax, [bottom]
+    mov [esi], eax
+
+    add esi, 4
+    mov eax, [right]
+    mov [esi], eax
+
+    add esi, 4
+    mov eax, [bottom]
+    mov [esi], eax
+
+    add esi ,4
+    mov eax, [right]
+    mov [esi], eax
+
+    add esi, 4
+    mov eax, [top]
+    mov [esi], eax
+
+    add esi, 4
+    mov eax, [left]
+    
+    mov [esi], eax
+
+    add esi, 4
+    mov eax, [top]
+    mov [esi], eax
 
     malloc 32
+
+
     mov [buffer], eax
     mov esi, eax
 
@@ -134,17 +194,200 @@ proc Rectangle.Create uses esi ,\
     invoke glBindBuffer, GL_ARRAY_BUFFER, [vbo]
 
     invoke glBufferData, GL_ARRAY_BUFFER, 32, [buffer], GL_STATIC_DRAW
-
     invoke glEnableVertexAttribArray, 0
     
     invoke glVertexAttribPointer, 0, 2, GL_FLOAT, GL_FALSE, 0, 0
 
+    lea eax, [tao]
+    invoke glGenBuffers, 1, eax
+    invoke glBindBuffer, GL_ARRAY_BUFFER, [tao]
+
+    invoke glBufferData, GL_ARRAY_BUFFER, 32, textCoords, GL_STATIC_DRAW
+
+
+    invoke glEnableVertexAttribArray, 1
+    
+    invoke glVertexAttribPointer, 1, 2, GL_FLOAT, GL_FALSE, 0, 0
+        
     invoke glBindVertexArray, 0
 
 
+    mov esi, [objPtr]
     mov eax, [vao]
+    mov [esi + Object.VAO], eax
+
+    mov esi, [objPtr]
+    ;add esi, Object.transform
+    mov [esi + Object.transform.position.x], 0.0
+    mov [esi + Object.transform.position.y], 0.0
+    mov [esi + Object.transform.position.z], 0.0
+
+    mov [esi + Object.transform.rotation.x], 0.0
+    mov [esi + Object.transform.rotation.y], 0.0
+    mov [esi + Object.transform.rotation.z], 0.0
+
+    mov [esi + Object.transform.scale.x], 1.0
+    mov [esi + Object.transform.scale.y], 1.0
+    mov [esi + Object.transform.scale.z], 1.0
+
+    mov [esi + Object.q.x], 0.0
+    mov [esi + Object.q.y], 0.0
+    mov [esi + Object.q.z], 0.0
+    mov [esi + Object.q.w], 0.0
     ret
 endp
+
+
+
+proc Text.Render uses esi edi,\
+                    text, vao, x, y, width, heigth
+
+    locals
+      tao dd ?
+      buffer dd ?
+      char dd 0
+      charSize dd 0.0625
+      sixteen dd 16.0
+      x1 dd 0
+      y1 dd 4
+      left dd ?
+      right dd ?
+      top dd ?
+      bottom dd ?
+    endl
+    
+    mov edi, [text]
+
+
+    cmp [edi], 0
+    je .endl
+
+
+    mov eax, [edi]
+    shr eax, 4
+    mov [y1], eax
+
+    mov eax, [edi]
+    and eax, 1111b
+    mov [x1], eax
+
+
+    fild [x1]
+    fmul [charSize]
+    fst [left]
+
+    fadd [charSize]
+
+    fstp [right]
+
+    fild [y1]
+    fmul [charSize]
+    fst [top]
+    fadd [charSize]
+    fstp [bottom]
+
+;0
+   
+
+    mov esi , textCoords
+    mov eax, [left]
+    mov [esi], eax
+
+    add esi, 4
+    mov eax, [bottom]
+    mov [esi], eax
+
+    add esi, 4
+    mov eax, [right]
+    mov [esi], eax
+
+    add esi, 4
+    mov eax, [bottom]
+    mov [esi], eax
+
+    add esi ,4
+    mov eax, [right]
+    mov [esi], eax
+
+    add esi, 4
+    mov eax, [top]
+    mov [esi], eax
+
+    add esi, 4
+    mov eax, [left]
+    
+    mov [esi], eax
+
+    add esi, 4
+    mov eax, [top]
+    mov [esi], eax
+
+    malloc 32
+
+
+    mov [buffer], eax
+    mov esi, eax
+
+   
+    mov eax, [x]
+    mov dword[esi], eax
+
+    mov eax, [y]
+    mov dword[esi + 4], eax
+
+    add esi, 8
+    fld [x]
+    fadd [width]
+    fstp dword[esi]
+
+    add esi, 4
+    mov eax, [y]
+    mov dword[esi], eax
+
+    add esi, 4
+    fld [x]
+    fadd [width]
+    fstp dword[esi]
+
+    add esi, 4
+    fld [y]
+    fadd [heigth]
+    fstp dword[esi]
+    
+    add esi, 4
+    mov eax, [x]
+    mov dword[esi], eax
+
+    add esi, 4
+    fld [y]
+    fadd [heigth]
+    fstp dword[esi]
+
+    invoke glBindVertexArray, [vao]
+
+    lea eax, [tao]
+    invoke glGenBuffers, 1, eax
+    invoke glBindBuffer, GL_ARRAY_BUFFER, [tao]
+
+    invoke glBufferData, GL_ARRAY_BUFFER, 32, textCoords, GL_STATIC_DRAW
+
+
+    invoke glEnableVertexAttribArray, 1
+    
+    invoke glVertexAttribPointer, 1, 2, GL_FLOAT, GL_FALSE, 0, 0
+        
+    invoke glBindVertexArray, 0
+
+
+    invoke glBindVertexArray, [R2.VAO]
+      invoke  glDrawArrays, 6, 0, 4
+    invoke glBindVertexArray, 0
+
+.endl:
+
+    ret
+endp
+
 
 proc UI.Pause
       cmp [GAME_MODE], 0

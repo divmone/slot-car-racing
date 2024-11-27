@@ -33,11 +33,11 @@ proc Init uses esi
 
         fild    [clientRect.right]      
         fidiv   [clientRect.bottom]   
-        fst     [aspect1]  
         fstp    [aspect]
 
         stdcall Glext.LoadFunctions
-        stdcall Glext.CreateShaders  
+        stdcall Glext.CreateShaders 
+        stdcall Glext.CreateShaders2D  
         
         ;invoke  PlaySound, musicPath, NULL,0x0008 or 0x00020000 or 0x0001
         
@@ -75,20 +75,27 @@ proc Init uses esi
         stdcall Object.SetPosition, table, 7.0, -170.0, 0.0
         stdcall Object.InitModelMatrix, car
         stdcall Quaternion.CreateFromAxisAngle, car, 0.0, 0.0, 0.0, 0.0
-
+        
+        stdcall Quaternion.CreateFromAxisAngle, R1, 0.0, 0.0, 0.0, 0.0
         stdcall Quaternion.CreateMatrix,car,  car.rmatrix
-        stdcall Rectangle.Init, R1
+        stdcall Quaternion.CreateMatrix, R1,  R1.rmatrix
 
-        stdcall Rectangle.Create, -0.2, 0.3, 0.4, 0.2
-        mov [R1.VAO], eax
+        invoke glGetUniformLocation, [program2D], modelName2D
+        mov [modelLocation2D], eax
 
-        stdcall Rectangle.Create, -0.2, 0.0, 0.4, 0.2
-        mov [R2.VAO], eax
+        invoke glGetUniformLocation, [program2D], projectionName
+        mov [projectionLocation], eax
 
-        stdcall Rectangle.Create, -0.2, -0.3, 0.4, 0.2
-        mov [R3.VAO], eax
+        stdcall Rectangle.Create, R1, 0.0, 0.0, 1.0, 1.0
 
+        ;`stdcall Rectangle.Create, R2,  0.0, 0.0, 0.4, 0.2
 
+        ;stdcall Rectangle.Create, R3, -0.2, -0.3, 0.4, 0.2
+
+        stdcall Texture.Create, buttonTexture
+        mov [R1.texture], eax 
+;        mov [R2.texture], eax
+;        mov [R3.texture], eax
         invoke  glShadeModel, GL_SMOOTH
         invoke  glHint, GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST
         invoke  glEnable, GL_DEPTH_TEST
@@ -96,6 +103,19 @@ proc Init uses esi
         invoke  glEnable, GL_CULL_FACE
         invoke  glCullFace, GL_BACK 
         invoke  glFrontFace, GL_CCW
+
+        fild [clientRect.right]
+        fstp [clientRect.right]
+
+        fild [clientRect.bottom]
+        fstp [clientRect.bottom]
+
+
+        ;invoke glOrtho, 0.0, 2880.0, 1800.0, 0.0, 0.0, 1.0
+        ;invoke glGetFloatv, GL_PROJECTION, projection2D
+        stdcall Matrix.Ortho, projection2D, 0.0, [clientRect.right], 0.0, [clientRect.bottom], 0.0, 1.0
+
+        stdcall Object.SetPosition,R1, 0.0, 0.50, 0.0
 
         stdcall Matrix.Projection, [aspect], [fovY], [zNear], [zFar], projection
         

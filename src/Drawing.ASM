@@ -1,4 +1,4 @@
-proc Draw uses esi
+proc Draw
         invoke  GetTickCount
         mov     [currentTime], eax
         sub     eax, [startTime]
@@ -9,15 +9,12 @@ proc Draw uses esi
         fstp    [programTime]
        ;jle     .Skip
 
-        stdcall Tick
-
         stdcall Spline.GetPoint, cubeSpline, car.transform.position, [programTime] 
         stdcall Spline.GetRotation, cubeSpline, car.transform.position, [programTime]                                                                               
         invoke  glClearColor, 0.6, 0.6, 1.0, 1.0
 
         invoke  glClear, GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT
 
-        
         stdcall Matrix.LookAt, cameraPosition, targetPosition, upVector 
         
         stdcall Object.Draw, car      
@@ -27,19 +24,33 @@ proc Draw uses esi
         stdcall Object.Draw, books
         stdcall Object.Draw, track
 
-
-        
-
         invoke  SwapBuffers, [hdc]
         
 
         ret
 endp
 
-proc Object.Draw uses esi edi,\ 
-        objPtr
+proc Sprite.Draw uses esi, objPtr
+        
+        stdcall Matrix.CreateModel, [objPtr]
 
-        invoke glPushMatrix
+        invoke glUseProgram, [program2D]
+        invoke glUniformMatrix4fv, [modelLocation2D], 1, GL_FALSE, model
+        invoke glUniformMatrix4fv, [projectionLocation], 1, GL_FALSE, projection2D
+      
+        mov esi, [objPtr]
+        invoke glBindTexture, GL_TEXTURE_2D, [esi + Object.texture]
+        invoke glBindVertexArray, [esi + Object.VAO]
+                invoke  glDrawArrays, 6, 0, 4
+        invoke glBindVertexArray, 0
+        invoke glBindTexture, GL_TEXTURE_2D, 0
+        
+        invoke glUseProgram, 0
+       
+        ret
+endp
+
+proc Object.Draw, objPtr
         ;memcpy tempMatrix, MVP, sizeof.Matrix4x4
 
         stdcall Matrix.CreateModel, [objPtr]
@@ -59,7 +70,6 @@ proc Object.Draw uses esi edi,\
 @@:     
         stdcall DrawMesh, [objPtr], [drawingMode]
         invoke  glUseProgram, 0
-        invoke glPopMatrix
         ;memcpy MVP, tempMatrix, sizeof.Matrix4x4
         ret
 endp  
@@ -76,11 +86,4 @@ proc DrawMesh uses esi,\
         invoke glBindTexture, GL_TEXTURE_2D, 0
 
         ret
-endp
-
-proc Tick
-    fld     [angle]        
-    fadd    [stepp]        
-    fstp    [angle]         
-    ret
 endp
