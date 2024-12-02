@@ -1,0 +1,12 @@
+# Blender 4.2.1 LTS MTL File: 'Modular_Track_Roads_FREE_SKETCHFAB.blend'
+# www.blender.org
+
+newmtl Trek_Material_free
+Ns 360.000000
+Ka 0.100000 0.100000 0.100000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd C:/Users/divmone/Downloads/BEDRILL/Modular_Track_Free/Textures/Track_Texture_free.png

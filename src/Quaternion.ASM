@@ -245,9 +245,105 @@ endp
 ;    // y = Y * sin( theta / 2 )
 ;    // z = Z * sin( theta / 2 )
 
-proc Quaternion.Multiply
+proc Quaternion.Multiply uses esi edi ebx, q1, q2, result 
+ 
+    mov esi, [q1]
+    mov edi, [q2]
+    mov ebx, [result]
 
+    fld dword[esi + quaternion.w]
+    fmul dword[edi + quaternion.w]
 
+    fld dword[esi + quaternion.x]
+    fmul dword[edi + quaternion.x]
+    fsubp
 
+    fld dword[esi + quaternion.y]
+    fmul dword[edi + quaternion.y]
+    fsubp
+
+    fld dword[esi + quaternion.z]
+    fmul dword[edi + quaternion.z]
+    fsubp
+
+    fstp [ebx + quaternion.w]
+
+;-------------------------------------------------
+    fld dword[esi + quaternion.w]
+    fmul dword[edi + quaternion.x]
+
+    fld dword[esi + quaternion.x]
+    fmul dword[edi + quaternion.w]
+    faddp
+
+    fld dword[esi + quaternion.y]
+    fmul dword[edi + quaternion.z]
+    faddp
+
+    fld dword[esi + quaternion.z]
+    fmul dword[edi + quaternion.y]
+    fsubp
+
+    fstp [ebx + quaternion.x]
+;---------------------------------------
+    fld dword[esi + quaternion.w]
+    fmul dword[edi + quaternion.y]
+
+    fld dword[esi + quaternion.y]
+    fmul dword[edi + quaternion.w]
+    faddp
+
+    fld dword[esi + quaternion.z]
+    fmul dword[edi + quaternion.x]
+    faddp
+
+    fld dword[esi + quaternion.x]
+    fmul dword[edi + quaternion.z]
+    fsubp
+
+    fstp [ebx + quaternion.y]
+;-----------------------------
+    fld dword[esi + quaternion.w]
+    fmul dword[edi + quaternion.z]
+
+    fld dword[esi + quaternion.z]
+    fmul dword[edi + quaternion.w]
+    faddp
+
+    fld dword[esi + quaternion.x]
+    fmul dword[edi + quaternion.y]
+    faddp
+
+    fld dword[esi + quaternion.y]
+    fmul dword[edi + quaternion.x]
+    fsubp
+    fstp [ebx + quaternion.z]
+
+    ret
+endp
+
+proc Quaternion.Add uses esi edi, dest, src
+    mov esi, [dest]
+    mov edi, [src]
+
+    fld dword[esi]
+    fadd dword[edi]
+    fstp dword[esi]
+
+    
+    fld dword[esi + 4]
+    fadd dword[edi + 4]
+    fstp dword[esi + 4]
+
+    
+    fld dword[esi + 8]
+    fadd dword[edi + 8]
+    fstp dword[esi + 8]
+
+    
+    fld dword[esi + 12]
+    fadd dword[edi + 12]
+    fstp dword[esi + 12]
+       
     ret
 endp

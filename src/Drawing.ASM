@@ -1,4 +1,10 @@
 proc Draw
+        locals 
+                tempTime dd 0.0
+                step dd 0.01
+                maxB dd 3.0
+                counter dd 0
+        endl
         invoke  GetTickCount
         mov     [currentTime], eax
         sub     eax, [startTime]
@@ -10,18 +16,31 @@ proc Draw
        ;jle     .Skip
 
         stdcall Spline.GetPoint, cubeSpline, car.transform.position, [programTime] 
-        stdcall Spline.GetRotation, cubeSpline, car.transform.position, [programTime]                                                                               
+        stdcall Spline.GetRotation, cubeSpline, car, [programTime]                                                                               
+   
         invoke  glClearColor, 0.6, 0.6, 1.0, 1.0
 
         invoke  glClear, GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT
-
+        
+        stdcall Vector3.Copy, tempCameraVector, cameraFront
+        stdcall Vector3.Add, tempCameraVector, cameraPosition
         stdcall Matrix.LookAt, cameraPosition, targetPosition, upVector 
         
-        stdcall Object.Draw, car      
+.loop: 
+       ; stdcall Spline.GetPoint, cubeSpline, road.transform.position, [tempTime] 
+       ; stdcall Spline.GetRotation, cubeSpline, road, [tempTime]                                                                             
+        stdcall Object.Draw, road  
+
+        ; fld [tempTime]
+        ; fadd [step]
+        ; fld [maxB]
+        ; fcomip st0, st1
+        ; fstp [tempTime]
+        ; ja .loop
+
+@@:
+        stdcall Object.Draw, car     
         stdcall Object.Draw, table
-        stdcall Object.Draw, lamp
-        stdcall Object.Draw, pens
-        stdcall Object.Draw, books
         stdcall Object.Draw, track
 
         invoke  SwapBuffers, [hdc]

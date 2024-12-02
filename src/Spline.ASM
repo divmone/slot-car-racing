@@ -74,7 +74,7 @@ proc Spline.GetPoint uses esi edi ebx,\
         mov     edi, [ebx + Spline.points]
 
 .Calculate:
-        stdcall Vector3.CubicInterpolate, [esi + Spline.Point.pMainVertex],\
+        stdcall Spline.CurveBezier2, [esi + Spline.Point.pMainVertex],\
                         [esi + Spline.Point.pDirectionNext], [edi + Spline.Point.pDirectionPrev],\
                         [edi + Spline.Point.pMainVertex], [result], [f]
 
@@ -82,20 +82,227 @@ proc Spline.GetPoint uses esi edi ebx,\
         ret
 endp
 
+
+proc Spline.CurveBezier2 uses esi, p1, p2, p3, p4, result, f
+        locals 
+                t dd ?
+                tt dd ?
+                ttt dd ?
+                tempVector Vector4 
+        
+        endl
+
+        fld [f]
+        fst [t]
+        fmul [f]
+        fst [tt]
+        fmul [f]
+        fstp [ttt]
+
+        lea esi, [tempVector]
+        fld1
+        fstp dword[esi + Vector4.x]
+        fld [t]
+        fstp dword[esi + Vector4.y]
+        fld [tt]
+        fstp dword[esi + Vector4.z]
+        fld [ttt]
+        fstp dword[esi + Vector4.w]
+
+        stdcall Vector3.SMultiplyMatrix, esi, splineMatrix, splineVector 
+
+        memcpy t1, [p1], 12
+        memcpy t2, [p2], 12
+        memcpy t3, [p3], 12
+        memcpy t4, [p4], 12
+
+        stdcall Vector3.CrossValue, t1, [splineVector.x]
+        stdcall Vector3.CrossValue, t2, [splineVector.y]
+        stdcall Vector3.CrossValue, t3, [splineVector.z]
+        stdcall Vector3.CrossValue, t4, [splineVector.w]
+
+        mov esi, [result]
+        stdcall Vector3.Copy, esi, t1
+        stdcall Vector3.Add, esi, t2
+        stdcall Vector3.Add, esi, t3
+        stdcall Vector3.Add, esi, t4
+
+        ret
+endp
+
+proc Vector4.Multiply uses esi edi ebx, v1, v2, r1
+        locals 
+                t1 Vector3
+                t2 Vector3
+                t3 Vector3
+                t4 Vector3
+        endl
+
+        mov esi, [v1]
+        stdcall Vector3.CrossValue,
+
+
+        ret
+endp
+proc Spline.CurveBezier, p1, p2, p3, p4, result, f
+        locals
+           t dd ?
+           tt dd ?
+           ttt dd ?
+           three dd 3.0
+           six dd 6.0
+           q1 dd ?
+           q2 dd ?
+           q3 dd ?
+           q4 dd ?
+           t1 Vector3
+           t2 Vector3
+           t3 Vector3
+           t4 Vector3
+        endl
+
+        mov eax, [f]
+        mov [t], eax
+        fld [t]
+        fmul [t]
+        fst [tt]
+        fmul [t]
+        fstp [ttt]
+
+;-t^3+3t^2-3t+1
+
+        fld1
+        fchs
+        fmul [ttt]
+        fld [three]
+        fmul [tt]
+        faddp
+
+        fld [three]
+        fmul [t]
+        fsubp
+        fld1
+        faddp
+        fstp [q1]
+
+;3t^3-6t^2+3t
+
+        fld [three]
+        fmul [ttt]
+        fld [tt]
+        fmul [six]
+        fsubp
+        fld [three]
+        fmul [t]
+        faddp
+        fstp [q2]
+;-3t^3+3t^2
+        fld [three]
+        fchs 
+        fmul [ttt]
+        fld [tt]
+        fmul [three]
+        faddp
+        fstp [q3]
+;t^3
+        fld [ttt]
+        fstp [q4]
+   
+        lea eax, [t1]
+        memcpy eax, [p1], 12 
+
+        lea eax, [t2]
+        memcpy eax, [p2], 12 
+
+        lea eax, [t3]
+        memcpy eax, [p3], 12 
+
+        lea eax, [t4]
+        memcpy eax, [p4], 12 
+
+        lea eax, [t1]
+        stdcall Vector3.CrossValue, eax, [q1]
+        lea eax, [t2]
+        stdcall Vector3.CrossValue, eax, [q2]
+        lea eax, [t3]
+        stdcall Vector3.CrossValue, eax, [q3]
+        lea eax, [t4]
+        stdcall Vector3.CrossValue, eax, [q4]
+
+        lea eax, [t1]
+        stdcall Vector3.Add, [result], eax
+        lea eax, [t2]
+        stdcall Vector3.Add, [result], eax
+        lea eax, [t3]
+        stdcall Vector3.Add, [result], eax
+        lea eax, [t4]
+        stdcall Vector3.Add, [result], eax
+        ret
+endp
+
+proc Vector3.SMultiplyMatrix uses esi edi ebx, v1, m1, r1
+
+        mov esi, [v1]
+        mov edi, [m1]
+        mov ebx, [r1]
+
+        ;1c
+        mov ecx, 4
+.loop:
+        fld dword[esi]
+        fmul dword[edi]
+        fld dword[esi + 4]
+        fmul dword[edi + Matrix4x4.m21]
+        faddp
+        fld dword[esi + 8]
+        fmul dword[edi + Matrix4x4.m31]
+        faddp
+        fld dword[esi + 12]
+        fmul dword[edi + Matrix4x4.m41]
+        faddp
+        fstp dword[ebx]
+
+        add esi, 16
+        add edi, 16
+        add ebx, 4
+        loop .loop
+        ret
+endp
+
+proc Spline.CatmullRom uses esi edi, p0, p1, m0, m1, t
+        locals
+                tt dd ?
+                ttt dd ?
+                q0 dd ?
+                q1 dd ?
+                q2 dd ?
+                q3 dd ?
+                tx dd ?
+                ty dd ?
+                
+        endl
+     
+
+
+        ret
+endp
+
 proc Spline.GetRotation uses esi edi,\ 
-        spline, currentV, time
+        spline, objPtr, time
 
         locals
                 axis Vector3
                 prevPoint Vector3 
                 nextPoint Vector3 
                 dupValue dd ?
-                eps       dd    0.01
+                eps       dd    0.001
                 prevTime      dd    ?
                 nextTime      dd    ?
                 one dd 1.0
                 toDegree dd 180.0
                 angle dd 0.0
+                ninety dd 90.0
+                tempq quaternion
         endl
 
         fld [time]
@@ -118,26 +325,73 @@ proc Spline.GetRotation uses esi edi,\
         stdcall Vector3.Sub, eax, ecx
         
         
+        lea edx, [axis]
+        mov esi, [objPtr]
+        add esi, Object.matrix
+        stdcall Vector3.Cross, eax, car.matrix.m11, edx
+        
         lea esi, [axis]
-        lea eax, [nextPoint]
-
-
-        stdcall Vector3.Cross, car.matrix.m11, eax,  esi
-
-        lea eax, [nextPoint]
-        stdcall Vector3.GetAngle, eax,  car.matrix.m11
-        mov [angle], eax
-
         stdcall Vector3.Normalize, esi
 
-        ;stdcall Quaternion.CreateFromAxisAngle, car,  [esi], [esi + 4], [esi + 8], [angle]
 
-        ;stdcall Quaternion.CreateMatrix, car.rmatrix    
-        
-        ;stdcall Matrix.Multiply4x4, car.rmatrix, tempMatrix2, car.rmatrix
-        ret
+        lea eax, [nextPoint]
+        mov esi, [objPtr]
+        add esi, Object.matrix
+        stdcall Vector3.GetAngle, esi,  eax
+        mov [angle], eax
+
+        fld [angle]
+        fadd [car.transform.rotation.y]
+        fstp [car.transform.rotation.y]
+
+.return:
+      ret
 endp
 
+;  double sinp = std::sqrt(1 + 2 * (q.w * q.y - q.x * q.z));
+;     double cosp = std::sqrt(1 - 2 * (q.w * q.y - q.x * q.z));
+;     angles.pitch = 2 * std::atan2(sinp, cosp) - M_PI / 2;
+
+proc Quaternion.ToEuler uses esi, objPtr
+        locals
+                sinp dd ?
+                two dd 2.0
+                result dd ?
+        endl
+
+        mov esi, [objPtr]
+        fld dword[esi + quaternion.w]
+        fmul dword[esi + quaternion.y]
+        fld dword[esi + quaternion.x]
+        fmul dword[esi + quaternion.z]
+        fsubp
+        fmul [two]
+        fld1
+        faddp
+        fsqrt
+        fstp [sinp]
+
+        fld dword[esi + quaternion.w]
+        fmul dword[esi + quaternion.y]
+        fld dword[esi + quaternion.x]
+        fmul dword[esi + quaternion.z]
+        fsubp
+        fmul [two]
+        fld1
+        fsubrp
+        fsqrt
+        fld [sinp]
+        fpatan
+        fmul [two]
+        fldpi
+        fdiv [two]
+        fsubp
+
+        fstp [result]
+
+        mov eax, [result]
+        ret
+endp
  ;stdcall Matrix.Multiply4x4, tempMatrix,  car.rmatrix, car.rmatrix
 
         ;stdcall Matrix.Normalize, car.rmatrix
@@ -162,15 +416,11 @@ proc Vector3.GetAngle uses edi esi, v1, v2
                 toDegree dd 180.0
         endl
 
-        stdcall Vector3.Copy, vec1, [v1]
+        stdcall Vector3.Normalize, [v1]
 
-        stdcall Vector3.Copy, vec2, [v2]
+        stdcall Vector3.Normalize, [v2]
 
-        stdcall Vector3.Normalize, vec1
-
-        stdcall Vector3.Normalize, vec2
-
-        stdcall Vector3.Dup, vec1, vec2
+        stdcall Vector3.Dup, [v1], [v2]
 
         mov [dupValue], eax
         fld [dupValue]    

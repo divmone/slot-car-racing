@@ -53,9 +53,9 @@
 
 
         zero            GLfloat         0.0
-        fovY            GLfloat         60.0
+        fovY            GLfloat         70.0
         zNear           GLfloat         0.001
-        zFar            GLfloat         1000.0
+        zFar            GLfloat         100000.0
         tAngle   dd       180.0
         PI      dd       3.14
         mVector         Vector3         0.1, 0.1, 0.0
@@ -79,10 +79,6 @@
 
         menuPosition    Vector3         200.0, 100.0, 100.0
         menuTargetPosition  Vector3     0.0, 0.0, 0.0
-
-        cameraPosition  Vector3         100.0, 100.0, 100.0
-        targetPosition  Vector3         0.0, 0.0, 0.0
-        upVector        Vector3         0.0, 1.0, 0.0
 
         lightPosition  Vector4         5.0, 5.1, 5.0, 1.0
         lightColor     Vector4         0.9, 0.9, 0.9, 1.0
@@ -149,6 +145,7 @@
         ;content db 108 dup(0) 
         temp dd ?
         GAME_MODE dd 0
+        five dd 1.0
 
         include         "Init.asm"
         include         "Mesh.asm"
@@ -170,6 +167,7 @@
         include         "TimeManager.asm"
         include         "Quaternion.asm"
         include         "UI.asm"
+        include         "Camera.asm"
 
 proc WinMain
 
@@ -178,7 +176,7 @@ proc WinMain
         endl
 
         xor     ebx, ebx
-
+        
         stdcall Init
         lea     esi, [msg]
 
@@ -216,6 +214,12 @@ proc WindowProc uses ebx,\
         jmp     .ReturnZero
 
 .KeyDown:
+
+        fld [deltaTime]
+        fmul [five]
+        fstp [cameraSpeed]
+
+
         switch [wParam]
         case .Destroy, 'P'
         case .GoToMenu, VK_ESCAPE
@@ -234,7 +238,7 @@ proc WindowProc uses ebx,\
         case .RotateDown, VK_DOWN
         jmp     .ReturnZero
 .GoToMenu:
-        stdcall UI.Pause
+        ;stdcall UI.Pause
         jmp     .ReturnZero
 .MoveUp:
       
@@ -275,25 +279,47 @@ proc WindowProc uses ebx,\
 
         jmp     .ReturnZero
 .MoveLeft:
-        stdcall Float.AddValue, R1.transform.position.x, [stepp]
+        stdcall Vector3.Cross, cameraFront, upVector, tempCameraVector
+        stdcall Vector3.Normalize, tempCameraVector
+        stdcall Vector3.CrossValue, tempCameraVector, [cameraSpeed]
+
+        stdcall Vector3.Sub, cameraPosition, tempCameraVector
+        
         jmp     .ReturnZero
 
 .MoveRight:
-        stdcall Float.SubValue, R1.transform.position.x, [stepp]
- 
+        stdcall Vector3.Cross, cameraFront, upVector, tempCameraVector
+        stdcall Vector3.Normalize, tempCameraVector
+        stdcall Vector3.CrossValue, tempCameraVector, [cameraSpeed]
+
+        stdcall Vector3.Add, cameraPosition, tempCameraVector
+        
         jmp     .ReturnZero
 
-.MoveFront:
-        stdcall Float.AddValue, car.transform.position.z, [stepp]
+.MoveFront:  ;W
+
+        ;cameraPos += cameraSpeed * cameraFront;
+
+        stdcall Vector3.Copy, tempCameraVector, cameraFront
+        stdcall Vector3.CrossValue, tempCameraVector, [cameraSpeed]
+        stdcall Vector3.Add, cameraPosition, tempCameraVector
+
+
+        ;stdcall Float.AddValue, car.transform.position.z, [stepp]
         jmp     .ReturnZero
 
-.MoveBack:
-        stdcall Float.SubValue, car.transform.position.z, [stepp]
+.MoveBack:   ;S
+        stdcall Vector3.Copy, tempCameraVector, cameraFront
+        stdcall Vector3.CrossValue, tempCameraVector, [cameraSpeed]
+        stdcall Vector3.Sub, cameraPosition, tempCameraVector
+
+        ;stdcall Float.SubValue, car.transform.position.z, [stepp]
         jmp     .ReturnZero
 
 .RotateLeft:
-        stdcall Float.AddValue, angleX, [step]
-        jmp     .ReturnZero
+        ;cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+
+      jmp     .ReturnZero
 
 
 .RotateRight:

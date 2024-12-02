@@ -6,9 +6,9 @@ struct quaternion
 ends
 
 struct Transform
-    position Vector3
-    rotation Vector3
-    scale    Vector3
+    position Vector3 0.0, 0.0, 0.0
+    rotation Vector3 0.0, 0.0, 0.0
+    scale    Vector3 1.0, 1.0, 1.0
 ends
 
 struct Object
@@ -55,13 +55,30 @@ track Object
 fileNameTr     db             "../models/room.obj",0 
 textPathTr        db             "../textures/images.bmp", 0 
 
+road Object
+fileNameR db  "../models/road.obj",0 
+textPathR        db    "../textures/road.bmp", 0 
+
 R1 Object
+r1Message db "packed", 0 
 R2 Object
 R3 Object
 
 
-buttonTexture       db             "../textures/verdana.bmp", 0 
+buttonTexture       db             "../textures/consolas.bmp", 0 
 
 textCoords    dd      0.0, 1.0,  1.0, 1.0,  1.0, 0.0, 0.0, 0.0 
 
 musicPath  db "../audio/goida.wav",0
+
+
+testq1 quaternion 1.0, 2.0, 3.0, 4.0
+testq2 quaternion 5.0, 6.0, 7.0, 8.0
+testq3 quaternion
+
+t1 Vector3
+t2 Vector3
+t3 Vector3
+t4 Vector3
+
+testObj Object

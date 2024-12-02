@@ -25,7 +25,11 @@ proc StrToInt uses ebx edi,\
         je @F
         mov bl, byte[esi]
         sub ebx, '0'
-        imul eax,eax, 10
+        xor edx, edx
+        push ecx
+        mov ecx, 10
+        mul ecx
+        pop ecx
         add eax, ebx
         inc esi
         dec ecx
@@ -36,8 +40,7 @@ proc StrToInt uses ebx edi,\
     ret
 endp
 
-proc StrToFloat  pointer
-
+proc StrToFloat, pointer
         locals
             number dd 0.0
             precision dd 0
@@ -62,7 +65,11 @@ proc StrToFloat  pointer
         je @F
         mov bl, byte[esi]
         sub ebx, '0'
-        imul eax, eax, 10
+        push ecx
+        xor edx, edx
+        mov ecx, 10
+        mul ecx
+        pop ecx
         add eax, ebx
         inc esi
         dec ecx
@@ -81,7 +88,11 @@ proc StrToFloat  pointer
         je @F
         mov bl, byte[esi]
         sub ebx, '0'
-        imul eax, eax, 10
+        xor edx, edx
+        push ecx
+        mov ecx, 10
+        mul ecx
+        pop ecx
         add eax, ebx
         inc [precision]
         cmp [precision], 9

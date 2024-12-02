@@ -76,10 +76,10 @@ proc Matrix.Ortho uses esi edi,\
 
   mov esi, [matrix]
 
-  mov     edi, esi
-  mov     eax, 0
-  mov     ecx, 16
-  rep     stosd
+  ;mov     edi, esi
+  ;mov     eax, 0
+  ;mov     ecx, 16
+  ;rep     stosd
 
   fld [right]
   fsub [left]
@@ -597,7 +597,7 @@ proc Matrix.Multiply4x4 uses ebx ecx edx, matrix1, matrix2, matrix_res
   ret
 endp
 
-proc Matrix.CreateModel uses esi , objPtr
+proc Matrix.CreateModel uses esi edi, objPtr
     mov esi, [objPtr]
     add esi, Object.transform.position
     stdcall Matrix.CreatePosition, esi, position 
@@ -609,9 +609,12 @@ proc Matrix.CreateModel uses esi , objPtr
 
     ;stdcall Quaternion.CreateFromAxisAngle, [objPtr], 0.0, 1.0, 0.0, 90.0
 
-    stdcall Quaternion.CreateMatrix, [objPtr], turn
-        
-    ;stdcall Matrix.CreateTurn, turn, esi
+    
+    ;stdcall Quaternion.CreateMatrix, [objPtr], turn
+    
+    mov esi, [objPtr]
+    add esi, Object.transform.rotation
+    stdcall Matrix.CreateTurn, turn, esi
 
     stdcall Matrix.Multiply4x4, scale, turn, model 
     stdcall Matrix.Multiply4x4, model, position, model 

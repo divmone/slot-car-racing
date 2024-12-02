@@ -10,3 +10,12 @@ draw
     вызываем drawarrays
 
     glm::mat4 projection = glm::ortho(0.0f, 800.0f, 600.0f, 0.0f, -1.0f, 1.0f);  
+
+left, right
+Specify the coordinates for the left and right vertical clipping planes.
+
+bottom, top
+Specify the coordinates for the bottom and top horizontal clipping planes.
+
+nearVal, farVal
+Specify the distances to the nearer and farther depth clipping planes. These values are negative if the plane is to be behind the viewer.

@@ -28,6 +28,7 @@ entry   WinMain
         include         "Controller.inc"
         include         "TimeManager.inc"
         include         "Quaternion.inc"
+        include         "Camera.inc"
 
 macro switch value
 {
