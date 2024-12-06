@@ -43,12 +43,9 @@ proc Init uses esi
         ;invoke  PlaySound, musicPath, NULL,0x0008 or 0x00020000 or 0x0001
         
         stdcall Object.Create, car, fileName, textPath
+        stdcall Object.Create, car2, fileName2, textPath2
         ;stdcall Object.Create, nissan, fileNameN, textPathN
         stdcall Object.Create, table, fileNameT, textPathT
-        stdcall Object.Create, sphere, fileNameS, textPathS
-        stdcall Object.Create, lamp, fileNameL, textPathL
-        stdcall Object.Create, pens, fileNameP, textPathP
-        stdcall Object.Create, books, fileNameB, textPathB
         stdcall Object.Create, track, fileNameTr, textPathTr
         stdcall Object.Create, road, fileNameR, textPathR
         
@@ -80,8 +77,8 @@ proc Init uses esi
         stdcall Object.InitModelMatrix, road
         
 
-        stdcall Quaternion.CreateFromAxisAngle, car, 0.0, 1.0, 0.0, 0.0
-        stdcall Quaternion.CreateFromAxisAngle, road, 0.0, 1.0, 0.0, 0.0
+        ;stdcall Quaternion.CreateFromAxisAngle, car, 0.0, 1.0, 0.0, 0.0
+        ;stdcall Quaternion.CreateFromAxisAngle, road, 0.0, 1.0, 0.0, 0.0
         ;
 
         stdcall Quaternion.CreateFromAxisAngle, R1, 0.0, 0.0, 0.0, 0.0
@@ -91,6 +88,7 @@ proc Init uses esi
         invoke glGetUniformLocation, [program2D], modelName2D
         mov [modelLocation2D], eax
 
+        stdcall Vector3.Copy, sphere.transform.position, cameraPosition1, 12
         invoke glGetUniformLocation, [program2D], projectionName
         mov [projectionLocation], eax
 
@@ -124,7 +122,7 @@ proc Init uses esi
         ;stdcall Object.SetPosition,R1, -0.5, -0.5, 0.0
         ;mov [R1.q.w], 10.0
         ;mov [R1.q.z], 0.1
-
+        stdcall Light.Init
         stdcall Matrix.Projection, [aspect], [fovY], [zNear], [zFar], projection
         
         invoke  GetTickCount

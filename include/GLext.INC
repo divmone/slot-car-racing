@@ -28,6 +28,9 @@ extensionAddresses:
         glBindAttribLocation    dd      ?
         glUniform3fv            dd      ?
         glGenerateMipmap        dd      ?
+        glGenFramebuffers       dd      ?
+        glBindFramebuffer        dd      ?
+        glFramebufferTexture2D  dd      ?
 extensionNames:
         db      "glBufferData",0
         db      "glGenBuffers", 0
@@ -58,6 +61,9 @@ extensionNames:
         db      "glBindAttribLocation",0
         db      "glUniform3fv",0
         db      "glGenerateMipmap", 0
+        db      "glGenFramebuffers", 0
+        db      "glBindFramebuffer", 0
+        db      "glFramebufferTexture2D",0
 
         db      0
 
@@ -70,3 +76,5 @@ define GL_STATIC_DRAW                    0x88E4
 define GL_ELEMENT_ARRAY_BUFFER           0x8893
 define GL_CLAMP_TO_EDGE                  0x812F 
 define GL_MIRRORED_REPEAT                0x8370 
+define GL_FRAMEBUFFER                    0x8D40
+define GL_DEPTH_ATTACHMENT               0x8D00

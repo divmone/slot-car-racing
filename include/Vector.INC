@@ -23,3 +23,5 @@ struct Vector4i
       w         dd      ?
 
 ends
+
+upperVector Vector3 0.0, 1.0, 0.0

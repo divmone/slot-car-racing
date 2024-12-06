@@ -82,7 +82,6 @@ proc Spline.GetPoint uses esi edi ebx,\
         ret
 endp
 
-
 proc Spline.CurveBezier2 uses esi, p1, p2, p3, p4, result, f
         locals 
                 t dd ?
@@ -252,18 +251,16 @@ proc Vector3.SMultiplyMatrix uses esi edi ebx, v1, m1, r1
         fld dword[esi]
         fmul dword[edi]
         fld dword[esi + 4]
-        fmul dword[edi + Matrix4x4.m21]
+        fmul dword[edi + 16]
         faddp
         fld dword[esi + 8]
-        fmul dword[edi + Matrix4x4.m31]
+        fmul dword[edi + 32]
         faddp
         fld dword[esi + 12]
-        fmul dword[edi + Matrix4x4.m41]
+        fmul dword[edi + 48]
         faddp
         fstp dword[ebx]
-
-        add esi, 16
-        add edi, 16
+        add edi, 4
         add ebx, 4
         loop .loop
         ret
@@ -287,13 +284,270 @@ proc Spline.CatmullRom uses esi edi, p0, p1, m0, m1, t
         ret
 endp
 
+
+proc Spline.GetDerivative  uses esi edi ebx,\
+     spline, result, time
+
+        locals
+                t       dd      ?
+                t2      dd      ?
+                t1      dd      ?
+                f       dd      ?
+                index   dd      ?
+        endl
+
+        mov     esi, [spline]
+
+        cmp     [esi + Spline.cycle], 1
+        je      .DoNotCheck
+
+        fld     [esi + Spline.time]                     ; tc
+        fld     [time]                                  ; ts, tc
+        fcomip  st0, st1                                ; tc
+        fstp    [esi + Spline.time]                     ;
+        ja      .Return                                 ; ts < tc
+
+.DoNotCheck:
+        mov     [index], 0
+
+        fld     [esi + Spline.time]                     ; tc
+        fld     [time]                                  ; ts, tc
+        fprem                                           ; t, tc
+        fstp    [t]                                     ; tc
+        fstp    [esi + Spline.time]                     ;
+
+        fldz                                            ; 0
+
+        mov     ecx, [esi + Spline.pointsCount]
+        mov     ebx, [esi + Spline.points]
+
+.CheckPointsLoop:
+        fadd    [ebx + Spline.Point.time]               ; t2
+        fld     [t]                                     ; t, t2
+        fcomip  st0, st1                                ; t2
+        jb      .FoundTransition                        ; if t < t2
+
+        add     ebx, sizeof.Spline.Point
+        inc     [index]
+
+        loop    .CheckPointsLoop
+
+.FoundTransition:
+        fst     [t2]                                    ; t2
+        fld     st0                                     ; t2, t2
+        fsub    [ebx + Spline.Point.time]               ; t1, t2
+        fst     [t1]                                    ; t1, t2
+        fsubp                                           ; (t2 - t1)
+        fld     [t]                                     ; t, (t2 - t1)
+        fsub    [t1]                                    ; (t - t1), (t2 - t1)
+        fdivrp                                          ; f
+        fstp    [f]                                     ;
+
+        mov     eax, sizeof.Spline.Point
+        xor     edx, edx
+        mul     [index]
+
+        mov     ebx, [spline]
+        mov     esi, [ebx + Spline.points]
+        add     esi, eax
+
+        mov     edi, esi
+        add     edi, sizeof.Spline.Point
+
+        mov     ecx, [index]
+        inc     ecx
+        cmp     ecx, [ebx + Spline.pointsCount]
+        jne     .Calculate
+        mov     edi, [ebx + Spline.points]
+
+.Calculate:
+        stdcall Spline.GetCurveBezierDerivate, [esi + Spline.Point.pMainVertex],\
+                        [esi + Spline.Point.pDirectionNext], [edi + Spline.Point.pDirectionPrev],\
+                        [edi + Spline.Point.pMainVertex], [result], [f]
+
+.Return:
+        ret
+endp
+
+proc Spline.GetAcceleration uses esi edi ebx,\
+     spline, result, time
+
+        locals
+                t       dd      ?
+                t2      dd      ?
+                t1      dd      ?
+                f       dd      ?
+                index   dd      ?
+        endl
+
+        mov     esi, [spline]
+
+        cmp     [esi + Spline.cycle], 1
+        je      .DoNotCheck
+
+        fld     [esi + Spline.time]                     ; tc
+        fld     [time]                                  ; ts, tc
+        fcomip  st0, st1                                ; tc
+        fstp    [esi + Spline.time]                     ;
+        ja      .Return                                 ; ts < tc
+
+.DoNotCheck:
+        mov     [index], 0
+
+        fld     [esi + Spline.time]                     ; tc
+        fld     [time]                                  ; ts, tc
+        fprem                                           ; t, tc
+        fstp    [t]                                     ; tc
+        fstp    [esi + Spline.time]                     ;
+
+        fldz                                            ; 0
+
+        mov     ecx, [esi + Spline.pointsCount]
+        mov     ebx, [esi + Spline.points]
+
+.CheckPointsLoop:
+        fadd    [ebx + Spline.Point.time]               ; t2
+        fld     [t]                                     ; t, t2
+        fcomip  st0, st1                                ; t2
+        jb      .FoundTransition                        ; if t < t2
+
+        add     ebx, sizeof.Spline.Point
+        inc     [index]
+
+        loop    .CheckPointsLoop
+
+.FoundTransition:
+        fst     [t2]                                    ; t2
+        fld     st0                                     ; t2, t2
+        fsub    [ebx + Spline.Point.time]               ; t1, t2
+        fst     [t1]                                    ; t1, t2
+        fsubp                                           ; (t2 - t1)
+        fld     [t]                                     ; t, (t2 - t1)
+        fsub    [t1]                                    ; (t - t1), (t2 - t1)
+        fdivrp                                          ; f
+        fstp    [f]                                     ;
+
+        mov     eax, sizeof.Spline.Point
+        xor     edx, edx
+        mul     [index]
+
+        mov     ebx, [spline]
+        mov     esi, [ebx + Spline.points]
+        add     esi, eax
+
+        mov     edi, esi
+        add     edi, sizeof.Spline.Point
+
+        mov     ecx, [index]
+        inc     ecx
+        cmp     ecx, [ebx + Spline.pointsCount]
+        jne     .Calculate
+        mov     edi, [ebx + Spline.points]
+
+.Calculate:
+        stdcall Spline.GetCurveBezierAcceleration, [esi + Spline.Point.pMainVertex],\
+                        [esi + Spline.Point.pDirectionNext], [edi + Spline.Point.pDirectionPrev],\
+                        [edi + Spline.Point.pMainVertex], [result], [f]
+
+.Return:
+        ret
+endp
+
+
+proc Spline.GetCurveBezierDerivate uses esi, p1, p2, p3, p4, result, f
+        locals 
+                t dd ?
+                tt dd ?
+                two dd 2.0
+                three dd 3.0
+                tempVector Vector4 
+        endl
+
+        fld [f]
+        fst [t]
+        fmul [f]
+        fstp [tt]
+
+
+        lea esi, [tempVector]
+        fldz
+        fstp dword[esi + Vector4.x]
+        fld1
+        fstp dword[esi + Vector4.y]
+        fld [t]
+        fmul [two]
+        fstp dword[esi + Vector4.z]
+        fld [tt]
+        fmul [three]
+        fstp dword[esi + Vector4.w]
+
+        stdcall Vector3.SMultiplyMatrix, esi, splineMatrix, splineVector 
+
+        memcpy t1, [p1], 12
+        memcpy t2, [p2], 12
+        memcpy t3, [p3], 12
+        memcpy t4, [p4], 12
+
+        stdcall Vector3.CrossValue, t1, [splineVector.x]
+        stdcall Vector3.CrossValue, t2, [splineVector.y]
+        stdcall Vector3.CrossValue, t3, [splineVector.z]
+        stdcall Vector3.CrossValue, t4, [splineVector.w]
+
+        mov esi, [result]
+        stdcall Vector3.Copy, esi, t1
+        stdcall Vector3.Add, esi, t2
+        stdcall Vector3.Add, esi, t3
+        stdcall Vector3.Add, esi, t4
+
+        ret
+endp
+
+
+proc Spline.GetCurveBezierAcceleration uses esi, p1, p2, p3, p4, result, f
+        locals 
+                two dd 2.0
+                six dd 6.0
+                tempVector Vector4 
+        endl
+
+        lea esi, [tempVector]
+        fldz
+        fstp dword[esi + Vector4.x]
+        fldz
+        fstp dword[esi + Vector4.y]
+        fld [two]
+        fstp dword[esi + Vector4.z]
+        fld [f]
+        fmul [six]
+        fstp dword[esi + Vector4.w]
+
+        stdcall Vector3.SMultiplyMatrix, esi, splineMatrix, splineVector 
+
+        memcpy t1, [p1], 12
+        memcpy t2, [p2], 12
+        memcpy t3, [p3], 12
+        memcpy t4, [p4], 12
+
+        stdcall Vector3.CrossValue, t1, [splineVector.x]
+        stdcall Vector3.CrossValue, t2, [splineVector.y]
+        stdcall Vector3.CrossValue, t3, [splineVector.z]
+        stdcall Vector3.CrossValue, t4, [splineVector.w]
+
+        mov esi, [result]
+        stdcall Vector3.Copy, esi, t1
+        stdcall Vector3.Add, esi, t2
+        stdcall Vector3.Add, esi, t3
+        stdcall Vector3.Add, esi, t4
+
+        ret
+endp
+
 proc Spline.GetRotation uses esi edi,\ 
         spline, objPtr, time
 
         locals
                 axis Vector3
-                prevPoint Vector3 
-                nextPoint Vector3 
+                point Vector3
                 dupValue dd ?
                 eps       dd    0.001
                 prevTime      dd    ?
@@ -305,56 +559,38 @@ proc Spline.GetRotation uses esi edi,\
                 tempq quaternion
         endl
 
-        fld [time]
-        fsub [eps]
-        fstp [prevTime]
+        lea eax, [point]
+        stdcall Spline.GetDerivative, [spline], eax, [time]
 
-        fld [time]
-        fadd [eps]
-        fstp [nextTime]
+        ; lea eax, [point]
+        ; stdcall Vector3.Normalize, eax
 
-        lea eax, [prevPoint]
-        stdcall Spline.GetPoint, [spline], eax, [prevTime] 
-
-        lea eax, [nextPoint]
-        stdcall Spline.GetPoint, [spline], eax, [nextTime] 
-
-        lea eax, [nextPoint]
-        lea ecx, [prevPoint]
-
-        stdcall Vector3.Sub, eax, ecx
+        lea esi, [point]
+        fld dword [esi]
+        fchs
+        fld dword [esi + 8]
+        fpatan
+        fmul [toDegree]
+        fldpi
+        fdivr st0, st1
+        fstp st1
+        fstp [angle]
+      
         
-        
-        lea edx, [axis]
-        mov esi, [objPtr]
-        add esi, Object.matrix
-        stdcall Vector3.Cross, eax, car.matrix.m11, edx
-        
-        lea esi, [axis]
-        stdcall Vector3.Normalize, esi
 
 
-        lea eax, [nextPoint]
-        mov esi, [objPtr]
-        add esi, Object.matrix
-        stdcall Vector3.GetAngle, esi,  eax
-        mov [angle], eax
 
-        fld [angle]
-        fadd [car.transform.rotation.y]
-        fstp [car.transform.rotation.y]
-
-.return:
+        stdcall Quaternion.CreateFromAxisAngle, [objPtr], 0.0, 1.0, 0.0, [angle]
+.skip:        
       ret
 endp
-
 ;  double sinp = std::sqrt(1 + 2 * (q.w * q.y - q.x * q.z));
 ;     double cosp = std::sqrt(1 - 2 * (q.w * q.y - q.x * q.z));
 ;     angles.pitch = 2 * std::atan2(sinp, cosp) - M_PI / 2;
 
 proc Quaternion.ToEuler uses esi, objPtr
         locals
-                sinp dd ?
+               sinp dd ?
                 two dd 2.0
                 result dd ?
         endl

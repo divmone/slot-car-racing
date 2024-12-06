@@ -1,51 +1,89 @@
-proc Draw
+proc Draw uses esi
         locals 
                 tempTime dd 0.0
-                step dd 0.01
-                maxB dd 3.0
+                step dd 0.05
+                maxB dd 11.0
                 counter dd 0
+                angle dd 0.1
+                dist dd 10.0
+                dist1 dd 5.0
+                oneSecond dd 100000.0
+
         endl
+       
+
         invoke  GetTickCount
         mov     [currentTime], eax
         sub     eax, [startTime]
-        mov     [nprogramTime], eax
+        mov     [programTime], eax
 
-        fild    [nprogramTime]
+        fild    [programTime]
         fdiv    [oneSecond]
         fstp    [programTime]
-       ;jle     .Skip
 
-        stdcall Spline.GetPoint, cubeSpline, car.transform.position, [programTime] 
-        stdcall Spline.GetRotation, cubeSpline, car, [programTime]                                                                               
-   
+        mov     eax, [currentTime]
+        sub     eax, [lastTime]
+        cmp     eax, 10
+        jle     .Skip
+
+        mov     eax, [currentTime]
+        mov     [lastTime], eax   
+
+.Skip:        
         invoke  glClearColor, 0.6, 0.6, 1.0, 1.0
 
         invoke  glClear, GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT
-        
-        stdcall Vector3.Copy, tempCameraVector, cameraFront
-        stdcall Vector3.Add, tempCameraVector, cameraPosition
-        stdcall Matrix.LookAt, cameraPosition, targetPosition, upVector 
+ 
+        stdcall Physics.Update, 0.07, cubeSpline, car
+
+        stdcall Matrix.LookAt, cameraPosition, tempVector, upVector 
         
 .loop: 
-       ; stdcall Spline.GetPoint, cubeSpline, road.transform.position, [tempTime] 
-       ; stdcall Spline.GetRotation, cubeSpline, road, [tempTime]                                                                             
+        stdcall Spline.GetPoint, cubeSpline, road.transform.position, [tempTime] 
+        stdcall Spline.GetRotation, cubeSpline, road, [tempTime]                                                                             
         stdcall Object.Draw, road  
 
-        ; fld [tempTime]
-        ; fadd [step]
-        ; fld [maxB]
-        ; fcomip st0, st1
-        ; fstp [tempTime]
-        ; ja .loop
+        fld [tempTime]
+        fadd [step]
+        fld [maxB]
+        fcomip st0, st1
+        fstp [tempTime]
+        ja .loop
+
+        mov [tempTime], 0.0
 
 @@:
-        stdcall Object.Draw, car     
+        ;stdcall Object.Draw, sphere     
+        stdcall Object.Draw, car
+        ;stdcall Object.Draw, car2      
         stdcall Object.Draw, table
         stdcall Object.Draw, track
+        ;stdcall Object.Draw, sphere
 
         invoke  SwapBuffers, [hdc]
         
+      
+        ;stdcall Vector3.CrossValue, tempVector, -1.0
+        ;memcpy sphere.transform.position,  tempVector, 12 
+        
+        ret
+endp
 
+proc Render
+
+        invoke glViewport, 0, 0, SHADOW_WIDTH, SHADOW_HEIGHT
+        invoke glBindFramebuffer, GL_FRAMEBUFFER, [depthMapFBO]
+        invoke glClear, GL_DEPTH_BUFFER_BIT
+         ConfigureShaderAndMatrices();
+        RenderScene();
+
+// 2. рисуем сцену как обычно с тенями (используя карту глубины)
+glBindFramebuffer(GL_FRAMEBUFFER, 0);
+glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    ConfigureShaderAndMatrices();
+    glBindTexture(GL_TEXTURE_2D, depthMap);
+    RenderScene();
         ret
 endp
 

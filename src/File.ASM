@@ -33,6 +33,7 @@ proc File.GetSize uses edi,\
         
         locals
                 hFile   dd      ? 
+                size dd ?
         endl
 
         invoke  CreateFile, [fileName], GENERIC_READ, ebx, ebx, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, ebx
@@ -40,7 +41,10 @@ proc File.GetSize uses edi,\
 
         invoke  GetFileSize, [hFile], ebx
         inc     eax
+        mov [size], eax
 
+        invoke  CloseHandle, [hFile]
+        mov eax, [size]
     ret
 endp
 

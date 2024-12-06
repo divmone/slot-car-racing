@@ -21,11 +21,20 @@ struct Object
     rmatrix Matrix4x4 
     ;objFileName  dd ?
     ;texFileName  dd ?
+    speed dd 0.0
+    mass dd 1.0
+    mu dd 0.01
+    acceleration dd 0.0
 ends
 
 car Object 0,0,0,0
-fileName        db              "../models/gtr1.obj",0
-textPath        db              "../textures/gt-r.bmp", 0
+fileName        db              "../models/gtr.obj",0
+textPath        db              "../textures/gtrred.bmp", 0
+
+car2 Object 0,0,0,0
+fileName2        db              "../models/gtr.obj",0
+textPath2        db              "../textures/gt-r.bmp", 0
+
 
 nissan Object 
 fileNameN        db              "../models/nissan.obj",0
@@ -81,4 +90,17 @@ t2 Vector3
 t3 Vector3
 t4 Vector3
 
+testVector Vector3 1.0, 2.0, 3.0
+
 testObj Object
+
+positionOnSpline2 dd 0.0
+positionOnSpline dd 0.0
+speed dd 0.0
+speed2 dd 0.0
+acceleration2 dd 0.0
+acceleration dd 0.0
+friction dd 0.01
+maxForce dd 1.0
+maxForce2 dd 0.5
+mass dd 1.0

@@ -610,11 +610,11 @@ proc Matrix.CreateModel uses esi edi, objPtr
     ;stdcall Quaternion.CreateFromAxisAngle, [objPtr], 0.0, 1.0, 0.0, 90.0
 
     
-    ;stdcall Quaternion.CreateMatrix, [objPtr], turn
+    stdcall Quaternion.CreateMatrix, [objPtr], turn
     
-    mov esi, [objPtr]
-    add esi, Object.transform.rotation
-    stdcall Matrix.CreateTurn, turn, esi
+    ; mov esi, [objPtr]
+    ; add esi, Object.transform.rotation
+    ; stdcall Matrix.CreateTurn, turn, esi
 
     stdcall Matrix.Multiply4x4, scale, turn, model 
     stdcall Matrix.Multiply4x4, model, position, model 
