@@ -54,8 +54,8 @@
 
         zero            GLfloat         0.0
         fovY            GLfloat         70.0
-        zNear           GLfloat         0.001
-        zFar            GLfloat         100000.0
+        zNear           GLfloat         0.1
+        zFar            GLfloat         1000.0
         tAngle   dd       180.0
         PI      dd       3.14
         mVector         Vector3         0.1, 0.1, 0.0
@@ -138,6 +138,18 @@ DirNext4  Vector3         60.66, 0.0, -10.0
 
 tempVector Vector3
 
+rotationPoint1 Vector4     0.0, 1.0, 0.0, 0.0
+rotationPoint1Prev Vector4 0.0, 1.0, 0.0, 0.0
+rotationPoint1Next Vector4 0.0, 1.0, 0.0, 20.0
+
+rotationPoint2 Vector4     0.0, 1.0, 0.0, 90.0
+rotationPoint2Prev Vector4 0.0, 1.0, 0.0, 40.0
+rotationPoint2Next Vector4 0.0, 1.0, 0.0, 0.0
+
+rotationPoints : Spline.Point rotationPoint1, rotationPoint1Prev, rotationPoint1Next, 1.0
+                 Spline.Point rotationPoint2, rotationPoint2Prev, rotationPoint2Next, 1.0
+
+rotationSpline   Spline          2, rotationPoints, 0, 2.0
 
         lightPosition1 Vector3     0.0, 50.0, 0.0
         lightPosition2 Vector3     0.0, 0.0, 0.0
@@ -165,7 +177,11 @@ tempVector Vector3
         productLenght    dd              0.0
         oneF            dd              1.0
         tempV           dd              0.0
+        tempAngle2 dd 0.0
+        tempAngle3 dd 0.0
+        tempAngle4 dd 0.0
 
+        tempPositionOnSpline dd ?
         tempValue       dd              ?
         one             dd              0.2     
         rVector         Vector3         0.0, 1.0, 0.0                                                     
@@ -181,7 +197,12 @@ tempVector Vector3
         temp dd ?
         GAME_MODE dd 0
         five dd 1.0
-
+        KEY_PRESSED dd -1
+        START_CRASH dd 0
+        seed dd 0
+        astep dd 20.0
+        aastep dd 0.0
+        direction dd 0.0
         include         "Init.asm"
         include         "Mesh.asm"
         include         "Vector.asm"
@@ -240,8 +261,9 @@ proc WindowProc uses ebx,\
         jmp     .Return
 
 .KeyUp:
-    cmp [wParam], VK_SPACE
-    ;je .ResetAcceleration
+    mov [KEY_PRESSED], 0
+    ;cmp [wParam], VK_SPACE
+    je .ResetAcceleration
     jmp .ReturnZero
 
 .ResetAcceleration:
@@ -253,12 +275,10 @@ proc WindowProc uses ebx,\
 
         cmp [GAME_MODE], 1
         je @F
-        ;stdcall DrawMenu
         stdcall Draw
-       
         jmp     .ReturnZero
 @@:
-         stdcall DrawMenu
+        stdcall DrawMenu
         jmp     .ReturnZero
 
 .KeyDown:
@@ -280,19 +300,37 @@ proc WindowProc uses ebx,\
         case .RotateDown, VK_DOWN
         case .Speed, VK_SPACE
         case .Speed2, VK_CONTROL
+        case .Respawn, 'R'
         jmp     .ReturnZero
+.Respawn:
+        mov [PHYSICS_MODE], 0
+        mov [START_CRASH], 0
+
+        mov [car.acceleration], 0
+        mov [car.speed], 0
+        mov [speed2], 20.0
+        
+        stdcall	 GetRandomNumber, 10, 40
+        mov [astep], eax
+        fild [astep]
+        fstp [astep]
+
+
+        jmp .ReturnZero
 .Speed2:
   
     jmp     .ReturnZero
 .Speed:
+    mov [KEY_PRESSED], 1
     fld [car.acceleration]
     fld [maxForce]
     fdiv [car.mass]
     faddp st1, st0
     fstp [car.acceleration]
+
     jmp     .ReturnZero
 .GoToMenu:
-        ;stdcall UI.Pause
+        stdcall UI.Pause
         jmp     .ReturnZero
 .MoveUp:
       

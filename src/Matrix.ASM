@@ -222,7 +222,6 @@ proc Matrix.LookAt uses esi edi ebx,\
         push    [temp]
         invoke  glTranslatef
 
-        invoke  glRotatef, 135.0, 0.0, 1.0, 0.0
         invoke glGetFloatv, GL_MODELVIEW_MATRIX, view
 
         ret

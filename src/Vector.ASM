@@ -537,4 +537,59 @@ proc Vector3.CrossValue uses esi,\
      ret
 endp
 
+proc Vector4.CrossValue uses esi,\
+                    dest, value
 
+     mov esi, [dest]
+
+     fld dword[esi + Vector4.x]
+     fmul [value]
+     fstp dword[esi + Vector4.x]
+
+     
+     fld dword[esi + Vector4.y]
+     fmul [value]
+     fstp dword[esi + Vector4.y]
+
+     
+     fld dword[esi + Vector4.z]
+     fmul [value]
+     fstp dword[esi + Vector4.z]
+
+     fld dword[esi + Vector4.w]
+     fmul [value]
+     fstp dword[esi + Vector4.w]
+     ret
+endp
+
+proc Vector4.Copy uses esi edi, dest, src
+     mov     esi, [src]
+     mov     edi, [dest]
+     mov     ecx, 4
+     rep     movsd
+     ret
+endp
+
+proc Vector4.Add uses esi edi,\
+     dest, src
+
+        mov     esi, [src]
+        mov     edi, [dest]
+
+        fld      [edi + Vector4.x]
+        fadd     [esi + Vector4.x]
+        fstp    [edi + Vector4.x]
+
+        fld      [edi + Vector4.y]
+        fadd     [esi + Vector4.y]
+        fstp    [edi + Vector4.y]
+
+        fld      [edi + Vector4.z]
+        fadd     [esi + Vector4.z]
+        fstp    [edi + Vector4.z]
+
+        fld      [edi + Vector4.w]
+        fadd     [esi + Vector4.w]
+        fstp     [edi + Vector4.w]
+        ret
+endp

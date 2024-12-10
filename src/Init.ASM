@@ -3,8 +3,8 @@ proc Init uses esi
                 hMainWindow     dd              ?
                 aspect          dd              ?
                 vbo dd ?
+                value dd 11.4
         endl
-
         invoke  GetProcessHeap
         mov     [hHeap], eax
 
@@ -13,7 +13,9 @@ proc Init uses esi
                         ebx, ebx, ebx, ebx, ebx, ebx, ebx, ebx
         mov     [hMainWindow], eax
 
+
         invoke  GetClientRect, eax, clientRect
+        invoke GetSystemMetrics, SM_CXSCREEN
         invoke  ShowCursor, 0
         invoke  GetTickCount
         mov     [time], eax
@@ -24,6 +26,10 @@ proc Init uses esi
         stdcall Log.Create
         ;stdcall  PrintToConsole, okMessage + 1, okMessage.size - 1
   
+        stdcall FloatToStr, 123.456, 5
+        stdcall Log, eax, ecx
+        stdcall Log, nMessage, nMessage.size
+
         invoke  ChoosePixelFormat, [hdc], pfd
         invoke  SetPixelFormat, [hdc], eax, pfd
 
@@ -64,18 +70,19 @@ proc Init uses esi
         stdcall Object.SetPosition, pens, -30.0, 0.0, 120.0        
         stdcall Object.SetPosition, books, 25.0, 0.0, 110.0 
         stdcall Object.SetPosition, track, 0.0, -150.0, 50.0 
-
+        stdcall Object.SetPosition, table, 0.0, 100.0, 0.0
         stdcall Object.SetRotation, track, 0.0, 90.0, 0.0  
         ;stdcall Object.SetScale, car, 10.0, 10.0, 10.0
         stdcall Object.SetScale, books, 0.45, 0.45, 0.45
         stdcall Object.SetScale, table, 50.0, 50.0, 50.0
         stdcall Object.SetScale, pens, 2.0, 2.0, 2.0
         stdcall Object.SetScale, track, 50.0, 50.0, 50.0
-        stdcall Object.SetPosition, table, 7.0, -170.0, 0.0
+        stdcall Object.SetPosition, table, 7.0, -165.0, 0.0
         ;stdcall Object.SetRotation, road, 20.0, -10.0, 0.0
         stdcall Object.InitModelMatrix, car
         stdcall Object.InitModelMatrix, road
         
+        stdcall Object.SetMaterial, car, carAmbient, carDiffuse, carSpecular, carShinine
 
         ;stdcall Quaternion.CreateFromAxisAngle, car, 0.0, 1.0, 0.0, 0.0
         ;stdcall Quaternion.CreateFromAxisAngle, road, 0.0, 1.0, 0.0, 0.0
@@ -104,9 +111,10 @@ proc Init uses esi
         invoke  glHint, GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST
         invoke  glEnable, GL_DEPTH_TEST
         invoke  glDepthFunc, GL_LESS 
-        invoke  glEnable, GL_CULL_FACE
-        invoke  glCullFace, GL_BACK 
+        ;Binvoke  glEnable, GL_CULL_FACE
+        ;invoke  glCullFace, GL_BACK 
         invoke  glFrontFace, GL_CCW
+
 
         fild [clientRect.right]
         fstp [clientRect.right]

@@ -30,6 +30,14 @@ modelLocation2D GLint             ?
 projectionName db                    "projection2D", 0
 projectionLocation GLint             ?
 
+ambientName db "material.ambient", 0
+ambientLocation GLint ?
+diffuseName db "material.diffuse", 0
+diffuseLocation GLint ?
+specularName db "material.specular", 0
+specularLocation GLint ?
+shininessName db "material.shininess", 0
+shininessLocation GLint ?
 
 program2D         dd              0
 

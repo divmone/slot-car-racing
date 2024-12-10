@@ -11,6 +11,13 @@ struct Transform
     scale    Vector3 1.0, 1.0, 1.0
 ends
 
+struct Material
+    ambient Vector3 0.9472,	0.9995,	0.9745	
+    diffuse Vector3 0.9,	0.9,	0.9
+    specular Vector3 0.9,	0.9,	0.9	
+    shininess GLfloat  0.9
+ends
+  
 struct Object
     mesh Mesh
     transform Transform 
@@ -22,9 +29,10 @@ struct Object
     ;objFileName  dd ?
     ;texFileName  dd ?
     speed dd 0.0
-    mass dd 1.0
-    mu dd 0.01
+    mass dd 3.0
+    mu dd 0.8
     acceleration dd 0.0
+    material Material
 ends
 
 car Object 0,0,0,0
@@ -85,10 +93,10 @@ testq1 quaternion 1.0, 2.0, 3.0, 4.0
 testq2 quaternion 5.0, 6.0, 7.0, 8.0
 testq3 quaternion
 
-t1 Vector3
-t2 Vector3
-t3 Vector3
-t4 Vector3
+t1 Vector4
+t2 Vector4
+t3 Vector4
+t4 Vector4
 
 testVector Vector3 1.0, 2.0, 3.0
 
@@ -97,10 +105,15 @@ testObj Object
 positionOnSpline2 dd 0.0
 positionOnSpline dd 0.0
 speed dd 0.0
-speed2 dd 0.0
+speed2 dd 20.0
 acceleration2 dd 0.0
 acceleration dd 0.0
 friction dd 0.01
 maxForce dd 1.0
 maxForce2 dd 0.5
 mass dd 1.0
+
+carAmbient Vector3 0.2472,	0.1995,	0.0745	
+carDiffuse Vector3    0.75164,	0.60648,	0.22648
+carSpecular Vector3     0.628281,	0.555802,	0.366065
+carShinine   dd  0.4

@@ -8,8 +8,9 @@ proc Draw uses esi
                 dist dd 10.0
                 dist1 dd 5.0
                 oneSecond dd 100000.0
-
-        endl
+                angle dd ?
+                toDegree dd 180.0
+        endl    
        
 
         invoke  GetTickCount
@@ -33,14 +34,43 @@ proc Draw uses esi
         invoke  glClearColor, 0.6, 0.6, 1.0, 1.0
 
         invoke  glClear, GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT
- 
+        
+    
         stdcall Physics.Update, 0.07, cubeSpline, car
 
-        stdcall Matrix.LookAt, cameraPosition, tempVector, upVector 
+        fldpi
+        fmul [tempAngle3]
+        fdiv [toDegree]
         
+        fstp [angle]
+
+        fld [car.transform.position.z]  ; Z-координата машины
+        fld [dist]                      ; Смещение камеры назад (за машиной)
+        fsubp      
+        fld [angle]
+        fcos
+        fmulp                      ; tempCameraVector.z = car.z - dist
+        fstp [tempCameraVector.z]
+
+        fld [car.transform.position.y]  ; Y-координата машины
+        fld [dist1]                     ; Смещение камеры вверх
+        faddp 
+        fld [angle]
+        fsin
+        fmulp                            ; tempCameraVector.y = car.y + dist1
+        fstp [tempCameraVector.y]
+
+        fld [car.transform.position.x]
+        fstp [tempCameraVector.x]
+
+   
+
+      stdcall Matrix.LookAt, tempCameraVector, car.transform.position, upVector
+        invoke glUseProgram, [program]  
 .loop: 
         stdcall Spline.GetPoint, cubeSpline, road.transform.position, [tempTime] 
         stdcall Spline.GetRotation, cubeSpline, road, [tempTime]                                                                             
+       
         stdcall Object.Draw, road  
 
         fld [tempTime]
@@ -53,37 +83,16 @@ proc Draw uses esi
         mov [tempTime], 0.0
 
 @@:
-        ;stdcall Object.Draw, sphere     
+        ;stdcall Object.Draw, sphere   
+        ;invoke glDisable, GL_TEXTURE_2D
         stdcall Object.Draw, car
         ;stdcall Object.Draw, car2      
         stdcall Object.Draw, table
         stdcall Object.Draw, track
         ;stdcall Object.Draw, sphere
-
+ invoke glUseProgram, 0 
         invoke  SwapBuffers, [hdc]
         
-      
-        ;stdcall Vector3.CrossValue, tempVector, -1.0
-        ;memcpy sphere.transform.position,  tempVector, 12 
-        
-        ret
-endp
-
-proc Render
-
-        invoke glViewport, 0, 0, SHADOW_WIDTH, SHADOW_HEIGHT
-        invoke glBindFramebuffer, GL_FRAMEBUFFER, [depthMapFBO]
-        invoke glClear, GL_DEPTH_BUFFER_BIT
-         ConfigureShaderAndMatrices();
-        RenderScene();
-
-// 2. рисуем сцену как обычно с тенями (используя карту глубины)
-glBindFramebuffer(GL_FRAMEBUFFER, 0);
-glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    ConfigureShaderAndMatrices();
-    glBindTexture(GL_TEXTURE_2D, depthMap);
-    RenderScene();
         ret
 endp
 
@@ -107,7 +116,7 @@ proc Sprite.Draw uses esi, objPtr
         ret
 endp
 
-proc Object.Draw, objPtr
+proc Object.Draw uses esi, objPtr
         ;memcpy tempMatrix, MVP, sizeof.Matrix4x4
 
         stdcall Matrix.CreateModel, [objPtr]
@@ -115,18 +124,33 @@ proc Object.Draw, objPtr
         stdcall Matrix.Multiply4x4, view, projection, PV
         stdcall Matrix.Multiply4x4, model, PV, MVP
 
-        invoke  glUseProgram, [program]
         
         invoke glUniformMatrix4fv, [MVPLocation], 1, GL_FALSE, MVP
       
-        invoke glUniform3fv, [viewPosLocation], 1, lightPosition1
+        invoke glUniform3fv, [viewPosLocation], 1, tempCameraVector
        
-        invoke glUniform3fv, [lightPosLocation], 1, cameraPosition
+        invoke glUniform3fv, [lightPosLocation], 1, lightPosition
         invoke glUniform3fv, [objectColorLocation], 1, objectColor
         invoke glUniform3fv, [lightColorLocation], 1, lightColor
+
+        mov esi, [objPtr]
+        add esi, Object.material.ambient
+        invoke glUniform3fv, [ambientLocation], 1, esi
+
+        mov esi, [objPtr]
+        add esi, Object.material.diffuse
+        invoke glUniform3fv, [diffuseLocation], 1, esi
+
+        mov esi, [objPtr]
+        add esi, Object.material.specular
+        invoke glUniform3fv, [specularLocation], 1, esi
+        
+        mov esi, [objPtr]
+        invoke  glUniform1f, [shininessLocation], [esi + Object.material.shininess]
+
 @@:     
         stdcall DrawMesh, [objPtr], [drawingMode]
-        invoke  glUseProgram, 0
+
         ;memcpy MVP, tempMatrix, sizeof.Matrix4x4
         ret
 endp  

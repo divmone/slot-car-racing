@@ -11,6 +11,7 @@ okMessage  String 'OK', 10
 nMessage String 10
 successMessage db       'shaders loaded successfully', 0
 
+dMessage String '|'
 
 charsWritten dd ?
 define FILE_LOG 1

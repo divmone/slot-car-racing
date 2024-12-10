@@ -58,6 +58,7 @@ proc Object.Create uses esi edi ,\
     invoke HeapFree, [hHeap], 0, [addressV]
 
     stdcall Mesh.CalculateNormals, [objPtr]
+
     mov esi, [objPtr]
     add esi, Object.VAO
     stdcall VAO.Init, esi, [objPtr]
@@ -174,5 +175,25 @@ proc Object.InitModelMatrix uses esi edi,\
         mov esi, model
         mov ecx, 16
         rep movsd
+    ret
+endp
+
+proc Object.SetMaterial uses esi, objPtr, ambient, diffuse, specular, shininess
+    mov eax, [objPtr]
+    add eax, Object.material.ambient
+    memcpy eax, [ambient], 12
+
+    mov eax, [objPtr]
+    add eax, Object.material.diffuse
+    memcpy esi, [diffuse], 12
+
+    mov eax, [objPtr]
+    add eax, Object.material.specular
+    memcpy eax, [specular], 12
+
+    mov esi, [objPtr] 
+    mov eax, [shininess]
+    mov [esi + Object.material.shininess], eax
+
     ret
 endp

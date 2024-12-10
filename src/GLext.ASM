@@ -80,6 +80,19 @@ proc Glext.CreateShaders
         invoke glGetUniformLocation, [program], modelName
         mov [modelLocation], eax
 
+        invoke glGetUniformLocation, [program], ambientName
+        mov [ambientLocation], eax
+
+        invoke glGetUniformLocation, [program], diffuseName
+        mov [diffuseLocation], eax
+
+        invoke glGetUniformLocation, [program], specularName
+        mov [specularLocation], eax
+
+        invoke glGetUniformLocation, [program], shininessName
+        mov [shininessLocation], eax
+
+
          ;invoke  glBindAttribLocation, [program], 0, timeName
       ;  mov     [timeLocation], eax
          ;invoke  glBindAttribLocation, [program], 2, sizeName
