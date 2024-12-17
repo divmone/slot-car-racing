@@ -1,12 +1,7 @@
 proc UI.StartRender
    
   ;stdcall Matrix.LookAt, menuPosition, menuTargetPosition, upVector 
-  memcpy tempMatrix, view, sizeof.Matrix4x4
-  invoke  glDisable, GL_DEPTH_TEST
-  invoke  glMatrixMode, GL_MODELVIEW
-  invoke  glLoadIdentity 
-  invoke  glMatrixMode, GL_PROJECTION
-  invoke  glLoadIdentity 
+ 
    
   invoke glUseProgram, 0  
 
@@ -52,17 +47,19 @@ proc Rectangle.Init uses esi, objPtr
 endp
 
 proc DrawMenu
-     invoke  glClearColor, 0.3, 0.3, 1.0, 1.0
-     invoke  glClear, GL_COLOR_BUFFER_BIT
-         stdcall Object.SetScale, R1, 0.2, 0.2, 0.2 
-         stdcall Rectangle.CreateText, R1, r1Message, 0.0, 0.0, 4.0, 6.0
-         ;stdcall Rectangle.CreateText, R1, r1Message, 0.0, 0.0, 0.4, 0.2
-         ;stdcall Rectangle.CreateText, R1, r1Message, 0.0, -0.3, 0.4, 0.2
+    invoke  glClearColor, 0.3, 0.3, 1.0, 0.0
+    invoke  glClear, GL_COLOR_BUFFER_BIT
+         
+         ;stdcall Rectangle.Create, R1, 0.0, 0.0, 1.0, 1.0
+         stdcall Rectangle.CreateText, R2, r1Message, 0.0, 0.1, 1.0, 2.0
+         ;stdcall Rectangle.CreateText, R3, r1Message, 0.0, 0.0, 1.0, 2.0
 
-        ; stdcall Sprite.Draw, R1
+        
+        ;stdcall Sprite.Draw, R1
         ; stdcall Sprite.Draw, R2
         ; stdcall Sprite.Draw, R3
-    invoke  SwapBuffers, [hdc]
+
+        invoke SwapBuffers, [hdc]
     ret
 endp
 
@@ -85,68 +82,6 @@ proc Rectangle.Create uses esi ,\
       bottom dd ?
     endl
     
-    mov [char], '2'
-    xor eax, eax
-    mov al, [char]
-    shr eax, 4
-    mov [y1], eax
-
-    xor eax, eax
-    mov al, [char]
-    and eax, 1111b
-    mov [x1], eax
-
-
-    fild [x1]
-    fmul [charSize]
-    fst [left]
-
-    fadd [charSize]
-
-    fstp [right]
-
-    fild [y1]
-    fmul [charSize]
-    fst [top]
-    fadd [charSize]
-    fstp [bottom]
-
-;0
-   
-
-    mov esi , textCoords
-    mov eax, [left]
-    mov [esi], eax
-
-    add esi, 4
-    mov eax, [bottom]
-    mov [esi], eax
-
-    add esi, 4
-    mov eax, [right]
-    mov [esi], eax
-
-    add esi, 4
-    mov eax, [bottom]
-    mov [esi], eax
-
-    add esi ,4
-    mov eax, [right]
-    mov [esi], eax
-
-    add esi, 4
-    mov eax, [top]
-    mov [esi], eax
-
-    add esi, 4
-    mov eax, [left]
-    
-    mov [esi], eax
-
-    add esi, 4
-    mov eax, [top]
-    mov [esi], eax
-
     malloc 32
 
 
@@ -207,7 +142,6 @@ proc Rectangle.Create uses esi ,\
 
     invoke glBufferData, GL_ARRAY_BUFFER, 32, textCoords, GL_STATIC_DRAW
 
-
     invoke glEnableVertexAttribArray, 1
     
     invoke glVertexAttribPointer, 1, 2, GL_FLOAT, GL_FALSE, 0, 0
@@ -218,8 +152,6 @@ proc Rectangle.Create uses esi ,\
     mov esi, [objPtr]
     mov eax, [vao]
     mov [esi + Object.VAO], eax
-
-    mov esi, [objPtr]
     ;add esi, Object.transform
     mov [esi + Object.transform.position.x], 0.0
     mov [esi + Object.transform.position.y], 0.0
@@ -240,6 +172,7 @@ proc Rectangle.Create uses esi ,\
     ret
 endp
 
+
 proc Rectangle.CreateText uses esi edi,\
                     objPtr, text, x, y, width, heigth
 
@@ -258,7 +191,7 @@ proc Rectangle.CreateText uses esi edi,\
       top dd ?
       bottom dd ?
       xpos dd 0.0
-      step dd 2.0
+      step dd 1.0
     endl
     
     mov edi, [text]
@@ -328,50 +261,11 @@ proc Rectangle.CreateText uses esi edi,\
     mov eax, [top]
     mov [esi], eax
 
-    malloc 32
-    
-    mov [buffer], eax
-    mov esi, eax
-
-   
-    mov eax, [x]
-    mov dword[esi], eax
-
-    mov eax, [y]
-    mov dword[esi + 4], eax
-
-    add esi, 8
-    fld [x]
-    fadd [width]
-    fstp dword[esi]
-
-    add esi, 4
-    mov eax, [y]
-    mov dword[esi], eax
-
-    add esi, 4
-    fld [x]
-    fadd [width]
-    fstp dword[esi]
-
-    add esi, 4
-    fld [y]
-    fadd [heigth]
-    fstp dword[esi]
-    
-    add esi, 4
-    mov eax, [x]
-    mov dword[esi], eax
-
-    add esi, 4
-    fld [y]
-    fadd [heigth]
-    fstp dword[esi]
 
     mov esi, [objPtr]
-    add esi, Object.VAO
 
-    invoke glBindVertexArray, [esi] 
+    invoke glBindVertexArray, [esi + Object.VAO] 
+
     lea eax, [tao]
     invoke glGenBuffers, 1, eax
     invoke glBindBuffer, GL_ARRAY_BUFFER, [tao]
@@ -383,13 +277,13 @@ proc Rectangle.CreateText uses esi edi,\
     
     invoke glVertexAttribPointer, 1, 2, GL_FLOAT, GL_FALSE, 0, 0
         
-        stdcall Object.SetPosition, [objPtr], [xpos], 0.0, 0.0
+    stdcall Object.SetPosition, [objPtr], [x], [y], 0.0
 
-        stdcall Matrix.CreateModel, [objPtr]
-        invoke glUseProgram, [program2D]
-        invoke glUniformMatrix4fv, [modelLocation2D], 1, GL_FALSE, model
-        invoke glUniformMatrix4fv, [projectionLocation], 1, GL_FALSE, projection2D
-        mov esi, [objPtr]
+    stdcall Matrix.CreateModel, [objPtr]
+    invoke glUseProgram, [program2D]
+    invoke glUniformMatrix4fv, [modelLocation3], 1, GL_FALSE, model
+        invoke glUniformMatrix4fv, [projectionLocation2D], 1, GL_FALSE, projection2D
+        invoke glActiveTexture, GL_TEXTURE0
         invoke glBindTexture, GL_TEXTURE_2D, [esi + Object.texture]
         invoke glBindVertexArray, [esi + Object.VAO] 
                 invoke  glDrawArrays, 6, 0, 4
@@ -399,9 +293,9 @@ proc Rectangle.CreateText uses esi edi,\
         invoke glUseProgram, 0
 
     inc edi
-    fld [xpos]
+    fld [x]
     fadd [step]
-    fstp [xpos]
+    fstp [x]
     
     jmp .loop
 .endl:
@@ -455,10 +349,7 @@ proc Text.Render uses esi edi,\
     fst [top]
     fadd [charSize]
     fstp [bottom]
-
 ;0
-   
-
     mov esi , textCoords
     mov eax, [left]
     mov [esi], eax

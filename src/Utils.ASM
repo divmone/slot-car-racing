@@ -341,6 +341,7 @@ proc FloatToStr uses esi, value, precision
     inc eax
     mov [resultStringL], eax
 
+    inc eax
     malloc eax
     mov [resultString], eax
     mov ecx, [intString]
@@ -353,6 +354,10 @@ proc FloatToStr uses esi, value, precision
     mov ecx, esi
     mov eax, [afterPointString]
     memcpy ecx, eax, [afterPointStringL]
+
+    mov esi, [resultString] 
+    add esi, [resultStringL]
+    mov byte[esi], 0
 
     mov eax, [resultString]
     mov ecx, [resultStringL]

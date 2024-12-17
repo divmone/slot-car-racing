@@ -31,6 +31,11 @@ extensionAddresses:
         glGenFramebuffers       dd      ?
         glBindFramebuffer        dd      ?
         glFramebufferTexture2D  dd      ?
+        glActiveTexture dd ?
+        glUniform1i     dd ?
+        glVertexAttribDivisor dd ?
+        glDrawArraysInstanced dd ?
+        wglCreateContextAttribsARB dd ?
 extensionNames:
         db      "glBufferData",0
         db      "glGenBuffers", 0
@@ -64,6 +69,11 @@ extensionNames:
         db      "glGenFramebuffers", 0
         db      "glBindFramebuffer", 0
         db      "glFramebufferTexture2D",0
+        db      "glActiveTexture", 0
+        db      "glUniform1i", 0
+        db      "glVertexAttribDivisor", 0
+        db      "glDrawArraysInstanced", 0
+        db      "wglCreateContextAttribsARB", 0
 
         db      0
 
@@ -78,3 +88,8 @@ define GL_CLAMP_TO_EDGE                  0x812F
 define GL_MIRRORED_REPEAT                0x8370 
 define GL_FRAMEBUFFER                    0x8D40
 define GL_DEPTH_ATTACHMENT               0x8D00
+define GL_TEXTURE0                       0x84C0  
+define GL_TEXTURE1                       0x84C1  
+define GL_CLAMP_TO_BORDER                0x812D  
+define GL_MULTISAMPLE                    0x809D
+define GL_DYNAMIC_DRAW                   0x88E8    

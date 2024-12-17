@@ -342,6 +342,7 @@ proc Vector3.DotProduct uses esi edi,\
      mov eax, [result]
      ret
 endp
+
 proc Vector3.Add uses esi edi,\
      dest, src
 

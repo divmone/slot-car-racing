@@ -222,10 +222,203 @@ proc Matrix.LookAt uses esi edi ebx,\
         push    [temp]
         invoke  glTranslatef
 
+        ;invoke  glRotatef, 135.0, 0.0, 1.0, 0.0
         invoke glGetFloatv, GL_MODELVIEW_MATRIX, view
 
         ret
-endp         
+endp    
+
+
+proc Matrix.LookAt2 uses esi edi ebx,\
+     camera, target, up, matrix
+
+    locals
+        temp dd ?
+        f Vector3
+        u Vector3
+        s Vector3                   
+    endl
+
+    lea eax, [f]
+    stdcall Vector3.Copy, eax, [target]
+    
+    lea eax, [f]
+    stdcall Vector3.Sub, eax, [camera]
+
+    lea eax, [f]
+    stdcall Vector3.Normalize, eax
+
+    lea eax, [u]
+    stdcall Vector3.Copy, eax, [up]
+
+    lea eax, [u]
+    stdcall Vector3.Normalize, eax
+
+    lea eax, [s]
+    lea ecx, [f]
+    lea edx, [u]
+    stdcall Vector3.Cross, ecx, edx, eax
+
+    lea eax, [s]
+    stdcall Vector3.Normalize, eax
+
+    lea eax, [s]
+    lea ecx, [f]
+    lea edx, [u]
+    stdcall Vector3.Cross, eax, ecx, edx
+
+    mov     edi, [matrix]
+    mov     eax, 0.0
+    mov     ecx, 16
+    rep     stosd
+
+    mov esi, [matrix]
+    mov eax, [s.x]
+    mov [esi + Matrix4x4.m11], eax
+    mov eax, [s.y]
+    mov [esi + Matrix4x4.m21], eax
+    mov eax, [s.z]
+    mov [esi + Matrix4x4.m31], eax
+
+    mov eax, [u.x]
+    mov [esi + Matrix4x4.m12], eax
+    mov eax, [u.y]
+    mov [esi + Matrix4x4.m22], eax
+    mov eax, [u.z]
+    mov [esi + Matrix4x4.m32], eax
+
+    fld [f.x]
+    fchs
+    fstp [esi + Matrix4x4.m13]
+    fld [f.y]
+    fchs
+    fstp [esi + Matrix4x4.m23]
+    fld [f.z]
+    fchs
+    fstp [esi + Matrix4x4.m33]
+
+    lea eax, [s]
+    stdcall Vector3.Dup, eax, [camera]
+    mov [temp], eax
+    fld [temp]
+    fchs
+    fstp [esi + Matrix4x4.m41]
+
+    lea eax, [u]
+    stdcall Vector3.Dup, eax, [camera]
+    mov [temp], eax
+    fld [temp]
+    fchs
+    fstp [esi + Matrix4x4.m42]
+
+
+    lea eax, [f]
+    stdcall Vector3.Dup, eax, [camera]
+    mov [esi + Matrix4x4.m43], eax
+
+    fld1
+    fstp [esi + Matrix4x4.m44]
+    
+    
+    ret
+endp    
+
+; gluLookAt(GLdouble eyex, GLdouble eyey, GLdouble eyez, GLdouble centerx,
+; 	  GLdouble centery, GLdouble centerz, GLdouble upx, GLdouble upy,
+; 	  GLdouble upz)
+; {
+;     float forward[3], side[3], up[3];
+;     GLfloat m[4][4];
+
+;     forward[0] = centerx - eyex;
+;     forward[1] = centery - eyey;
+;     forward[2] = centerz - eyez;
+
+;     up[0] = upx;
+;     up[1] = upy;
+;     up[2] = upz;
+
+;     normalize(forward);
+
+;     /* Side = forward x up */
+;     cross(forward, up, side);
+;     normalize(side);
+
+;     /* Recompute up as: up = side x forward */
+;     cross(side, forward, up);
+
+;     __gluMakeIdentityf(&m[0][0]);
+;     m[0][0] = side[0];
+;     m[1][0] = side[1];
+;     m[2][0] = side[2];
+
+;     m[0][1] = up[0];
+;     m[1][1] = up[1];
+;     m[2][1] = up[2];
+
+;     m[0][2] = -forward[0];
+;     m[1][2] = -forward[1];
+;     m[2][2] = -forward[2];
+
+;     glMultMatrixf(&m[0][0]);
+;     glTranslated(-eyex, -eyey, -eyez);
+; }
+; mat4x4 lookAt(vec3  const & eye, vec3  const & center, vec3  const & up)
+; {
+;     vec3  f = normalize(center - eye);
+;     vec3  u = normalize(up);
+;     vec3  s = normalize(cross(f, u));
+;     u = cross(s, f);
+
+;     mat4x4 Result(1);
+;     Result[0][0] = s.x;
+;     Result[1][0] = s.y;
+;     Result[2][0] = s.z;
+
+;     Result[0][1] = u.x;
+;     Result[1][1] = u.y;
+;     Result[2][1] = u.z;
+
+;     Result[0][2] =-f.x;
+;     Result[1][2] =-f.y;
+;     Result[2][2] =-f.z;
+;     Result[3][0] =-dot(s, eye);
+;     Result[3][1] =-dot(u, eye);
+;     Result[3][2] = dot(f, eye);
+;     return Result;
+; }
+; glm::mat4 calculate_lookAt_matrix(glm::vec3 position, glm::vec3 target, glm::vec3 worldUp)
+; {
+;     // 1. Position = known
+;     // 2. Calculate cameraDirection
+;     glm::vec3 zaxis = glm::normalize(position - target);
+
+;     // 3. Get positive right axis vector
+;     glm::vec3 xaxis = glm::normalize(glm::cross(glm::normalize(worldUp), zaxis));
+;     // 4. Calculate camera up vector
+;     
+        ;glm::vec3 yaxis = glm::cross(zaxis, xaxis);
+
+;     // Create translation and rotation matrix
+;     // In glm we access elements as mat[col][row] due to column-major layout
+;     glm::mat4 translation; // Identity matrix by default
+;     translation[3][0] = -position.x; // Third column, first row
+;     translation[3][1] = -position.y;
+;     translation[3][2] = -position.z;
+;     glm::mat4 rotation;
+;     rotation[0][0] = xaxis.x; // First column, first row
+;     rotation[1][0] = xaxis.y;
+;     rotation[2][0] = xaxis.z;
+;     rotation[0][1] = yaxis.x; // First column, second row
+;     rotation[1][1] = yaxis.y;
+;     rotation[2][1] = yaxis.z;
+;     rotation[0][2] = zaxis.x; // First column, third row
+;     rotation[1][2] = zaxis.y;
+;     rotation[2][2] = zaxis.z; 
+
+;     // Return lookAt matrix as combination of translation and rotation matrix
+;     return rotation * translation; // Remember to read from right to left (first translation then rotation)
+; }
 
 proc Matrix.GetAxis  uses esi edi ebx,\
      camera, target, up, xAx, yAx, zAx

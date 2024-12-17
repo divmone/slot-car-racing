@@ -31,6 +31,7 @@ entry   WinMain
         include         "Camera.inc"
         include         "Light.inc"
         include         "Physics.inc"
+        include         "2D.inc"
 
 macro switch value
 {
@@ -88,6 +89,7 @@ data import
                 gdi32,          "GDI32.DLL",\
                 opengl32,       "OPENGL32.DLL",\
                 winmm,          "WINMM.DLL",\
+                freetype,       "..\FREETYPE.DLL",\
                 ole, 'OLE32.DLL',\
                 oleaut, 'OLEAUT32.DLL'
 end data

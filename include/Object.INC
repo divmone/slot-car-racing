@@ -29,10 +29,18 @@ struct Object
     ;objFileName  dd ?
     ;texFileName  dd ?
     speed dd 0.0
-    mass dd 3.0
+    mass dd 6.0
     mu dd 0.8
     acceleration dd 0.0
     material Material
+    positionOnSpline dd 0.0 
+    tempAngle dd 0.0
+    speed2 dd 20.0
+    isCrashed dd 0
+    isFreeFall dd 0
+    astep dd 20.0
+    useInstancing dd 0
+    lapCount dd 0
 ends
 
 car Object 0,0,0,0
@@ -54,7 +62,7 @@ textPathT        db              "../textures/8027.bmp", 0
 
 sphere Object
 fileNameS        db             "../models/sphere.obj",0 
-textPathS        db             "../textures/light.bmp", 0
+textPathS        db             "../textures/8027.bmp", 0
 
 lamp Object
 fileNameL        db             "../models/lamp.obj",0 
@@ -76,15 +84,17 @@ road Object
 fileNameR db  "../models/road.obj",0 
 textPathR        db    "../textures/road.bmp", 0 
 
+arch Object
+fileNameA db  "../models/ballooons.obj",0 
+textPathA        db    "../textures/ui.bmp", 0 
+
+
 R1 Object
-r1Message db "packed", 0 
+r1Message db "123", 0 
 R2 Object
 R3 Object
 
 
-buttonTexture       db             "../textures/consolas.bmp", 0 
-
-textCoords    dd      0.0, 1.0,  1.0, 1.0,  1.0, 0.0, 0.0, 0.0 
 
 musicPath  db "../audio/goida.wav",0
 

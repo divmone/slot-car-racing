@@ -1,28 +1,42 @@
+proc ThreadWrapper uses esi, args
+        mov esi, [args]
+        push dword[esi + 8]
+        push dword[esi + 4]
+        push dword[esi]
+        stdcall Physics.Update
+        xor eax, eax
+
+        ret
+endp
+
 proc Physics.Update uses esi, deltaTime, spline, objPtr
         locals
                 accelerationV dd ?
                 frictionV dd ?
                 ten dd 100.0
                 radius dd ?
-                vmax dd ?
                 mu dd 0.00001
-                str1 dd ?
                 v dd 0.0
                 vmax dd ?          
                 deceleration dd 8.0
-                testSpeed dd ?
+                ;testSpeed dd ?
                 angle dd 0.0
                 point Vector3 
                 toDegree dd 180.0
                 step2 dd 45.0
-
+                positionOnSpline dd 0.0
+                
         endl
 
-        cmp [START_CRASH], 1
+        mov esi, [objPtr]
+        mov eax, [esi + Object.positionOnSpline]
+        mov [positionOnSpline], eax
+
+        cmp [esi + Object.isCrashed], 1
         jne @f
         ret
 @@:     
-        cmp [PHYSICS_MODE], 1
+        cmp [esi + Object.isFreeFall], 1
         je .skip
 
         mov esi, [objPtr]
@@ -42,8 +56,6 @@ proc Physics.Update uses esi, deltaTime, spline, objPtr
         fadd [positionOnSpline]
         fstp [positionOnSpline]
 
-   
-        
         stdcall Spline.GetAcceleration, [spline], accelerationVector, [positionOnSpline]
         stdcall Spline.GetDerivative, [spline], frictionVector, [positionOnSpline]
        
@@ -86,63 +98,73 @@ proc Physics.Update uses esi, deltaTime, spline, objPtr
         fstp st0
         ja .skip
 
-       
-    
-     
-        mov eax, [tempAngle3]
+        mov eax, [esi + Object.tempAngle]
         mov [tempAngle], eax
         
-        stdcall Spline.GetPoint, cubeSpline, car.transform.position, [positionOnSpline]
-        stdcall Spline.GetRotation, cubeSpline, car, [positionOnSpline]                                                                               
-        mov eax, [tempAngle2]
-        mov [tempAngle3], eax
-        
+        mov esi, [objPtr]
+        add esi, Object.transform.position
+
+        stdcall Spline.GetPoint, [spline], esi, [positionOnSpline]
+        mov esi, [objPtr]
+        stdcall Spline.GetRotation, [spline], esi, [positionOnSpline]                                                                               
+  
         ;stdcall FloatToStr, [tempAngle3]
         ;stdcall Log, eax, ecx
         ;stdcall Log, nMessage, 1 
         ;mov eax, [positionOnSpline]
         ;mov [tempPositionOnSpline], eax
+        mov esi, [objPtr]
+        mov eax, [positionOnSpline]
+        mov [esi + Object.positionOnSpline], eax
         ret
 .skip:  
 
         fldz
-        fld [speed2]
+        fld [esi + Object.speed2]
         fcomip st0, st1
         fstp st0
         ja @F
         mov [deceleration], 0.0
-        mov [START_CRASH], 1
+
+        mov [esi + Object.isCrashed], 1
 
 @@:
         fld [deceleration]
         fmul [deltaTime]
-        fsubr [speed2]
-        fstp [speed2]
+        fsubr [esi + Object.speed2]
+        fstp [esi + Object.speed2]
 
 .ll:
-        ;memcpy car.transform.position, frictionVector, 12
-        stdcall Vector3.Copy, frictionVector, car.matrix.m31
-        stdcall Vector3.CrossValue, frictionVector, -1.0
+     
+        fld1
+        fchs
+        fmul [deltaTime]
+        mov esi, [objPtr]
+        fmul [esi + Object.speed2]
+        fstp [v]
+        mov esi, [objPtr]
+        add esi, Object.matrix.m31
+        stdcall Vector3.Copy, frictionVector, esi
         stdcall Vector3.Normalize, frictionVector
-        stdcall Vector3.CrossValue, frictionVector, [deltaTime]
-        stdcall Vector3.CrossValue, frictionVector, [speed2]
+        stdcall Vector3.CrossValue, frictionVector,[v]
+       
         
         ; lea eax, [point]
         ; stdcall Vector3.Normalize, eax
      
         
         
-       
-        fld [tempAngle3]
+        mov esi, [objPtr]
+        fld dword[esi + Object.tempAngle]
         fld [tempAngle]
         fcomip st0, st1
         jb @F
 
-        fadd [astep]
+        fadd dword[esi + Object.astep]
         fstp [tempAngle4]
         jmp .l1
 @@:
-        fsub [astep]
+        fsub dword[esi + Object.astep]
         fstp [tempAngle4]
  .l1:       
         stdcall Quaternion.CreateFromAxisAngle, [objPtr], 0.0, 1.0, 0.0, [tempAngle4]
@@ -150,9 +172,12 @@ proc Physics.Update uses esi, deltaTime, spline, objPtr
         ;stdcall Quaternion.CreateFromAxisAngle, testObj, 0.0, 0.0, 1.0, [tempAngle4]
         ;stdcall Quaternion.Multiply, testObj.q, car.q, car.q
         
-        stdcall Vector3.Add, car.transform.position,  frictionVector
+        mov esi, [objPtr]
+        add esi, Object.transform.position
+        stdcall Vector3.Add, esi,  frictionVector
      
-        mov [PHYSICS_MODE], 1
+        mov esi, [objPtr]
+        mov [esi + Object.isFreeFall], 1
         ret
        
         ret
@@ -174,7 +199,7 @@ proc Physics.CalculateFriction uses esi, objPtr
 endp
 
 proc Physics.CalculateMU uses esi, objPtr
-        locals
+    locals
                 temp dd 0.8
         endl
         mov esi, [objPtr]

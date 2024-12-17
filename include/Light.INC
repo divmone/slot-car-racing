@@ -1,6 +1,10 @@
 depthMapFBO GLuint ?
 depthMap GLuint ?
 
-define SHADOW_WIDTH 1024
-define SHADOW_HEIGHT 1024
+lightPosition Vector3    0.0, 20.0, 0.0
+lightTargetPosition Vector3 0.0, 0.0, 0.0
+upVector3 Vector3 7.0, 8.0, 9.0
+
+define SHADOW_WIDTH 2048
+define SHADOW_HEIGHT 2048
 

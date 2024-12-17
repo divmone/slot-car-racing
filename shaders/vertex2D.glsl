@@ -10,5 +10,5 @@ out vec2 tCoord;
 void main()
 {
     gl_Position = projection2D * model2D * vec4(pos, 0.0, 1.0);
-    tCoord = textCoord; 
+    tCoord = textCoord;
 } 

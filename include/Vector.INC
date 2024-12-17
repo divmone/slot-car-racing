@@ -24,5 +24,5 @@ struct Vector4i
 
 ends
 
-upperVector Vector3 0.0, 1.0, 0.0
+tVector Vector3 0.0, 1.0, 0.0
 tempCameraVector1 Vector3 

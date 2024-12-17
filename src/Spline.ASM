@@ -693,42 +693,47 @@ proc Spline.GetRotation uses esi edi,\
 
         lea eax, [point]
         stdcall Spline.GetDerivative, [spline], eax, [time]
-
-        ; lea eax, [point]
-        ; stdcall Vector3.Normalize, eax
-
+        
         lea esi, [point]
         fld dword [esi]
         fchs
         fld dword [esi + 8]
         fpatan
+
         fmul [toDegree]
         fldpi
         fdivr st0, st1
         fstp st1
         fstp [angle]
         mov eax, [angle]
-        mov [tempAngle2], eax
-        stdcall Quaternion.CreateFromAxisAngle, [objPtr], 0.0, 1.0, 0.0, [tempAngle2]
-        
-        lea esi, [point]
-        
-        fchs
-        fld dword [esi + 4]
-        fld dword [esi +8]   
-        fpatan
-        fmul [toDegree]
-        fldpi
-        fdivr st0, st1
-        fstp st1
-        ;fadd [ninety]
-        fstp [angle]
-        mov eax, [angle]
-        mov [tempAngle2], eax
 
-        ;stdcall Quaternion.CreateFromAxisAngle, testObj, 0.0, 1.0, 0.0, 0.0
+        mov esi, [objPtr]
 
-        ;stdcall Quaternion.Multiply, car.q, testObj.q, car.q
+        mov [esi + Object.tempAngle], eax
+
+
+        stdcall Quaternion.CreateFromAxisAngle, [objPtr], 0.0, 1.0, 0.0, [esi + Object.tempAngle]
+        
+        ; lea esi, [point]
+        
+        ; fld dword [esi + 4] 
+        ; fchs
+        ; fld dword [esi + 8]  
+        ; fpatan
+        ; fmul [toDegree]
+        ; fldpi
+        ; fdivr st0, st1
+        ; fstp st1
+        ; ;fadd [ninety]
+        ; fchs
+        ; fstp [angle]
+        ; mov eax, [angle]
+        ; mov [tempAngle2], eax
+        ; stdcall Quaternion.CreateFromAxisAngle, testObj, 1.0, 0.0, 0.0, [angle]
+
+        ; mov esi, [objPtr]
+        ; add esi, Object.q
+        ; stdcall Quaternion.Multiply, testObj.q, esi
 
 .skip:        
       ret

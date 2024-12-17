@@ -47,7 +47,7 @@
         scaleStep       GLfloat         0.05
         scaleC          GLfloat         2.0
 
-        drawingMode      dd              1
+        drawingMode      dd              4
 
         plane           Mesh            planeVertices, 0, 0, PLANE_VERTICES_COUNT
 
@@ -80,7 +80,6 @@
         menuPosition    Vector3         200.0, 100.0, 100.0
         menuTargetPosition  Vector3     0.0, 0.0, 0.0
 
-        lightPosition  Vector4         5.0, 5.1, 5.0, 1.0
         lightColor     Vector4         0.9, 0.9, 0.9, 1.0
         
         trackPointPosition1 Vector3 0.0, 0.0, 0.0
@@ -104,6 +103,39 @@ cameraPosition4 Vector3         0.0, 0.0, -10.0
 cameraDirPrev4  Vector3        -60.66, 0.0, -10.0  
 cameraDirNext4  Vector3         60.66, 0.0, -10.0
 
+Position1 Vector3         -1.65, 0.0,  91.11 
+DirPrev1  Vector3         59.00, 0.0, 91.11
+DirNext1  Vector3        -62.31, 0.000, 88.88
+
+Position2 Vector3         0.325, 0.0, -11.97
+DirPrev2  Vector3        -60.33, 0.0, -11.97
+DirNext2  Vector3         60.98, 0.0, -8.02
+
+Position3 Vector3         1.75, 0.0, -109.034
+DirPrev3  Vector3          62.41, 0.0, -109.034
+DirNext3  Vector3         -58.90, 0.0, -110.96
+
+Position4 Vector3         0.32, 0.0, -11.97
+DirPrev4  Vector3        -60.33, 0.0, -11.97
+DirNext4  Vector3         60.98, 0.0, -8.027
+
+Position12 Vector3        -3.317, 0.000, 92.236
+DirPrev12  Vector3        57.343, 0.000, 92.236
+DirNext12  Vector3        -63.977, 0.000, 87.764
+
+Position22 Vector3         0.651, 0.000, -13.947
+DirPrev22  Vector3        -60.009, 0.000, -13.947   
+DirNext22  Vector3         61.311, 0.000, -6.053
+
+Position32 Vector3         3.503, 0.000, -108.068
+DirPrev32  Vector3          64.163, 0.000, -108.068
+DirNext32  Vector3         -57.157, 0.000, -111.932
+
+Position42 Vector3        0.651, 0.000, -13.947
+DirPrev42  Vector3        -60.009, 0.000, -13.947
+DirNext42  Vector3         61.311, 0.000, -6.053
+
+
 ;  cameraPosition1 Vector3        45.0, 0.0, 90.0
 ;         cameraDirPrev1  Vector3         0.0, 0.0, 90.0
 ;         cameraDirNext1  Vector3         45.0, 0.0, 0.0
@@ -119,22 +151,8 @@ cameraDirNext4  Vector3         60.66, 0.0, -10.0
 ;         cameraPosition4 Vector3         -45.0, 0.0, 90.0
 ;         cameraDirPrev4  Vector3          -45.0, 0.0, 0.0
 ;         cameraDirNext4  Vector3          0.0, 0.0, 90.0
-
-Position1 Vector3         0.0, 0.0, 90.0
-DirPrev1  Vector3         60.66, 0.0, 90.0
-DirNext1  Vector3        -60.66, 0.0, 90.0
-
-Position2 Vector3         0.0, 0.0, -10.0
-DirPrev2  Vector3        -60.66, 0.0, -10.0
-DirNext2  Vector3         60.66, 0.0, -10.0  
-
-Position3 Vector3          0.0, 0.0, -110.0
-DirPrev3  Vector3          60.66, 0.0, -110.0
-DirNext3  Vector3         -60.66, 0.0, -110.0  
-
-Position4 Vector3         0.0, 0.0, -10.0
-DirPrev4  Vector3        -60.66, 0.0, -10.0  
-DirNext4  Vector3         60.66, 0.0, -10.0
+threadId dd ?
+mutex dd ?
 
 tempVector Vector3
 
@@ -146,19 +164,26 @@ rotationPoint2 Vector4     0.0, 1.0, 0.0, 90.0
 rotationPoint2Prev Vector4 0.0, 1.0, 0.0, 40.0
 rotationPoint2Next Vector4 0.0, 1.0, 0.0, 0.0
 
-rotationPoints : Spline.Point rotationPoint1, rotationPoint1Prev, rotationPoint1Next, 1.0
-                 Spline.Point rotationPoint2, rotationPoint2Prev, rotationPoint2Next, 1.0
-
-rotationSpline   Spline          2, rotationPoints, 0, 2.0
-
-        lightPosition1 Vector3     0.0, 50.0, 0.0
-        lightPosition2 Vector3     0.0, 0.0, 0.0
         cubePoints:     Spline.Point    cameraPosition1, cameraDirPrev1, cameraDirNext1, 1.0
                         Spline.Point    cameraPosition2, cameraDirPrev2, cameraDirNext2, 1.0
                         Spline.Point    cameraPosition3, cameraDirPrev3, cameraDirNext3, 1.0
                         Spline.Point    cameraPosition4, cameraDirPrev4, cameraDirNext4, 1.0
 
         cubeSpline      Spline          4, cubePoints, 1, 4.0
+
+        tracePoints1:   Spline.Point    Position1, DirPrev1, DirNext1, 1.0
+                        Spline.Point    Position2, DirPrev2, DirNext2, 1.0
+                        Spline.Point    Position3, DirPrev3, DirNext3, 1.0
+                        Spline.Point    Position4, DirPrev4, DirNext4, 1.0
+
+        traceSpline1      Spline          4, tracePoints1, 1, 4.0
+
+        tracePoints2:   Spline.Point    Position12, DirPrev12, DirNext22, 1.0
+                        Spline.Point    Position22, DirPrev22, DirNext22, 1.0
+                        Spline.Point    Position32, DirPrev32, DirNext32, 1.0
+                        Spline.Point    Position42, DirPrev42, DirNext42, 1.0
+
+        traceSpline2      Spline          4, tracePoints1, 1, 4.0
 
         startTime       dd              0.0
         programTime     dd              ?   
@@ -203,6 +228,12 @@ rotationSpline   Spline          2, rotationPoints, 0, 2.0
         astep dd 20.0
         aastep dd 0.0
         direction dd 0.0
+        aspect          dd              ?
+        tempVec Vector3 0.0, 1.0, 0.0
+        instanseAmount dd ?
+        counter dd 0
+        
+
         include         "Init.asm"
         include         "Mesh.asm"
         include         "Vector.asm"
@@ -226,6 +257,7 @@ rotationSpline   Spline          2, rotationPoints, 0, 2.0
         include         "Camera.asm"
         include         "Light.asm"
         include         "Physics.asm"
+        include         "2D.asm"
 
 proc WinMain
 
@@ -239,6 +271,9 @@ proc WinMain
         lea     esi, [msg]
 
 .cycle:
+        stdcall Physics.Update, 0.07, cubeSpline, car
+        stdcall Physics.Update, 0.07, cubeSpline, car2
+        
         invoke  GetMessage, esi, ebx, ebx, ebx
         invoke  DispatchMessage, esi
         jmp     .cycle
@@ -248,228 +283,103 @@ endp
 proc WindowProc uses ebx,\
      hWnd, uMsg, wParam, lParam
 
-        xor     ebx, ebx
-       
-        switch  [uMsg]
-        case    .Paint,         WM_PAINT
-        case    .Destroy,       WM_DESTROY
-        case    .KeyDown,       WM_KEYDOWN
-        case    .KeyUp,         WM_KEYUP
-        case    .MouseWheel,    WM_MOUSEWHEEL
+    xor     ebx, ebx
+    
+    switch  [uMsg]
+    case    .Paint,         WM_PAINT
+    case    .Destroy,       WM_DESTROY
+    case    .KeyDown,       WM_KEYDOWN
+    case    .KeyUp,         WM_KEYUP
+    case    .MouseWheel,    WM_MOUSEWHEEL
 
-        invoke  DefWindowProc, [hWnd], [uMsg], [wParam], [lParam]
-        jmp     .Return
+    invoke  DefWindowProc, [hWnd], [uMsg], [wParam], [lParam]
+    jmp     .Return
 
 .KeyUp:
-    mov [KEY_PRESSED], 0
-    ;cmp [wParam], VK_SPACE
-    je .ResetAcceleration
+    switch [wParam]
+        case .ResetAcceleration1, VK_A
+        case .ResetAcceleration2, VK_L
     jmp .ReturnZero
 
-.ResetAcceleration:
-    fldz
-    fstp [car.acceleration]
+.ResetAcceleration1:
+    stdcall Object.ResetAcceleration, car
     jmp .ReturnZero
-
+.ResetAcceleration2:
+    stdcall Object.ResetAcceleration, car2
+    jmp .ReturnZero
 .Paint:
-
-        cmp [GAME_MODE], 1
-        je @F
-        stdcall Draw
-        jmp     .ReturnZero
+    cmp [GAME_MODE], 1
+    je @F
+    stdcall Draw
+    jmp     .ReturnZero
 @@:
-        stdcall DrawMenu
-        jmp     .ReturnZero
+    stdcall DrawMenu
+    jmp     .ReturnZero
 
 .KeyDown:
-        switch [wParam]
+    switch [wParam]
         case .Destroy, 'P'
         case .GoToMenu, VK_ESCAPE
-        case .MoveLeft, VK_A   
-        case .MoveRight, VK_D
-        case .MoveFront, VK_W
-        case .MoveBack, VK_S
-        case .MoveUp, VK_E
-        case .MoveDown,VK_Q
-        case .RotateRight, 58h
-        case .selectMode, 31h
-        case .RotateLeft, 5Ah
-        case .RotateLeftC, VK_LEFT
-        case .RotateRightC, VK_RIGHT
-        case .RotateUp, VK_UP
-        case .RotateDown, VK_DOWN
-        case .Speed, VK_SPACE
-        case .Speed2, VK_CONTROL
-        case .Respawn, 'R'
-        jmp     .ReturnZero
-.Respawn:
-        mov [PHYSICS_MODE], 0
-        mov [START_CRASH], 0
-
-        mov [car.acceleration], 0
-        mov [car.speed], 0
-        mov [speed2], 20.0
-        
-        stdcall	 GetRandomNumber, 10, 40
-        mov [astep], eax
-        fild [astep]
-        fstp [astep]
-
-
-        jmp .ReturnZero
+        case .ChangeCameraMode, VK_W
+        case .SelectDrawMode, 31h
+        case .Speed, VK_A
+        case .Speed2, VK_L
+        case .Respawn1, VK_R
+        case .Respawn2, VK_U
+    jmp     .ReturnZero
+.Respawn1:
+    stdcall Object.Respawn, car
+    jmp .ReturnZero
+.Respawn2:
+    stdcall Object.Respawn, car2
+    jmp .ReturnZero
 .Speed2:
-  
+    stdcall Object.SetAcceleration, car2
     jmp     .ReturnZero
 .Speed:
-    mov [KEY_PRESSED], 1
-    fld [car.acceleration]
-    fld [maxForce]
-    fdiv [car.mass]
-    faddp st1, st0
-    fstp [car.acceleration]
-
+    stdcall Object.SetAcceleration, car
     jmp     .ReturnZero
 .GoToMenu:
-        stdcall UI.Pause
-        jmp     .ReturnZero
-.MoveUp:
-      
-        fldpi
-        fdiv [toRadian]
-        fmul [angleY]
-        fcos
-        fmul [velocity]
-        fadd [posX]
-        fstp [posX]
-
-        fldpi
-        fdiv [toRadian]
-        fmul [angleY]
-        fsin
-        fmul [velocity]
-        fadd [posZ]
-        fstp [posZ]
-
-        jmp     .ReturnZero
-.MoveDown:
-
-        fldpi
-        fidiv [toRadian]
-        fmul [angleY]
-        fcos
-        fmul [velocity]
-        fsubr [posX]
-        fstp [posX]
-
-        fldpi
-        fidiv [toRadian]
-        fmul [angleY]
-        fsin
-        fmul [velocity]
-        fsubr[posZ]
-        fstp [posZ]
-
-        jmp     .ReturnZero
-.MoveLeft:
-        stdcall Vector3.Cross, cameraFront, upVector, tempCameraVector
-        stdcall Vector3.Normalize, tempCameraVector
-        stdcall Vector3.CrossValue, tempCameraVector, [cameraSpeed]
-
-        stdcall Vector3.Sub, cameraPosition, tempCameraVector
-        
-        jmp     .ReturnZero
-
-.MoveRight:
-        stdcall Vector3.Cross, cameraFront, upVector, tempCameraVector
-        stdcall Vector3.Normalize, tempCameraVector
-        stdcall Vector3.CrossValue, tempCameraVector, [cameraSpeed]
-
-        stdcall Vector3.Add, cameraPosition, tempCameraVector
-        
-        jmp     .ReturnZero
-
-.MoveFront:  ;W
-
-        ;cameraPos += cameraSpeed * cameraFront;
-
-        stdcall Vector3.Copy, tempCameraVector, cameraFront
-        stdcall Vector3.CrossValue, tempCameraVector, [cameraSpeed]
-        stdcall Vector3.Add, cameraPosition, tempCameraVector
-
-
-        ;stdcall Float.AddValue, car.transform.position.z, [stepp]
-        jmp     .ReturnZero
-
-.MoveBack:   ;S
-        stdcall Vector3.Copy, tempCameraVector, cameraFront
-        stdcall Vector3.CrossValue, tempCameraVector, [cameraSpeed]
-        stdcall Vector3.Sub, cameraPosition, tempCameraVector
-
-        ;stdcall Float.SubValue, car.transform.position.z, [stepp]
-        jmp     .ReturnZero
-
-.RotateLeft:
-        ;cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-
-      jmp     .ReturnZero
-
-
-.RotateRight:
-        stdcall Float.SubValue, angleX, [step]
-        jmp     .ReturnZero
-
-.RotateRightC:
-        fld     [angleZ]
-        fsub    [step]
-        fstp    [angleZ]
-
-        jmp     .ReturnZero
-.RotateLeftC:
-        fld     [angleZ]
-        fadd    [step]
-        fstp    [angleZ]
-
-        jmp     .ReturnZero
-.RotateUp:
-       stdcall Float.SubValue, car.transform.position.x, 5.0
-       jmp     .ReturnZero
-.RotateDown:
-       stdcall Float.AddValue, car.transform.position.x, 5.0
-       jmp     .ReturnZero
-
-
- .MouseWheel:
-        mov     eax, [wParam]
-        test    eax, 0x80000000
-        jne     .Negative
-        stdcall Vector3.AddValue, car.transform.scale, [scaleStep]
-        jmp     .ReturnZero
-
+    stdcall UI.Pause
+    jmp     .ReturnZero
+.ChangeCameraMode:  ;W
+    cmp [CAMERA_MODE], 0
+    je @F
+    mov [CAMERA_MODE], 0
+    stdcall Vector3.Copy, tempCameraVector, cameraPosition
+    stdcall Vector3.Copy, targetPosition, tVector
+    jmp     .ReturnZero
+@@:
+    mov [CAMERA_MODE], 1
+    jmp     .ReturnZero
+.MouseWheel:
+    mov     eax, [wParam]
+    test    eax, 0x80000000
+    jne     .Negative
+    stdcall Vector3.Add,  lightPosition, tVector
+    jmp     .ReturnZero    
 .Negative:
-        stdcall Vector3.SubValue, car.transform.scale, [scaleStep]
-        jmp     .ReturnZero
-
-.selectMode:
-        cmp [drawingMode], 1
-        je  .setFour
-        mov [drawingMode], 1
-        jmp @F
-
+    stdcall Vector3.Sub,  lightPosition, tVector
+    jmp     .ReturnZero    
+.SelectDrawMode:
+    cmp [drawingMode], 1
+    je  .setFour
+    mov [drawingMode], 1
+    jmp @F    
 .setFour:
-        mov [drawingMode], 4
+    mov [drawingMode], 4
 
 @@:
-        jmp .ReturnZero
+    jmp .ReturnZero
 
 .Destroy:
-        invoke HeapDestroy, [hHeap]
-        invoke CloseHandle, [logFile]
-        invoke ExitProcess, ebx
+    invoke HeapDestroy, [hHeap]
+    invoke CloseHandle, [logFile]
+    invoke ExitProcess, ebx
 
 .ReturnZero:
-        xor     eax, eax
+    xor     eax, eax
 
 .Return:
-        ret
+    ret
 endp
-;3 479

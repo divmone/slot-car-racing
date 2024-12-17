@@ -22,20 +22,6 @@ proc Glext.LoadFunctions uses esi edi
 endp
 
 proc Glext.CreateShaders
-        invoke  glUseProgram, ebx
-
-        cmp     [program], ebx
-        je      @F
-
-        invoke  glDetachShader, [program], [fragmentShader]
-        invoke  glDeleteShader, [fragmentShader]
-        
-        invoke  glDetachShader, [program], [vertexShader]
-        invoke  glDeleteShader, [vertexShader]
-        
-        invoke  glDeleteProgram, [program]
-
-@@:
 
         stdcall Glext.LoadShader, vshaderFile, GL_VERTEX_SHADER
         mov     [vertexShader], eax
@@ -80,17 +66,19 @@ proc Glext.CreateShaders
         invoke glGetUniformLocation, [program], modelName
         mov [modelLocation], eax
 
-        invoke glGetUniformLocation, [program], ambientName
-        mov [ambientLocation], eax
+        invoke glGetUniformLocation, [program], lightSpaceMatrixName
+        mov [lightSpaceMatrixLocation], eax
 
-        invoke glGetUniformLocation, [program], diffuseName
-        mov [diffuseLocation], eax
+        invoke glGetUniformLocation, [program], viewName
+        mov [viewLocation], eax
 
-        invoke glGetUniformLocation, [program], specularName
-        mov [specularLocation], eax
+        invoke glGetUniformLocation, [program], projectionName
+        mov [projectionLocation], eax
 
-        invoke glGetUniformLocation, [program], shininessName
-        mov [shininessLocation], eax
+        invoke glGetUniformLocation, [program], useInstancingName
+        mov [useInstancingLocation], eax
+
+
 
 
          ;invoke  glBindAttribLocation, [program], 0, timeName
@@ -115,6 +103,30 @@ proc Glext.CreateShaders
         ret
 endp
 
+proc Glext.CreateShader, vshaderFile, fshaderFile
+        locals
+                shader dd ?
+                vShader dd ?
+                fShader dd ?
+        endl
+
+        invoke  glDetachShader, [shader], [fShader]
+        invoke  glDeleteShader, [fShader]
+        
+        invoke  glDetachShader, [shader], [vShader]
+        invoke  glDeleteShader, [vShader]
+        
+        invoke  glDeleteProgram, [shader]
+
+        stdcall Glext.LoadShader, [vshaderFile], GL_VERTEX_SHADER
+        mov     [vShader], eax
+
+        stdcall Glext.LoadShader, [fshaderFile], GL_FRAGMENT_SHADER
+        mov     [fShader], eax
+
+        stdcall Glext.CreateProgram,  [vShader], [fShader]
+        ret
+endp
 proc Glext.CreateShaders2D
         invoke  glUseProgram, ebx
 
