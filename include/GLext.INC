@@ -36,6 +36,7 @@ extensionAddresses:
         glVertexAttribDivisor dd ?
         glDrawArraysInstanced dd ?
         wglCreateContextAttribsARB dd ?
+        glBufferSubData dd ?
 extensionNames:
         db      "glBufferData",0
         db      "glGenBuffers", 0
@@ -74,6 +75,7 @@ extensionNames:
         db      "glVertexAttribDivisor", 0
         db      "glDrawArraysInstanced", 0
         db      "wglCreateContextAttribsARB", 0
+        db      "glBufferSubData",0
 
         db      0
 

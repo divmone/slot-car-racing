@@ -114,16 +114,13 @@ proc Object.SetPosition uses esi,\
                object, x, y, z
 
     mov esi, [object]
+    movss xmm0, [x]           ; Load x into xmm0
+    movss xmm1, [y]           ; Load y into xmm1
+    movss xmm2, [z]
 
-    mov eax, [x]
-    mov [esi + Object.transform.position.x], eax
-
-    mov eax, [y]
-    mov [esi + Object.transform.position.y], eax
-
-    mov eax, [z]
-    mov [esi + Object.transform.position.z], eax
-
+    movss [esi + Object.transform.position.x], xmm0
+    movss [esi + Object.transform.position.y], xmm1
+    movss [esi + Object.transform.position.z], xmm2
     ret
 endp
 
@@ -294,14 +291,65 @@ proc Track.InitArray uses esi edi ebx
     ret
 endp
 
-proc Object.CheckLap uses esi edi, objPtr
-    mov esi, objPtr
-    add esi, Object.transform.position
-    mov edi, arch.transform.position
+proc Object.CheckLap uses esi , objPtr
+    locals
+        t dd 0.01   
+    endl
+    
+    mov eax, 1                           
+    ret
+
+@@:
+    xor eax, eax                          
+    ret
+endp
+
+proc Button.Create uses esi, objPtr, x, y, message, buttonColor, textColor
+    locals
+        length dd ?
+    endl
+    mov esi, [objPtr]
+    add esi, Button.messageRect
+    stdcall Rectangle.Create, esi, 0.0, 0.0, 1.0, 1.0
+    stdcall Object.SetPosition, esi, [x], [y], 0.0
+    mov esi, [objPtr]
+    stdcall Texture.CreateRGBA, fontTexture
+    mov [esi + Button.messageRect.texture], eax 
+
+    stdcall GetStringLength, [message]
+    mov [length], eax
+    fild [length]
+    fstp [length]
+    mov esi, [objPtr]
+    add esi, Button.buttonRect
+    stdcall Rectangle.Create, esi, 0.0, 0.0, 8.0, 1.0
+    stdcall Object.SetPosition, esi, [x], [y], 0.0
+    mov esi, [objPtr]
+    stdcall Texture.Create, buttonTexture
+    mov [esi + Button.buttonRect.texture], eax 
+    mov eax, [message]
+    mov [esi + Button.message], eax
+    mov eax, [x]
+    mov [esi + Button.position.x], eax
+    mov eax, [y]
+    mov [esi + Button.position.y], eax
+
+    mov eax, [buttonColor]
+    mov [esi + Button.buttonColor], eax
+    mov eax, [textColor]
+    mov [esi + Button.textColor], eax
 
 
 
+    ret
+endp
 
-
+proc Button.Draw uses esi, objPtr
+    mov esi, [objPtr]
+    lea eax, [esi + Button.messageRect]
+    stdcall Sprite.DrawText, eax, [esi + Button.message], [esi + Button.position.x], [esi + Button.position.y], [esi + Button.textColor]
+    lea eax, [esi + Button.buttonRect]
+    stdcall Sprite.Draw, eax, [esi + Button.buttonColor]
+  
     ret
 endp

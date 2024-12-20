@@ -1,7 +1,7 @@
 depthMapFBO GLuint ?
 depthMap GLuint ?
 
-lightPosition Vector3    0.0, 20.0, 0.0
+lightPosition Vector3    0.0, 50.0, 0.0
 lightTargetPosition Vector3 0.0, 0.0, 0.0
 upVector3 Vector3 7.0, 8.0, 9.0
 

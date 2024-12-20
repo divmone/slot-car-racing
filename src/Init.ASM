@@ -35,7 +35,6 @@ proc Init uses esi
         invoke  wglMakeCurrent, [hdc], eax
 
         invoke  glViewport, ebx, ebx, [clientRect.right], [clientRect.bottom]
-        invoke  glScissor, ebx, ebx, [clientRect.right], [clientRect.bottom]
         fild    [clientRect.right]      
         fidiv   [clientRect.bottom]   
         fstp    [aspect]
@@ -72,7 +71,7 @@ proc Init uses esi
         stdcall Quaternion.CreateFromAxisAngle, pens, 0.0, 1.0, 0.0, 90.0
         stdcall Quaternion.CreateFromAxisAngle, books, 0.0, 1.0, 0.0, 90.0
         stdcall Quaternion.CreateFromAxisAngle, track, 0.0, 1.0, 0.0, -90.0
-  
+
         stdcall Object.SetPosition, sphere, 0.0, 50.0, 0.0
         stdcall Object.SetPosition, car, 0.0, 0.0, 0.0 
         stdcall Object.SetPosition, lamp, 45.0, 50.0, -110.0
@@ -147,8 +146,9 @@ proc Init uses esi
         mov [modelLocation3], eax
         invoke glGetUniformLocation, [program2D], projectionName2D
         mov [projectionLocation2D], eax
+        invoke glGetUniformLocation, [program2D], colorName
+        mov [colorNameLocation], eax
 
-        
         invoke glUseProgram, [program]
         invoke glUniform3fv, [lightPosLocation], 1, lightPosition
         invoke glUniform3fv, [viewPosLocation], 1, cameraPosition
@@ -156,14 +156,24 @@ proc Init uses esi
         invoke glUniform1i, [texLocation], 1
         
         stdcall Rectangle.Create, R1, 0.0, 0.0, 1.0, 1.0
-        stdcall Object.SetPosition, R1, -10.0, 9.0, 0.0
+        stdcall Object.SetPosition, R1, -9.0, 9.0, 0.0
+        
+        stdcall Rectangle.Create, R2, 0.0, 0.0, 1.0, 1.0
+        stdcall Object.SetPosition, R2, -10.0, 9.0, 0.0
         ;stdcall Interface.CreateRectangle, R1
 
-        stdcall Texture.Create, buttonTexture
+        stdcall Texture.CreateRGBA, fontTexture
         mov [R1.texture], eax 
-        ;mov [R2.texture], eax
-        ;mov [R3.texture], eax
-        ;invoke  glShadeModel, GL_SMOOTH
+
+        stdcall Texture.Create, buttonTexture
+        ;mov [R1.texture], eax 
+
+        stdcall Button.Create, startButton, -9.0, -4.0, startMessage, BLACK_COLOR, GRAY_COLOR
+        stdcall Button.Create, settingsButton, -9.0, -6.0, settingsMessage, BLACK_COLOR, GRAY_COLOR
+        stdcall Button.Create, exitButton, -9.0, -8.0, exitMessage, BLACK_COLOR, GRAY_COLOR
+
+        invoke glAlphaFunc, GL_GREATER, 0.9
+
         invoke  glHint, GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST
         invoke  glEnable, GL_DEPTH_TEST
         invoke  glDepthFunc, GL_LESS 
@@ -174,7 +184,7 @@ proc Init uses esi
         stdcall Track.InitArray
         stdcall Spline.GetPoint, cubeSpline, arch.transform.position, 0.0
         stdcall Spline.GetRotation, cubeSpline, arch, 0.0                                                                      
-    
+
         ; stdcall Object.SetPosition, R1, 0.0, 1.0, 0.0
         ;stdcall Object.SetScale, R1, 0.2, 0.2, 0.2
         ; stdcall Object.SetScale, R2, 0.2, 0.2, 0.2
@@ -184,5 +194,6 @@ proc Init uses esi
         stdcall Matrix.Projection, [aspect], [fovY], [zNear], [zFar], projection
         stdcall Light.Init
         mov [road.useInstancing], 1
+        stdcall UI.SetActiveButton, 0
         ret
 endp

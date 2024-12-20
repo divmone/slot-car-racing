@@ -1,3 +1,4 @@
+
 struct quaternion
     x dd 0.0
     y dd 0.0
@@ -41,6 +42,16 @@ struct Object
     astep dd 20.0
     useInstancing dd 0
     lapCount dd 0
+ends
+
+struct Button
+    buttonRect Object
+    messageRect Object
+    message dd ?
+    position Vector3 0.0, 0.0, 0.0
+    buttonColor dd WHITE_COLOR
+    textColor dd BLACK_COLOR
+    isActive dd FALSE
 ends
 
 car Object 0,0,0,0
@@ -94,6 +105,11 @@ r1Message db "123", 0
 R2 Object
 R3 Object
 
+startButton Button
+exitButton Button
+settingsButton Button
+
+menuButtons dd startButton, settingsButton, exitButton
 
 
 musicPath  db "../audio/goida.wav",0
@@ -127,3 +143,4 @@ carAmbient Vector3 0.2472,	0.1995,	0.0745
 carDiffuse Vector3    0.75164,	0.60648,	0.22648
 carSpecular Vector3     0.628281,	0.555802,	0.366065
 carShinine   dd  0.4
+

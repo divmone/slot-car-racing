@@ -1,3 +1,61 @@
+proc UI.DrawMainMenu 
+  locals
+    ten dd 100.0
+  endl
+    stdcall	 GetRandomNumber, 1, 5
+    mov [car.acceleration], eax
+    fild [car.acceleration]
+    fdiv [ten]
+    fstp [car.acceleration]
+    stdcall Physics.Update, 0.07, cubeSpline, car
+    ;stdcall Spline.GetPoint, cubeSpline, car,  [programTime]
+    ;stdcall Spline.GetRotation, cubeSpline, car,  [programTime]                                                               
+  
+    stdcall Matrix.LookAt2, lightPosition, car.transform.position, upVector, view1
+    stdcall Matrix.Multiply4x4, view1, lightProjection,  lightSpaceMatrix
+    
+    invoke glViewport, 0, 0, SHADOW_WIDTH, SHADOW_HEIGHT
+  
+    invoke glBindFramebuffer, GL_FRAMEBUFFER, [depthMapFBO]
+        invoke glClear, GL_DEPTH_BUFFER_BIT
+         invoke glUseProgram, [depthShader]
+         invoke glUniformMatrix4fv, [lightSpaceMatrixLocation2], 1, GL_FALSE, lightSpaceMatrix 
+         invoke glActiveTexture, GL_TEXTURE0
+    invoke glBindTexture, GL_TEXTURE_2D, [depthMap]
+    stdcall RenderScene, [depthShader]
+    invoke glBindFramebuffer, GL_FRAMEBUFFER, 0
+    
+    invoke  glClearColor, 0.6, 0.6, 1.0, 1.0
+
+    invoke  glClear, GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT
+        
+    invoke  glViewport, 0, 0, [clientRect.right], [clientRect.bottom]
+
+    stdcall Matrix.LookAt2, tempCameraVector,  car.transform.position, upVector, view
+    
+    invoke glUseProgram, [program]
+    invoke glUniformMatrix4fv, [projectionLocation], 1, GL_FALSE, projection
+    invoke glUniformMatrix4fv, [viewLocation], 1, GL_FALSE, view
+    invoke glUniformMatrix4fv, [lightSpaceMatrixLocation], 1, GL_FALSE, lightSpaceMatrix
+    invoke glActiveTexture, GL_TEXTURE0
+    invoke glBindTexture, GL_TEXTURE_2D, [depthMap]
+    stdcall RenderScene, [program]
+
+
+    invoke glUseProgram, [program2D]
+    invoke glEnable, GL_ALPHA_TEST
+  
+    invoke glUniformMatrix4fv, [projectionLocation2D], 1, GL_FALSE, projection2D
+        stdcall Button.Draw, startButton
+        stdcall Button.Draw, settingsButton
+        stdcall Button.Draw, exitButton
+        stdcall Sprite.DrawText, R1, logoMessage, -7.0, 8.0, WHITE_COLOR
+    
+        invoke glDisable, GL_ALPHA_TEST
+
+    ret
+endp
+
 proc UI.StartRender
    
   ;stdcall Matrix.LookAt, menuPosition, menuTargetPosition, upVector 
@@ -46,22 +104,39 @@ proc Rectangle.Init uses esi, objPtr
   ret
 endp
 
-proc DrawMenu
-    invoke  glClearColor, 0.3, 0.3, 1.0, 0.0
-    invoke  glClear, GL_COLOR_BUFFER_BIT
-         
-         ;stdcall Rectangle.Create, R1, 0.0, 0.0, 1.0, 1.0
-         stdcall Rectangle.CreateText, R2, r1Message, 0.0, 0.1, 1.0, 2.0
-         ;stdcall Rectangle.CreateText, R3, r1Message, 0.0, 0.0, 1.0, 2.0
+proc UI.SetActiveButton uses esi, number
+   
+    mov eax, [number] 
+    shl eax, 2        
+            
+    mov esi, menuButtons
+    add esi, eax      
 
-        
-        ;stdcall Sprite.Draw, R1
-        ; stdcall Sprite.Draw, R2
-        ; stdcall Sprite.Draw, R3
+    mov eax, [esi]    
+    mov esi, eax      
 
-        invoke SwapBuffers, [hdc]
+    
+    mov [esi + Button.isActive], 1
+    mov [esi + Button.textColor], WHITE_COLOR  
+
     ret
 endp
+
+proc UI.SetDeactiveButton uses esi, number
+    mov eax, [number]   
+    shl eax, 2          
+    
+    mov esi, menuButtons
+        
+    mov eax, [esi + eax]      
+    mov esi, eax        
+
+    mov [esi + Button.isActive], 0     
+    mov [esi + Button.textColor], GRAY_COLOR
+
+    ret
+endp
+
 
 proc Rectangle.Create uses esi ,\
                     objPtr, x, y, width, heigth
@@ -131,7 +206,7 @@ proc Rectangle.Create uses esi ,\
     invoke glGenBuffers, 1, eax
     invoke glBindBuffer, GL_ARRAY_BUFFER, [vbo]
 
-    invoke glBufferData, GL_ARRAY_BUFFER, 32, [buffer], GL_STATIC_DRAW
+    invoke glBufferData, GL_ARRAY_BUFFER, 32, [buffer], GL_DYNAMIC_DRAW
     invoke glEnableVertexAttribArray, 0
     
     invoke glVertexAttribPointer, 0, 2, GL_FLOAT, GL_FALSE, 0, 0
@@ -140,7 +215,7 @@ proc Rectangle.Create uses esi ,\
     invoke glGenBuffers, 1, eax
     invoke glBindBuffer, GL_ARRAY_BUFFER, [tao]
 
-    invoke glBufferData, GL_ARRAY_BUFFER, 32, textCoords, GL_STATIC_DRAW
+    invoke glBufferData, GL_ARRAY_BUFFER, 32, textCoords, GL_DYNAMIC_DRAW
 
     invoke glEnableVertexAttribArray, 1
     
@@ -172,135 +247,6 @@ proc Rectangle.Create uses esi ,\
     ret
 endp
 
-
-proc Rectangle.CreateText uses esi edi,\
-                    objPtr, text, x, y, width, heigth
-
-    locals
-      vao dd ?
-      vbo dd ?
-      tao dd ?
-      buffer dd ?
-      char db 0
-      charSize dd 0.0625
-      sixteen dd 16.0
-      x1 dd 0
-      y1 dd 4
-      left dd ?
-      right dd ?
-      top dd ?
-      bottom dd ?
-      xpos dd 0.0
-      step dd 1.0
-    endl
-    
-    mov edi, [text]
-
-.loop:
-    cmp byte[edi], 0
-    je .endl
-  
-    xor eax, eax
-    mov al, byte[edi]
-    shr eax, 4
-    mov [y1], eax
-
-    xor eax, eax
-    mov al, byte[edi]
-    and eax, 1111b
-    mov [x1], eax
-
-
-    fild [x1]
-    fmul [charSize]
-    fst [left]
-
-    fadd [charSize]
-
-    fstp [right]
-
-    fild [y1]
-    fmul [charSize]
-    fst [top]
-    fadd [charSize]
-    fstp [bottom]
-
-;0
-   
-
-    mov esi , textCoords
-    mov eax, [left]
-    mov [esi], eax
-
-    add esi, 4
-    mov eax, [bottom]
-    mov [esi], eax
-
-    add esi, 4
-    mov eax, [right]
-    mov [esi], eax
-
-    add esi, 4
-    mov eax, [bottom]
-    mov [esi], eax
-
-    add esi ,4
-    mov eax, [right]
-    mov [esi], eax
-
-    add esi, 4
-    mov eax, [top]
-    mov [esi], eax
-
-    add esi, 4
-    mov eax, [left]
-    
-    mov [esi], eax
-
-    add esi, 4
-    mov eax, [top]
-    mov [esi], eax
-
-
-    mov esi, [objPtr]
-
-    invoke glBindVertexArray, [esi + Object.VAO] 
-
-    lea eax, [tao]
-    invoke glGenBuffers, 1, eax
-    invoke glBindBuffer, GL_ARRAY_BUFFER, [tao]
-
-    invoke glBufferData, GL_ARRAY_BUFFER, 32, textCoords, GL_STATIC_DRAW
-
-
-    invoke glEnableVertexAttribArray, 1
-    
-    invoke glVertexAttribPointer, 1, 2, GL_FLOAT, GL_FALSE, 0, 0
-        
-    stdcall Object.SetPosition, [objPtr], [x], [y], 0.0
-
-    stdcall Matrix.CreateModel, [objPtr]
-    invoke glUseProgram, [program2D]
-    invoke glUniformMatrix4fv, [modelLocation3], 1, GL_FALSE, model
-        invoke glUniformMatrix4fv, [projectionLocation2D], 1, GL_FALSE, projection2D
-        invoke glActiveTexture, GL_TEXTURE0
-        invoke glBindTexture, GL_TEXTURE_2D, [esi + Object.texture]
-        invoke glBindVertexArray, [esi + Object.VAO] 
-                invoke  glDrawArrays, 6, 0, 4
-        invoke glBindVertexArray, 0
-        invoke glBindTexture, GL_TEXTURE_2D, 0
-        
-        invoke glUseProgram, 0
-
-    inc edi
-    fld [x]
-    fadd [step]
-    fstp [x]
-    
-    jmp .loop
-.endl:
-    ret
-endp
 
 proc Text.Render uses esi edi,\
                     text, vao, x, y, width, heigth

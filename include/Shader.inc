@@ -39,6 +39,9 @@ viewName db                    "view", 0
 viewLocation GLint             ?
 viewLocation2 GLint             ?
 
+colorName db "texColor", 0
+colorNameLocation GLint  ?
+
 
 projectionName2D db                    "projection2D", 0
 projectionLocation2D GLint             ?

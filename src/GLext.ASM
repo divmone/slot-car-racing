@@ -19,8 +19,7 @@ proc Glext.LoadFunctions uses esi edi
 
 .Return:
         ret
-endp
-
+endp   
 proc Glext.CreateShaders
 
         stdcall Glext.LoadShader, vshaderFile, GL_VERTEX_SHADER

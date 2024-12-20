@@ -76,11 +76,6 @@ proc Matrix.Ortho uses esi edi,\
 
   mov esi, [matrix]
 
-  ;mov     edi, esi
-  ;mov     eax, 0
-  ;mov     ecx, 16
-  ;rep     stosd
-
   fld [right]
   fsub [left]
   fdivr [two]
@@ -267,10 +262,10 @@ proc Matrix.LookAt2 uses esi edi ebx,\
     lea edx, [u]
     stdcall Vector3.Cross, eax, ecx, edx
 
-    mov     edi, [matrix]
-    mov     eax, 0.0
-    mov     ecx, 16
-    rep     stosd
+    ; mov     edi, [matrix]
+    ; mov     eax, 0.0
+    ; mov     ecx, 16
+    ; rep     stosd
 
     mov esi, [matrix]
     mov eax, [s.x]
@@ -316,8 +311,7 @@ proc Matrix.LookAt2 uses esi edi ebx,\
     stdcall Vector3.Dup, eax, [camera]
     mov [esi + Matrix4x4.m43], eax
 
-    fld1
-    fstp [esi + Matrix4x4.m44]
+    mov [esi + Matrix4x4.m44], 1.0
     
     
     ret
