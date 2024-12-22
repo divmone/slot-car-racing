@@ -155,12 +155,11 @@ proc RenderScene uses esi, shader
     fstp [tempCameraVector.x]
     
     stdcall Object.Draw, road, [shader]
-    stdcall Object.Draw, car,  [shader] 
-    stdcall Object.Draw, grass,  [shader]       
+    stdcall Object.Draw, car,  [shader]     
+    stdcall Object.Draw, car2,  [shader]        
     stdcall Object.Draw, table, [shader] 
-    stdcall Object.Draw, track, [shader]
     stdcall Object.Draw, arch, [shader]
-    
+    stdcall Object.Draw, grass, [shader]
     ret
 endp
 

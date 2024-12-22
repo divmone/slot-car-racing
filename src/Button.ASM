@@ -1,4 +1,7 @@
 proc Button.Press, index
+     stdcall UI.SetDeactiveButton, [activeMenu], [activeButton]
+     stdcall UI.SetActiveButton, [activeMenu], 0
+     mov [activeButton], 0
      switch [index]
      case .Start, 0
      case .Settings, 1
@@ -78,10 +81,11 @@ proc Button.Press, index
      .SelectMenu2:
           ret
      .MainMenu2:
-     .PauseMenu2:
      invoke HeapDestroy, [hHeap]
      invoke CloseHandle, [logFile]
-     invoke ExitProcess, ebx 
+     invoke ExitProcess, ebx    
+     .PauseMenu2:
+     mov [GAME_MODE], MAINMENU
           ret
      .SelestMode2:
      

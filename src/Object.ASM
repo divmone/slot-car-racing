@@ -233,47 +233,71 @@ endp
 
 proc Grass.InitArray uses esi edi ebx
     locals
-        width dd 100
-        height dd 100
+        tempX dd 0.0
+        tempY dd 0.0
+        tempTime dd 0.0
+        step dd 0.01
+        maxB dd 4.0
         size dd ?
         buffer dd ?
         vbo dd ?
         sizeOfArr dd ?
+        width dd 100
+        heigth dd 100
     endl
     xor edx, edx
-    mov ecx, [width]
-    mov eax, [height]
+    mov eax, [width]
+    mov ecx, [heigth]
     mul ecx
-
-
-    mov eax, [size]
-    xor edx, edx
-    mov ecx, sizeof.Matrix4x4
+    mov ecx,  sizeof.Matrix4x4
     mul ecx
-    mov [sizeOfArr], eax
-    malloc eax 
+    mov [size], eax
+    malloc eax
     mov [buffer], eax
-
+ 
     mov ebx, [buffer]
-.loop:
-    stdcall Spline.GetPoint, cubeSpline, road.transform.position, [tempTime] 
-    stdcall Spline.GetRotation, cubeSpline, road, [tempTime]                                                                              
-    stdcall Matrix.CreateModel, road   
-    memcpy ebx, model, 64
-    add ebx, sizeof.Matrix4x4
+    mov ecx, [size]
+     mov ebx, [buffer]
+    mov ecx, [size]
+    
 
-    fld [tempTime]
-    fadd [step]
-    fld [maxB]
-    fcomip st0, st1
-    fstp [tempTime]
-    ja .loop
+    xor esi, esi             
+.loopX:
+    xor edi, edi             
+.loopY:
+    fld [esi]
+    fmul [step]                ; X = esi * step
+    fstp qword ptr [tempTime]  ; Сохраняем X в tempTime
+
+    fld [edi]
+    fmul [step]                ; Y = edi * step
+    fstp qword ptr [tempTime+8] ; Сохраняем Y в tempTime + 8
+
+    ; Преобразуем позицию в модельную матрицу
+    push tempTime              ; Позиция X, Y
+    stdcall Object.SetPosition, grass, 
+    stdcall Matrix.CreateModel, grass
+    memcpy ebx, model, 64      ; Копирование матрицы модели в буфер
+    add ebx, sizeof.Matrix4x4  ; Переход к следующей ячейке в буфере
+
+    inc edi                    ; Переход к следующей строке
+    cmp edi, [heigth]           ; Проверяем, достигли ли конца по Y
+    jl .loopY                   ; Если нет, продолжаем
+
+    inc esi                    ; Переход к следующему столбцу
+    cmp esi, [width]            ; Проверяем, достигли ли конца по X
+    jl .loopX                   ; Если нет, продолжаем
+
+    pop ecx                     ; Восстанавливаем контекст
+    loop .loop                  ; Повторяем цикл для каждой ячейки сетки
+
 
     lea eax, [vbo]
     invoke glGenBuffers, 1, eax
     invoke glBindBuffer, GL_ARRAY_BUFFER, [vbo]
 
     invoke glBufferData, GL_ARRAY_BUFFER, [sizeOfArr], [buffer], GL_STATIC_DRAW
+    invoke  HeapFree, [hHeap], ebx, [buffer]
     invoke glBindVertexArray, [road.VAO]
     invoke glEnableVertexAttribArray, 3 
     invoke glVertexAttribPointer, 3, 4, GL_FLOAT, GL_FALSE, sizeof.Matrix4x4, 0
@@ -301,6 +325,9 @@ proc Track.InitArray uses esi edi ebx
         vbo dd ?
         sizeOfArr dd ?
     endl
+    mov eax, [cubeSpline.time]
+    mov [maxB], eax
+
     fld [maxB]
     fdiv [step]
     fist [instanseAmount]

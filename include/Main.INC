@@ -1,6 +1,7 @@
 format  PE GUI 5.0
 entry   WinMain
 
+        
         include         "win32a.inc"
 
         include         "api\kernel32.inc"
@@ -8,6 +9,7 @@ entry   WinMain
         include         "api\gdi32.inc"
         include         "api\opengl.inc"
         include         "api\winmm.inc"
+        ;include         "equates\kernel32.inc"
 
         include         "Mesh.inc"
         include         "Vector.inc"
@@ -34,6 +36,7 @@ entry   WinMain
         include         "2D.inc"
         include         "UI.inc"
 
+  
 macro switch value
 {
         mov     eax, value
@@ -76,9 +79,12 @@ macro malloc [arg]
         wndClass        WNDCLASS                0, WindowProc, 0, 0, 0, 0, 0, 0, 0, className
         pfd             PIXELFORMATDESCRIPTOR   sizeof.PIXELFORMATDESCRIPTOR, 1, PFD_FLAGS, PFD_TYPE_RGBA, COLOR_DEPTH,\
                                                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,\
-                                                COLOR_DEPTH, 0, 0, PFD_MAIN_PLANE, 0, PFD_MAIN_PLANE
+                                  COLOR_DEPTH, 0, 0, PFD_MAIN_PLANE, 0, PFD_MAIN_PLANE  
+        
 
 data import
+
+        
 
         library kernel32,       "KERNEL32.DLL",\
                 user32,         "USER32.DLL",\
@@ -89,3 +95,4 @@ data import
                 ole, 'OLE32.DLL',\
                 oleaut, 'OLEAUT32.DLL'
 end data
+

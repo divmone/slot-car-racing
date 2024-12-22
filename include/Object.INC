@@ -103,6 +103,11 @@ grass Object
 fileNameG db  "../models/grass.obj",0 
 textPathG        db    "../textures/grass.bmp", 0 
 
+house Object
+fileNameH db  "../models/house.obj",0 
+textPathH        db    "../textures/light.bmp", 0 
+
+
 R1 Object
 r1Message db "123", 0 
 R2 Object
@@ -127,8 +132,9 @@ selectModeButtons dd timeGameButton, botGameButton, driveAtarGameButton
 menuButtons dd startButton, settingsButton, exitButton
 
 
-musicPath  db "../audio/goida.wav",0
-
+musicPath  db "../audio/menusound.wav",0
+musicPath1  db "../audio/menu1.wav",0
+musicPath2  db "../audio/ost.wav",0
 
 testq1 quaternion 1.0, 2.0, 3.0, 4.0
 testq2 quaternion 5.0, 6.0, 7.0, 8.0

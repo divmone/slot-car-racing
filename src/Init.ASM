@@ -24,8 +24,15 @@ proc Init uses esi
         invoke  GetDC, [hMainWindow]
         mov     [hdc], eax
         
+        
         ;stdcall  PrintToConsole, okMessage + 1, okMessage.size - 1
-    
+        ;invoke CreateZPlay
+        ;mov [zPlay], eax
+        ;invoke  ZPlayOpenFile,[zPlay], musicPath2,4
+        ;invoke  ZPlayPlay,[zPlay]
+
+        ;cominvk zplay,OpenFile,pName,1
+        ;cominvk zplay, Play
 
         invoke  ChoosePixelFormat, [hdc], pfd
         invoke  SetPixelFormat, [hdc], eax, pfd
@@ -61,38 +68,17 @@ proc Init uses esi
         stdcall Object.Create, car2, fileName2, textPath2
         ;stdcall Object.Create, nissan, fileNameN, textPathN
         stdcall Object.Create, table, fileNameT, textPathT
-        stdcall Object.Create, track, fileNameTr, textPathTr
         stdcall Object.Create, road, fileNameR, textPathR
-        stdcall Object.Create, sphere, fileNameS, textPathS
         stdcall Object.Create, arch, fileNameA, textPathA
         stdcall Object.Create, grass, fileNameG, textPathG
-
-
-        stdcall Quaternion.CreateFromAxisAngle, car, 0.0, 1.0, 0.0, 90.0
-        stdcall Quaternion.CreateFromAxisAngle, table, 0.0, 1.0, 0.0, 90.0
-        stdcall Quaternion.CreateFromAxisAngle, sphere, 0.0, 1.0, 0.0, 90.0
-        stdcall Quaternion.CreateFromAxisAngle, lamp, 0.0, 1.0, 0.0, 90.0
-        stdcall Quaternion.CreateFromAxisAngle, pens, 0.0, 1.0, 0.0, 90.0
-        stdcall Quaternion.CreateFromAxisAngle, books, 0.0, 1.0, 0.0, 90.0
-        stdcall Quaternion.CreateFromAxisAngle, track, 0.0, 1.0, 0.0, -90.0
-
-        stdcall Object.SetPosition, sphere, 0.0, 50.0, 0.0
-        stdcall Object.SetPosition, car, 0.0, 0.0, 0.0 
-        stdcall Object.SetPosition, lamp, 45.0, 50.0, -110.0
-        stdcall Object.SetPosition, pens, -30.0, 0.0, 120.0        
-        stdcall Object.SetPosition, books, 25.0, 0.0, 110.0 
-        stdcall Object.SetPosition, track, 0.0, -140.0, 50.0 
-        stdcall Object.SetPosition, table, 0.0, 100.0, 0.0
-        stdcall Object.SetRotation, track, 0.0, 90.0, 0.0 
-
+        stdcall Object.SetPosition, car2, -20.0, 0.0, 90.0  
         stdcall Object.SetPosition, grass, 0.0, 0.0, 0.0  
         ;stdcall Object.SetScale, car, 10.0, 10.0, 10.0
-        stdcall Object.SetScale, grass, 6.0, 6.0, 6.0
+   
+        stdcall Object.SetScale, table, 300.0, 50.0, 300.0
         stdcall Object.SetScale, arch, 0.4, 0.4, 0.4
-        stdcall Object.SetScale, books, 0.45, 0.45, 0.45
-        stdcall Object.SetScale, table, 50.0, 50.0, 50.0
-        stdcall Object.SetScale, pens, 2.0, 2.0, 2.0
-        stdcall Object.SetScale, track, 50.0, 50.0, 50.0
+
+    
         stdcall Object.SetPosition, table, 7.0, -163.0, 0.0
         ;stdcall Object.SetRotation, road, 20.0, -10.0, 0.0
         stdcall Object.InitModelMatrix, car
@@ -245,6 +231,7 @@ proc Init uses esi
         stdcall UI.SetActiveButton, menuButtons,0
 
         invoke CreateThread, 0, 0, SplashTimerThread, 0, 0, 0
+        
         ret
 endp
 
@@ -268,11 +255,13 @@ endp
 
 
 proc PhysicsThread, lpParam
+;invoke PlaySound, musicPath2, NULL, 1
 .loop: 
     invoke Sleep, 1
     stdcall Object.CheckLap, car
     mov [car.lapCount], eax
     stdcall Physics.Update, 0.07, cubeSpline, car
+     
     jmp .loop
 endp
 
@@ -299,6 +288,7 @@ proc DecrementThread, lpParam
     cmp [globalTimer], 0
     jg .threadLoop           
     mov [GAME_MODE], ENDGAME
+    mov [car.acceleration], 0
     invoke ExitThread, 0
 endp
 

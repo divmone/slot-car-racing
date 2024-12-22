@@ -84,21 +84,71 @@
         trackPointPosition3 Vector3 0.0, 0.0, 0.0
         trackPointPosition4 Vector3 0.0, 0.0, 0.0
 
+; cameraPosition1 Vector3         0.0, 0.0, 90.0
+; cameraDirPrev1  Vector3         60.66, 0.0, 90.0
+; cameraDirNext1  Vector3        -120.66, 0.0, 90.0
+
+; cameraPosition2 Vector3         0.0, 0.0, -110.0
+; cameraDirPrev2  Vector3        -120.66, 0.0, -110.0
+; cameraDirNext2  Vector3         60.66, 0.0, -110.0  
+
+; cameraPosition3 Vector3          0.0, 0.0, -10.0
+; cameraDirPrev3  Vector3          60.66, 0.0, -10.0
+; cameraDirNext3  Vector3         -60.66, 0.0, -10.0  
+
+; cameraPosition4 Vector3          0.0, 0.0, 10.0
+; cameraDirPrev4  Vector3         -60.66, 0.0, 10.0
+; cameraDirNext4  Vector3         60.66, 0.0, 10.0
+
+
 cameraPosition1 Vector3         0.0, 0.0, 90.0
-cameraDirPrev1  Vector3         60.66, 0.0, 90.0
-cameraDirNext1  Vector3        -60.66, 0.0, 90.0
+cameraDirPrev1  Vector3         0.0, 0.0, 0.0
+cameraDirNext1  Vector3         0.0, 0.0, 150.0
 
-cameraPosition2 Vector3         0.0, 0.0, -10.0
-cameraDirPrev2  Vector3        -60.66, 0.0, -10.0
-cameraDirNext2  Vector3         60.66, 0.0, -10.0  
+cameraPosition2 Vector3         -80.0, 0.0, 90.0
+cameraDirPrev2  Vector3        -80.0, 0.0, 150.0
+cameraDirNext2  Vector3        -80.0, 0.0, 40.0
 
-cameraPosition3 Vector3          0.0, 0.0, -110.0
-cameraDirPrev3  Vector3          60.66, 0.0, -110.0
-cameraDirNext3  Vector3         -60.66, 0.0, -110.0  
+cameraPosition3 Vector3         -150.0, 0.0, 90.0
+cameraDirPrev3  Vector3         -150.0, 0.0, 40.0
+cameraDirNext3  Vector3         -150.0, 0.0, 150.0
 
-cameraPosition4 Vector3         0.0, 0.0, -10.0
-cameraDirPrev4  Vector3        -60.66, 0.0, -10.0  
-cameraDirNext4  Vector3         60.66, 0.0, -10.0
+cameraPosition4 Vector3          -200.0, 0.0, 90.0
+cameraDirPrev4  Vector3          -200.0, 0.0, 150.0
+cameraDirNext4  Vector3          -200.0, 0.0, 0.0
+
+
+; cameraPosition6 Vector3         -130.0, 0.0, 0.0
+; cameraDirPrev6  Vector3        -130.0, 0.0, 0.0  
+; cameraDirNext6  Vector3         -130.0, 0.0, 0.0
+
+; cameraPosition7 Vector3         -70.0, 0.0,  10.0
+; cameraDirPrev7  Vector3        -70.0, 0.0,  10.0
+; cameraDirNext7  Vector3         -70.0, 0.0,  10.0
+
+; cameraPosition8 Vector3         0.0, 0.0, -10.0
+; cameraDirPrev8  Vector3        -60.66, 0.0, -10.0  
+; cameraDirNext8  Vector3         60.66, 0.0, -10.0
+
+; cameraPosition9 Vector3         0.0, 0.0, -10.0
+; cameraDirPrev9  Vector3        -60.66, 0.0, -10.0  
+; cameraDirNext9  Vector3         60.66, 0.0, -10.0
+
+; cameraPosition10 Vector3         0.0, 0.0, -10.0
+; cameraDirPrev10  Vector3        -60.66, 0.0, -10.0  
+; cameraDirNext10  Vector3         60.66, 0.0, -10.0
+        cubePoints:     Spline.Point    cameraPosition1, cameraDirPrev1, cameraDirNext1, 1.0
+                        Spline.Point    cameraPosition2, cameraDirPrev2, cameraDirNext2, 1.0
+                        Spline.Point    cameraPosition3, cameraDirPrev3, cameraDirNext3, 1.0
+                        Spline.Point    cameraPosition4, cameraDirPrev4, cameraDirNext4, 2.0
+                        ;Spline.Point    cameraPosition5, cameraDirPrev5, cameraDirNext5, 1.0
+        ;                 Spline.Point    cameraPosition6, cameraDirPrev6, cameraDirNext6, 1.0
+        ;                 Spline.Point    cameraPosition7, cameraDirPrev7, cameraDirNext7, 1.0
+        ;                 Spline.Point    cameraPosition8, cameraDirPrev8, cameraDirNext8, 1.0
+        ;                 Spline.Point    cameraPosition9, cameraDirPrev9, cameraDirNext9, 1.0
+        ;                 Spline.Point    cameraPosition10, cameraDirPrev10, cameraDirNext10, 1.0
+         cubeSpline      Spline          4, cubePoints, 1, 5.0
+
 
 Position1 Vector3         -1.65, 0.0,  91.11 
 DirPrev1  Vector3         59.00, 0.0, 91.11
@@ -160,13 +210,6 @@ rotationPoint1Next Vector4 0.0, 1.0, 0.0, 20.0
 rotationPoint2 Vector4     0.0, 1.0, 0.0, 90.0
 rotationPoint2Prev Vector4 0.0, 1.0, 0.0, 40.0
 rotationPoint2Next Vector4 0.0, 1.0, 0.0, 0.0
-
-        cubePoints:     Spline.Point    cameraPosition1, cameraDirPrev1, cameraDirNext1, 1.0
-                        Spline.Point    cameraPosition2, cameraDirPrev2, cameraDirNext2, 1.0
-                        Spline.Point    cameraPosition3, cameraDirPrev3, cameraDirNext3, 1.0
-                        Spline.Point    cameraPosition4, cameraDirPrev4, cameraDirNext4, 1.0
-
-        cubeSpline      Spline          4, cubePoints, 1, 4.0
 
         tracePoints1:   Spline.Point    Position1, DirPrev1, DirNext1, 1.0
                         Spline.Point    Position2, DirPrev2, DirNext2, 1.0
@@ -237,6 +280,82 @@ rotationPoint2Next Vector4 0.0, 1.0, 0.0, 0.0
         EXIT dd 0   
         activeMenu dd menuButtons
         isGameEnd dd 0
+         interface hrum,\
+          SetSettings,\
+          GetSettings ,\
+          GetVersion ,\
+          GetError ,\
+          GetErrorW,\
+          GetFileFormat,\
+          GetFileFormatW,\
+          EnumerateWaveOut,\
+          GetWaveOutInfo,\
+          GetWaveOutInfoW,\
+          SetWaveOutDevice,\
+          OpenFile,\
+          OpenFileW ,\
+          AddFile ,\
+          AddFileW ,\
+          OpenStream  ,\
+          PushDataToStream ,\
+          IsStreamDataFree ,\
+          GetDynamicStreamLoad ,\
+          GetStreamInfo ,\
+          GetStreamInfoW ,\
+          Close ,\
+          Play,\
+          PlayLoop,\
+          Seek ,\
+          ReverseMode ,\
+          Stop ,\
+          Pause  ,\
+          Resume ,\
+          GetPosition,\
+          SetMasterVolume ,\
+          SetPlayerVolume,\
+          GetMasterVolume ,\
+          GetPlayerVolume,\
+          GetBitrate,\
+          GetStatus ,\
+          MixChannels ,\
+          GetVUData ,\
+          SlideVolume ,\
+          EnableEqualizer,\
+          SetEqualizerPoints  ,\
+          GetEqualizerPoints,\
+          SetEqualizerParam ,\
+          GetEqualizerParam  ,\
+          SetEqualizerPreampGain ,\
+          GetEqualizerPreampGain ,\
+          SetEqualizerBandGain,\
+          GetEqualizerBandGain,\
+          LoadID3 ,\
+          LoadID3W ,\
+          LoadFileID3 ,\
+          LoadFileID3W,\
+          EnableEcho ,\
+          SetEchoParam ,\
+          GetEchoParam ,\
+          SetCallbackFunc,\
+          SetRate,\
+          GetRate ,\
+          SetPitch ,\
+          GetPitch,\
+          SetTempo ,\
+          GetTempo ,\
+          StereoCut,\
+          Release ,\
+          DetectBPM,\
+          DetectFileBPM,\
+          DetectFileBPMW ,\
+          GetFFTData ,\
+          DrawFFTGraphOnHDC ,\
+          DrawFFTGraphOnHWND ,\
+          SetFFTGraphParam ,\
+          GetFFTGraphParam
+                   
+        pName       db 's.wav',0   
+        zPlay hrum
 
         include         "Init.asm"
         include         "Mesh.asm"
@@ -263,6 +382,8 @@ rotationPoint2Next Vector4 0.0, 1.0, 0.0, 0.0
         include         "Physics.asm"
         include         "2D.asm"
         include         "Button.asm"
+
+   
 
 proc WinMain
 
@@ -323,7 +444,7 @@ proc WindowProc uses ebx,\
 .Paint:
     switch [GAME_MODE]
     case .RenderSplashScreen, SPLASHSCREEN
-    case .RenderMainMenu, MAINMENU
+    case .RenderMainMenu  , MAINMENU
     case .RenderMainMenu, SELECTMENU
     case .RenderMainMenu, SELECTMODE
     case .RenderMenu, PAUSEMENU
@@ -367,10 +488,12 @@ proc WindowProc uses ebx,\
         case .Enter, VK_RETURN
     jmp     .ReturnZero
 .Enter:
+    invoke PlaySound, musicPath1, NULL, 1
     stdcall Button.Press, [activeButton]
     stdcall UI.SetActiveButton, [activeMenu], 0
     jmp .ReturnZero
 .IncActiveButton:
+    invoke PlaySound, musicPath, NULL, 1
     cmp [GAME_MODE], SELECTMODE
     je @F
     cmp [GAME_MODE], MAINMENU
@@ -391,6 +514,7 @@ proc WindowProc uses ebx,\
     stdcall UI.SetActiveButton,[activeMenu], [activeButton]
     jmp .ReturnZero
 .DecActiveButton:
+    invoke PlaySound, musicPath, NULL, 1
     cmp [GAME_MODE], SELECTMODE
     je @F
     cmp [GAME_MODE], MAINMENU
@@ -429,12 +553,17 @@ proc WindowProc uses ebx,\
     stdcall Object.Respawn, car2
     jmp .ReturnZero
 .Speed2:
+    cmp [GAME_MODE], ENDGAME
+    je .ReturnZero
     stdcall Object.SetAcceleration, car2
     jmp     .ReturnZero
 .Speed:
+    cmp [GAME_MODE], ENDGAME
+    je .ReturnZero
     stdcall Object.SetAcceleration, car
     jmp     .ReturnZero
 .GoToMenu:
+    invoke PlaySound, musicPath1, NULL, 1
     stdcall UI.SetDeactiveButton, [activeMenu],[activeButton]
     stdcall UI.Pause
     stdcall UI.SetActiveButton, [activeMenu], 0

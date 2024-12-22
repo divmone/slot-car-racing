@@ -41,7 +41,6 @@ proc UI.DrawMainMenu uses esi, buttons
     invoke glBindTexture, GL_TEXTURE_2D, [depthMap]
     stdcall RenderScene, [program]
 
-
     invoke glUseProgram, [program2D]
     invoke glEnable, GL_ALPHA_TEST
   
@@ -402,16 +401,36 @@ endp
 
 
 proc UI.Pause
-      cmp [GAME_MODE], GAME
-      je @F
-      mov [GAME_MODE], GAME
-      stdcall UI.EndRender
-      
-      ret
-@@:
-      mov [GAME_MODE], PAUSEMENU
-      stdcall UI.StartRender
-    ret
+      switch [GAME_MODE]
+     case .SelectMenu, SELECTMENU
+     case .MainMenu, MAINMENU
+     case .PauseMenu, PAUSEMENU
+     case .SelestMode, SELECTMODE
+     case .GameMode, GAME
+.SelectMenu:
+  mov [GAME_MODE], MAINMENU
+  mov eax,  menuButtons
+  mov [activeMenu], eax
+  ret
+.MainMenu:
+   invoke HeapDestroy, [hHeap]
+  invoke CloseHandle, [logFile]
+     invoke ExitProcess, ebx 
+  ret
+.PauseMenu:
+  mov [GAME_MODE], GAME
+  mov eax,  menuButtons
+  mov [activeMenu], eax
+  ret
+.SelestMode:
+  mov [GAME_MODE], SELECTMENU
+  mov eax,  selectModeButtons
+  mov [activeMenu], eax
+  ret
+.GameMode:
+  mov [GAME_MODE], PAUSEMENU
+  ret
+
 endp
 
 proc UI.Unpause
