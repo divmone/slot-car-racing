@@ -741,7 +741,7 @@ proc Matrix.CreateScale uses esi edi, scaleC, scaleM
   ret
 endp
 
-proc Matrix.Multiply4x4 uses ebx ecx edx, matrix1, matrix2, matrix_res 
+proc Matrix.Multiply4x4 uses ebx esi, matrix1, matrix2, matrix_res 
 
    locals
      temp    dd     ?

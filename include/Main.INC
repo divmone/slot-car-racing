@@ -32,6 +32,7 @@ entry   WinMain
         include         "Light.inc"
         include         "Physics.inc"
         include         "2D.inc"
+        include         "UI.inc"
 
 macro switch value
 {
@@ -64,11 +65,6 @@ macro malloc [arg]
 {
     invoke  HeapAlloc, [hHeap], ebx, arg
 }  
-
-        include         "Plane.inc"
-         include         "Cube.inc"
-         include         "zhiguli.inc"
-
 
         true            =       1
         false           =       0

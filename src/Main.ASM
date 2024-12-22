@@ -49,9 +49,6 @@
 
         drawingMode      dd              4
 
-        plane           Mesh            planeVertices, 0, 0, PLANE_VERTICES_COUNT
-
-
         zero            GLfloat         0.0
         fovY            GLfloat         70.0
         zNear           GLfloat         0.1
@@ -220,7 +217,7 @@ rotationPoint2Next Vector4 0.0, 1.0, 0.0, 0.0
         tempTime dd 0.0
         ;content db 108 dup(0) 
         temp dd ?
-        GAME_MODE dd 2
+        GAME_MODE dd SPLASHSCREEN
         five dd 1.0
         KEY_PRESSED dd -1
         START_CRASH dd 0
@@ -233,7 +230,13 @@ rotationPoint2Next Vector4 0.0, 1.0, 0.0, 0.0
         instanseAmount dd ?
         counter dd 0
         globalTimer dd 100
-        
+        hThread    dd 0                
+        dwThreadId dd 0  
+        lapCountStr dd ?
+        globalTimerStr dd  ? 
+        EXIT dd 0   
+        activeMenu dd menuButtons
+        isGameEnd dd 0
 
         include         "Init.asm"
         include         "Mesh.asm"
@@ -270,6 +273,7 @@ proc WinMain
         xor     ebx, ebx
         
         stdcall Init
+
         lea     esi, [msg]
 
 .cycle:
@@ -280,32 +284,30 @@ proc WinMain
 
 endp
 
+proc RenderThreadProc
+   
+
+
+    ret
+endp
+
 proc WindowProc uses ebx,\
      hWnd, uMsg, wParam, lParam
 
     xor     ebx, ebx
     
     switch  [uMsg]
-    case    .Paint,         WM_PAINT
+    
     case    .Destroy,       WM_DESTROY
     case    .KeyDown,       WM_KEYDOWN
     case    .KeyUp,         WM_KEYUP
     case    .MouseWheel,    WM_MOUSEWHEEL
-    case    .Create,        WM_CREATE
-    case    .Timer,         WM_TIMER
+    case    .Paint,         WM_PAINT
+    
 
     invoke  DefWindowProc, [hWnd], [uMsg], [wParam], [lParam]
     jmp     .Return
 
-.Timer:
-    cmp [wParam], 1001  
-    jne .ReturnZero   
-    dec [globalTimer]
-    jmp .ReturnZero
-
-
-.Create:
-    invoke SetTimer, [hWnd], 1001, 1000, NULL
 .KeyUp:
     switch [wParam]
         case .ResetAcceleration1, VK_A
@@ -319,24 +321,33 @@ proc WindowProc uses ebx,\
     stdcall Object.ResetAcceleration, car2
     jmp .ReturnZero
 .Paint:
-    cmp [GAME_MODE], 2
-    je .RenderMainMenu
-    cmp [GAME_MODE], 1
-    je .RenderMenu
+    switch [GAME_MODE]
+    case .RenderSplashScreen, SPLASHSCREEN
+    case .RenderMainMenu, MAINMENU
+    case .RenderMainMenu, SELECTMENU
+    case .RenderMainMenu, SELECTMODE
+    case .RenderMenu, PAUSEMENU
+    case .RenderGame, GAME
+    case .RenderEndGame, ENDGAME
+    
 
-    stdcall Object.CheckLap, car
-    add [car.lapCount], eax
-    stdcall Physics.Update, 0.07, cubeSpline, car
-    stdcall Physics.Update, 0.07, cubeSpline, car2
+.RenderSplashScreen:
+    stdcall DrawSplashScreen
+    jmp .RenderCommon
+.RenderGame:
     stdcall Draw
     jmp .RenderCommon
 .RenderMainMenu:
-    stdcall UI.DrawMainMenu
+    stdcall UI.DrawMainMenu, [activeMenu]
     jmp .RenderCommon
 .RenderMenu:
     stdcall Draw
-    stdcall DrawMenu
-
+    stdcall DrawMenu, [activeMenu]
+    jmp .RenderCommon
+.RenderEndGame:
+    stdcall Draw
+    stdcall DrawEndGame
+    ;stdcall DrawMenu, [activeMenu]
 .RenderCommon:
     invoke SwapBuffers, [hdc]
     jmp .ReturnZero
@@ -357,43 +368,61 @@ proc WindowProc uses ebx,\
     jmp     .ReturnZero
 .Enter:
     stdcall Button.Press, [activeButton]
-    stdcall UI.SetActiveButton, 0
+    stdcall UI.SetActiveButton, [activeMenu], 0
     jmp .ReturnZero
 .IncActiveButton:
-    cmp [GAME_MODE], 2
+    cmp [GAME_MODE], SELECTMODE
     je @F
-
-    cmp [GAME_MODE], 1
+    cmp [GAME_MODE], MAINMENU
+    je @F
+    cmp [GAME_MODE], SELECTMENU
+    je @F
+    cmp [GAME_MODE], PAUSEMENU
     jne .ReturnZero
 @@:
-    stdcall UI.SetDeactiveButton, [activeButton]
+    stdcall UI.SetDeactiveButton,[activeMenu], [activeButton]
     cmp [activeButton], 1
     ja @f
     inc [activeButton]
-    stdcall UI.SetActiveButton, [activeButton]
+    stdcall UI.SetActiveButton, [activeMenu],[activeButton]
     jmp .ReturnZero
 @@:
     mov [activeButton], 0
-    stdcall UI.SetActiveButton, [activeButton]
+    stdcall UI.SetActiveButton,[activeMenu], [activeButton]
     jmp .ReturnZero
 .DecActiveButton:
-    cmp [GAME_MODE], 2
+    cmp [GAME_MODE], SELECTMODE
     je @F
-
-    cmp [GAME_MODE], 1
+    cmp [GAME_MODE], MAINMENU
+    je @F
+    cmp [GAME_MODE], SELECTMENU
+    je @F
+    cmp [GAME_MODE], PAUSEMENU
     jne .ReturnZero
 @@:
-    stdcall UI.SetDeactiveButton, [activeButton]
+    stdcall UI.SetDeactiveButton, [activeMenu],[activeButton]
+ 
     cmp [activeButton], 1
     jb @f
     dec [activeButton]
-    stdcall UI.SetActiveButton, [activeButton]
+
+    stdcall UI.SetActiveButton,[activeMenu], [activeButton]
     jmp .ReturnZero
 @@:
     mov [activeButton], 2
-    stdcall UI.SetActiveButton, [activeButton]
+    stdcall UI.SetActiveButton, [activeMenu], [activeButton]
     jmp .ReturnZero
 .Respawn1:
+    switch [GAME_MODE]
+    case .1, GAME
+    case .2, ENDGAME
+.1:
+    stdcall Object.Respawn, car
+    jmp .ReturnZero
+.2:
+    mov [GAME_MODE], SELECTMENU
+    mov eax,  selectModeButtons
+    mov [activeMenu], eax
     stdcall Object.Respawn, car
     jmp .ReturnZero
 .Respawn2:
@@ -406,9 +435,9 @@ proc WindowProc uses ebx,\
     stdcall Object.SetAcceleration, car
     jmp     .ReturnZero
 .GoToMenu:
-    stdcall UI.SetDeactiveButton, [activeButton]
+    stdcall UI.SetDeactiveButton, [activeMenu],[activeButton]
     stdcall UI.Pause
-    stdcall UI.SetActiveButton, 0
+    stdcall UI.SetActiveButton, [activeMenu], 0
     jmp     .ReturnZero
 .ChangeCameraMode:  ;W
     cmp [CAMERA_MODE], 0
@@ -431,10 +460,10 @@ proc WindowProc uses ebx,\
     jmp     .ReturnZero    
 .SelectDrawMode:
     cmp [drawingMode], 1
-    je  .setFour
+    je  .SetFour
     mov [drawingMode], 1
     jmp @F    
-.setFour:
+.SetFour:
     mov [drawingMode], 4
 
 @@:
@@ -444,6 +473,7 @@ proc WindowProc uses ebx,\
     invoke HeapDestroy, [hHeap]
     invoke CloseHandle, [logFile]
     invoke ExitProcess, ebx
+    mov [EXIT], 1
 
 .ReturnZero:
     xor     eax, eax

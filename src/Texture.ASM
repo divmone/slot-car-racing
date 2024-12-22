@@ -24,7 +24,7 @@ proc Texture.Create ,textPath
     ret
 endp
 
-proc Texture.CreateRGBA ,textPath
+proc Texture.CreateRGBA ,textPath, width, height
     locals
         temp dd 0 
         texture GLuint 0  
@@ -34,7 +34,7 @@ proc Texture.CreateRGBA ,textPath
     invoke glGenTextures, 1, eax
     invoke glBindTexture, GL_TEXTURE_2D, [texture]
     
-    invoke glTexImage2D, GL_TEXTURE_2D, 0, GL_RGBA,  512, 512, 0, GL_RGBA, GL_UNSIGNED_BYTE, [textPath]  
+    invoke glTexImage2D, GL_TEXTURE_2D, 0, GL_RGBA,  [width], [height], 0, GL_RGBA, GL_UNSIGNED_BYTE, [textPath]  
         invoke glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE
         invoke glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE
         invoke glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR

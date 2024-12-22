@@ -1,8 +1,8 @@
-proc UI.DrawMainMenu 
+proc UI.DrawMainMenu uses esi, buttons
   locals
-    ten dd 100.0
+    ten dd 1000.0
   endl
-    stdcall	 GetRandomNumber, 1, 5
+    stdcall	 GetRandomNumber, 1, 30
     mov [car.acceleration], eax
     fild [car.acceleration]
     fdiv [ten]
@@ -46,11 +46,13 @@ proc UI.DrawMainMenu
     invoke glEnable, GL_ALPHA_TEST
   
     invoke glUniformMatrix4fv, [projectionLocation2D], 1, GL_FALSE, projection2D
-        stdcall Button.Draw, startButton
-        stdcall Button.Draw, settingsButton
-        stdcall Button.Draw, exitButton
-        stdcall Sprite.DrawText, R1, logoMessage, -7.0, 8.0, WHITE_COLOR
-    
+        mov esi, [buttons]
+
+    stdcall Button.Draw, [esi]
+    stdcall Button.Draw, [esi + 4]
+    stdcall Button.Draw, [esi + 8]
+     stdcall Sprite.Draw2, carRect
+        stdcall Sprite.DrawText, R1, logoMessage, -9.0, 7.0, WHITE_COLOR, 1.2
         invoke glDisable, GL_ALPHA_TEST
 
     ret
@@ -104,12 +106,12 @@ proc Rectangle.Init uses esi, objPtr
   ret
 endp
 
-proc UI.SetActiveButton uses esi, number
+proc UI.SetActiveButton uses esi, buttons, number
    
     mov eax, [number] 
     shl eax, 2        
             
-    mov esi, menuButtons
+    mov esi, [buttons]
     add esi, eax      
 
     mov eax, [esi]    
@@ -118,15 +120,18 @@ proc UI.SetActiveButton uses esi, number
     
     mov [esi + Button.isActive], 1
     mov [esi + Button.textColor], WHITE_COLOR  
-
+    stdcall Object.SetPosition, carRect, 0.0, [esi + Button.position.y], 0.0
+    ;stdcall Rectangle.Create, carRect, -10.0, [esi + Button.position.y], 1.0, 1.0
+   
+           
     ret
 endp
 
-proc UI.SetDeactiveButton uses esi, number
+proc UI.SetDeactiveButton uses esi, buttons,  number
     mov eax, [number]   
     shl eax, 2          
     
-    mov esi, menuButtons
+    mov esi, [buttons]
         
     mov eax, [esi + eax]      
     mov esi, eax        
@@ -397,14 +402,14 @@ endp
 
 
 proc UI.Pause
-      cmp [GAME_MODE], 0
+      cmp [GAME_MODE], GAME
       je @F
-      mov [GAME_MODE], 0
+      mov [GAME_MODE], GAME
       stdcall UI.EndRender
       
       ret
 @@:
-      mov [GAME_MODE], 1
+      mov [GAME_MODE], PAUSEMENU
       stdcall UI.StartRender
     ret
 endp

@@ -30,6 +30,7 @@ modelName2D db                    "model2D", 0
 modelLocation2D GLint             ?
 modelLocation2 GLint             ?
 modelLocation3 GLint             ?
+modelLocationSprite GLint             ?
 
 projectionName db                    "projection", 0
 projectionLocation GLint             ?
@@ -45,6 +46,7 @@ colorNameLocation GLint  ?
 
 projectionName2D db                    "projection2D", 0
 projectionLocation2D GLint             ?
+projectionLocation2DSprite GLint             ?
 
 
 texName db "tex", 0
@@ -87,3 +89,9 @@ roadVShaderFile    db   "../shaders/roadV.glsl", 0
 roadFShader   GLuint    0
 roadFShaderFile    db   "../shaders/roadF.glsl", 0        
 
+spriteShader    dd   0
+spriteVShader   GLuint    0
+spriteVShaderFile    db   "../shaders/spriteV.glsl", 0        
+
+spriteFShader   GLuint    0
+spriteFShaderFile    db   "../shaders/spriteF.glsl", 0   

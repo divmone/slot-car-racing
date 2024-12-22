@@ -231,25 +231,25 @@ proc Object.ResetAcceleration uses esi, objPtr
     ret
 endp
 
-proc Track.InitArray uses esi edi ebx
+proc Grass.InitArray uses esi edi ebx
     locals
-        tempTime dd 0.0
-        step dd 0.05
-        maxB dd 4.0
+        width dd 100
+        height dd 100
         size dd ?
         buffer dd ?
         vbo dd ?
         sizeOfArr dd ?
     endl
-    fld [maxB]
-    fdiv [step]
-    fist [instanseAmount]
-    fistp [size]
+    xor edx, edx
+    mov ecx, [width]
+    mov eax, [height]
+    mul ecx
+
 
     mov eax, [size]
     xor edx, edx
     mov ecx, sizeof.Matrix4x4
-    mul eax
+    mul ecx
     mov [sizeOfArr], eax
     malloc eax 
     mov [buffer], eax
@@ -291,65 +291,87 @@ proc Track.InitArray uses esi edi ebx
     ret
 endp
 
-proc Object.CheckLap uses esi , objPtr
+proc Track.InitArray uses esi edi ebx
     locals
-        t dd 0.01   
+        tempTime dd 0.0
+        step dd 0.01
+        maxB dd 4.0
+        size dd ?
+        buffer dd ?
+        vbo dd ?
+        sizeOfArr dd ?
     endl
+    fld [maxB]
+    fdiv [step]
+    fist [instanseAmount]
+    fistp [size]
+
+    mov eax, [size]
+    xor edx, edx
+    mov ecx, sizeof.Matrix4x4
+    mul ecx
+    mov [sizeOfArr], eax
+    malloc eax 
+    mov [buffer], eax
+
+    mov ebx, [buffer]
+    mov ecx, [size]
     
-    mov eax, 1                           
-    ret
+.loop:
+    push ecx
+    stdcall Spline.GetPoint, cubeSpline, road.transform.position, [tempTime] 
+    stdcall Spline.GetRotation, cubeSpline, road, [tempTime]                                                                              
+    stdcall Matrix.CreateModel, road   
+    memcpy ebx, model, 64
+    add ebx, sizeof.Matrix4x4
 
-@@:
-    xor eax, eax                          
+    fld [tempTime]
+    fadd [step]
+    fstp [tempTime]
+
+    pop ecx
+    loop .loop
+
+    lea eax, [vbo]
+    invoke glGenBuffers, 1, eax
+    invoke glBindBuffer, GL_ARRAY_BUFFER, [vbo]
+
+    invoke glBufferData, GL_ARRAY_BUFFER, [sizeOfArr], [buffer], GL_STATIC_DRAW
+    invoke  HeapFree, [hHeap], ebx, [buffer]
+    invoke glBindVertexArray, [road.VAO]
+    invoke glEnableVertexAttribArray, 3 
+    invoke glVertexAttribPointer, 3, 4, GL_FLOAT, GL_FALSE, sizeof.Matrix4x4, 0
+    invoke glEnableVertexAttribArray, 4
+    invoke glVertexAttribPointer, 4, 4, GL_FLOAT, GL_FALSE, sizeof.Matrix4x4, 16
+    invoke glEnableVertexAttribArray, 5
+    invoke glVertexAttribPointer, 5, 4, GL_FLOAT, GL_FALSE, sizeof.Matrix4x4, 32
+    invoke glEnableVertexAttribArray, 6
+    invoke glVertexAttribPointer, 6, 4, GL_FLOAT, GL_FALSE, sizeof.Matrix4x4, 48
+    invoke glVertexAttribDivisor, 3, 1
+    invoke glVertexAttribDivisor, 4, 1
+    invoke glVertexAttribDivisor, 5, 1
+    invoke glVertexAttribDivisor, 6, 1
+    invoke glBindVertexArray, 0
     ret
 endp
 
-proc Button.Create uses esi, objPtr, x, y, message, buttonColor, textColor
+proc Object.CheckLap uses esi, objPtr
     locals
-        length dd ?
+        oldState dw ?
+        newState dw ?
+        laps dd 0 
     endl
-    mov esi, [objPtr]
-    add esi, Button.messageRect
-    stdcall Rectangle.Create, esi, 0.0, 0.0, 1.0, 1.0
-    stdcall Object.SetPosition, esi, [x], [y], 0.0
-    mov esi, [objPtr]
-    stdcall Texture.CreateRGBA, fontTexture
-    mov [esi + Button.messageRect.texture], eax 
-
-    stdcall GetStringLength, [message]
-    mov [length], eax
-    fild [length]
-    fstp [length]
-    mov esi, [objPtr]
-    add esi, Button.buttonRect
-    stdcall Rectangle.Create, esi, 0.0, 0.0, 8.0, 1.0
-    stdcall Object.SetPosition, esi, [x], [y], 0.0
-    mov esi, [objPtr]
-    stdcall Texture.Create, buttonTexture
-    mov [esi + Button.buttonRect.texture], eax 
-    mov eax, [message]
-    mov [esi + Button.message], eax
-    mov eax, [x]
-    mov [esi + Button.position.x], eax
-    mov eax, [y]
-    mov [esi + Button.position.y], eax
-
-    mov eax, [buttonColor]
-    mov [esi + Button.buttonColor], eax
-    mov eax, [textColor]
-    mov [esi + Button.textColor], eax
 
 
-
-    ret
-endp
-
-proc Button.Draw uses esi, objPtr
-    mov esi, [objPtr]
-    lea eax, [esi + Button.messageRect]
-    stdcall Sprite.DrawText, eax, [esi + Button.message], [esi + Button.position.x], [esi + Button.position.y], [esi + Button.textColor]
-    lea eax, [esi + Button.buttonRect]
-    stdcall Sprite.Draw, eax, [esi + Button.buttonColor]
-  
+    fstcw [oldState]    
+    mov ax, [oldState]  
+    or ax, 0c00h        
+    mov [newState], ax  
+    fldcw [newState]    
+    fld [car.positionOnSpline] 
+    fdiv [cubeSpline.time]
+    fistp [laps]      
+    fldcw [oldState] 
+    mov eax, [laps]
     ret
 endp

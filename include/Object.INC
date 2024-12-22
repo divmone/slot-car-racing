@@ -99,16 +99,31 @@ arch Object
 fileNameA db  "../models/ballooons.obj",0 
 textPathA        db    "../textures/ui.bmp", 0 
 
+grass Object
+fileNameG db  "../models/grass.obj",0 
+textPathG        db    "../textures/grass.bmp", 0 
 
 R1 Object
 r1Message db "123", 0 
 R2 Object
 R3 Object
+R4 Object
+R5 Object
 
 startButton Button
 exitButton Button
 settingsButton Button
 
+timeGameButton Button
+botGameButton Button
+driveAtarGameButton Button
+
+firstModeButton Button
+secondModeButton Button
+thirdModeButton Button
+
+modesButtons dd firstModeButton, secondModeButton, thirdModeButton
+selectModeButtons dd timeGameButton, botGameButton, driveAtarGameButton
 menuButtons dd startButton, settingsButton, exitButton
 
 
@@ -127,6 +142,9 @@ t4 Vector4
 testVector Vector3 1.0, 2.0, 3.0
 
 testObj Object
+
+splashRect Object
+carRect Object
 
 positionOnSpline2 dd 0.0
 positionOnSpline dd 0.0

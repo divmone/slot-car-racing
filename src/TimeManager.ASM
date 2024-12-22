@@ -64,3 +64,25 @@ proc TimeManager.UpdateFPS
     fstp st0
     ret
 endp
+
+proc Timer.proc
+    dec [globalTimer]
+
+    xor eax, eax
+    ret
+endp
+
+proc    _TimerProc hWnd, IdEvent, uElapse, dwTime
+        push    esi edi ebx
+        dec [globalTimer]
+        pop     ebx edi esi
+        ret
+endp
+
+proc Timerproc HWND,uint1,uint2,uint3
+     invoke MessageBox,0,.txt ,0,0
+     ret
+.txt db 'buttn Timerproc0',0,0
+endp
+; (...)
+       

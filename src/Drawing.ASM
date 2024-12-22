@@ -1,4 +1,4 @@
-proc Draw     
+proc Draw   
     stdcall Matrix.LookAt2, lightPosition, car.transform.position, upVector, view1
     stdcall Matrix.Multiply4x4, view1, lightProjection,  lightSpaceMatrix
     
@@ -33,24 +33,33 @@ proc Draw
     invoke glEnable, GL_ALPHA_TEST
     invoke glClear, GL_DEPTH_BUFFER_BIT
     invoke glUniformMatrix4fv, [projectionLocation2D], 1, GL_FALSE, projection2D
-        stdcall IntToStr, [car.lapCount] 
-        stdcall Sprite.DrawText, R2, eax, -9.0, 9.0, WHITE_COLOR
+        stdcall Sprite.DrawText, R2, [lapCountStr], -9.0, 9.0, WHITE_COLOR, 1.0
+        stdcall Sprite.DrawText, R2, [globalTimerStr], -3.0, 9.0, WHITE_COLOR, 1.0
+
         invoke glDisable, GL_ALPHA_TEST
         ;stdcall Sprite.Draw, R1, ORANGE_COLOR
     ret
 endp
 
 
-proc DrawMenu
+proc DrawMenu uses esi, buttons
 
     invoke glUseProgram, [program2D]
     invoke glEnable, GL_ALPHA_TEST
     invoke glClear, GL_DEPTH_BUFFER_BIT
     invoke glUniformMatrix4fv, [projectionLocation2D], 1, GL_FALSE, projection2D
-        stdcall Button.Draw, startButton
-        stdcall Button.Draw, settingsButton
-        stdcall Button.Draw, exitButton
-        invoke glDisable, GL_ALPHA_TEST
+    
+
+    mov esi, [buttons]
+
+    stdcall Button.Draw, [esi]
+    stdcall Button.Draw, [esi + 4]
+    stdcall Button.Draw, [esi + 8]
+    stdcall Sprite.Draw2, carRect
+      
+    invoke glDisable, GL_ALPHA_TEST
+   
+  
         ;stdcall Sprite.Draw, R1, ORANGE_COLOR
     
     ret
@@ -91,11 +100,33 @@ proc DrawMainMenu
     stdcall Object.Draw, car,  [shader]      
     stdcall Object.Draw, table, [shader] 
 
-    stdcall DrawMenu
+    stdcall DrawMenu, menuButtons
 
     ret
 endp
 
+proc DrawEndGame
+    invoke glUseProgram, [program2D]
+    invoke glEnable, GL_ALPHA_TEST
+    invoke glClear, GL_DEPTH_BUFFER_BIT
+    invoke glUniformMatrix4fv, [projectionLocation2D], 1, GL_FALSE, projection2D
+    stdcall Sprite.DrawText, R2, finalMessage, -10.0, 0.0, WHITE_COLOR, 1.0
+    stdcall Sprite.DrawText, R2, [lapCountStr], 3.5, 0.0, WHITE_COLOR, 1.0
+    stdcall Sprite.DrawText, R3, restartMessage, -9.0, -9.0, WHITE_COLOR, 0.7
+    invoke glDisable, GL_ALPHA_TEST
+    ret
+endp
+
+proc DrawSplashScreen
+    invoke  glClearColor, 0.6, 0.6, 1.0, 1.0
+    invoke glUseProgram, [program2D]
+    invoke glEnable, GL_ALPHA_TEST
+    invoke glClear, GL_DEPTH_BUFFER_BIT
+    invoke glUniformMatrix4fv, [projectionLocation2D], 1, GL_FALSE, projection2D
+    stdcall Sprite.Draw, splashRect, splachColor
+    invoke glDisable, GL_ALPHA_TEST
+    ret
+endp
 proc RenderScene uses esi, shader
     locals 
         dist dd 10.0
@@ -104,9 +135,6 @@ proc RenderScene uses esi, shader
     endl  
           
     ;invoke CreateThread, 0, 0, ThreadWrapper, arg, 0, threadId
-
-    cmp [CAMERA_MODE], 1
-    jne @F
     fldpi
     fmul [tempAngle3]
     fdiv [toDegree]
@@ -128,10 +156,10 @@ proc RenderScene uses esi, shader
     
     stdcall Object.Draw, road, [shader]
     stdcall Object.Draw, car,  [shader] 
-    stdcall Object.Draw, car2,  [shader]       
+    stdcall Object.Draw, grass,  [shader]       
     stdcall Object.Draw, table, [shader] 
     stdcall Object.Draw, track, [shader]
-    stdcall Object.Draw, arch, [shader] 
+    stdcall Object.Draw, arch, [shader]
     
     ret
 endp
@@ -195,9 +223,23 @@ proc Sprite.Draw uses esi, objPtr, color
     ret
 endp
 
+proc Sprite.Draw2 uses esi, objPtr
+
+    stdcall Matrix.CreateModel, [objPtr]
+    invoke glUseProgram, [spriteShader]
+    invoke glUniformMatrix4fv, [modelLocationSprite], 1, GL_FALSE, model
+    invoke glUniformMatrix4fv, [projectionLocation2DSprite], 1, GL_FALSE, projection2D
+    mov esi, [objPtr]
+    invoke glActiveTexture, GL_TEXTURE0
+    invoke glBindTexture, GL_TEXTURE_2D, [esi + Object.texture]
+    invoke glBindVertexArray, [esi + Object.VAO]
+            invoke  glDrawArrays, 6, 0, 6
+    ret
+endp
+
 
 proc Sprite.DrawText uses esi edi ebx,\
-                    objPtr, text, x, y, color
+                    objPtr, text, x, y, color, step
 
     locals
       tao dd ?
@@ -212,7 +254,6 @@ proc Sprite.DrawText uses esi edi ebx,\
       top dd ?
       bottom dd ?
       xpos dd 0.0
-      step dd 1.0
     endl
     
     mov esi, [objPtr]

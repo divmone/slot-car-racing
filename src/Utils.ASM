@@ -364,13 +364,13 @@ proc FloatToStr uses esi, value, precision
     ret
 endp
 
-proc	GetRandomNumber	minValue, maxValue
+proc   GetRandomNumber	minValue, maxValue
 	push		ebx ecx edx
 	mov		eax, [seed]
 	or		eax, eax
 	jnz		@2
 @1:
-	invoke		GetTickCount 
+	invoke	GetTickCount 
 	or		eax, eax
 	jz		@1
 @2:
