@@ -151,6 +151,8 @@ testObj Object
 
 splashRect Object
 carRect Object
+settingsRect Object
+isCommingSoonRect Object
 
 positionOnSpline2 dd 0.0
 positionOnSpline dd 0.0

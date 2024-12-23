@@ -8,16 +8,18 @@ proc Button.Press, index
      case .Exit, 2
 .Start: 
      switch [GAME_MODE]
+     case .SettingsMode1, SETTINGS
      case .SelectMenu, SELECTMENU
      case .MainMenu, MAINMENU
      case .PauseMenu, PAUSEMENU
      case .SelestMode, SELECTMODE
      case .GameMode, GAME
+     .SettingsMode1:
+          ret
      .SelectMenu:
           mov eax,  modesButtons
           mov [activeMenu], eax
           mov [GAME_MODE], SELECTMODE
-
           ret
      .MainMenu:
           mov [GAME_MODE], SELECTMENU
@@ -28,42 +30,39 @@ proc Button.Press, index
           mov [GAME_MODE], GAME
           ret
      .SelestMode:
-          mov [GAME_MODE], GAME
-          mov eax,  menuButtons
-          mov [activeMenu], eax
-          mov [globalTimer], 30
-          mov [car.acceleration], 0.0
-          mov [car.speed], 0.0
-          mov [car.positionOnSpline], 0.0
-          
-          invoke CreateThread, 0, 0, DecrementThread, 0, 0, 0
+          stdcall Button.selectMode, 30
      .GameMode:
+     
 
           ret
 
 .Settings: 
      switch [GAME_MODE]
+     case .SettingsMode, SETTINGS
      case .SelectMenu1, SELECTMENU
      case .MainMenu1, MAINMENU
      case .PauseMenu1, PAUSEMENU
      case .SelestMode1, SELECTMODE
-      case .GameMode1, GAME
+     case .GameMode1, GAME
+     .SettingsMode:
+          
+          ret
      .SelectMenu1:
+          mov [isBotGame], 1
+          mov [GAME_MODE], SELECTMODE
+          mov eax, modesButtons
+          mov [activeMenu], eax
           ret
      .MainMenu1:
+          mov [GAME_MODE], SETTINGS
+          mov [fromMainMenu], 1
           ret
      .PauseMenu1:
+          mov [GAME_MODE], SETTINGS
+          mov [fromMainMenu], 0
           ret
      .SelestMode1:
-     
-          mov [GAME_MODE], GAME
-          mov eax,  menuButtons
-          mov [activeMenu], eax
-          mov [globalTimer], 60
-             mov [car.acceleration], 0.0
-          mov [car.speed], 0.0
-          mov [car.positionOnSpline], 0.0
-          invoke CreateThread, 0, 0, DecrementThread, 0, 0, 0
+     stdcall Button.selectMode, 60
           ret
 
           .GameMode1:
@@ -73,11 +72,14 @@ proc Button.Press, index
      ret
 .Exit:
      switch [GAME_MODE]
+     case .SettingsMode2, SETTINGS
      case .SelectMenu2, SELECTMENU
      case .MainMenu2, MAINMENU
      case .PauseMenu2, PAUSEMENU
      case .SelestMode2, SELECTMODE
      case .GameMode2, GAME
+     .SettingsMode2:
+          ret
      .SelectMenu2:
           ret
      .MainMenu2:
@@ -88,15 +90,7 @@ proc Button.Press, index
      mov [GAME_MODE], MAINMENU
           ret
      .SelestMode2:
-     
-          mov [GAME_MODE], GAME
-          mov eax,  menuButtons
-          mov [activeMenu], eax
-          mov [globalTimer], 120
-             mov [car.acceleration], 0.0
-          mov [car.speed], 0.0
-          mov [car.positionOnSpline], 0.0
-          invoke CreateThread, 0, 0, DecrementThread, 0, 0, 0
+          stdcall Button.selectMode, 120
           ret
 
      .GameMode2:
@@ -105,7 +99,29 @@ proc Button.Press, index
      ret
 endp
 
-
+proc Button.selectMode, time
+     mov [GAME_MODE], GAME
+     mov eax,  menuButtons
+     mov [activeMenu], eax
+     mov eax, [time]
+     mov [globalTimer], eax
+     mov [car.acceleration], 0.0
+     mov [car.speed], 0.0
+     mov [car.positionOnSpline], 0.0
+     mov [EXIT], 0
+     stdcall IntToStr, [car.lapCount]
+     mov [lapCountStr], eax
+     stdcall IntToStr, [car2.lapCount]
+     mov [lapCountStr2], eax
+     mov [car.lapCount], 0
+     mov [car2.lapCount], 0
+     invoke CreateThread, 0, 0, DecrementThread, 0, 0, 0
+     cmp [isBotGame], 1
+     jne @F
+     mov [isBotGame], 2
+@@:
+     ret
+endp
 proc Button.Create uses esi, objPtr, x, y, message, buttonColor, textColor
     locals
         length dd ?

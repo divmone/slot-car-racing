@@ -211,6 +211,7 @@ proc Rectangle.Create uses esi ,\
     invoke glBindBuffer, GL_ARRAY_BUFFER, [vbo]
 
     invoke glBufferData, GL_ARRAY_BUFFER, 32, [buffer], GL_DYNAMIC_DRAW
+    invoke HeapFree, [hHeap], ebx, [buffer]
     invoke glEnableVertexAttribArray, 0
     
     invoke glVertexAttribPointer, 0, 2, GL_FLOAT, GL_FALSE, 0, 0
@@ -402,11 +403,20 @@ endp
 
 proc UI.Pause
       switch [GAME_MODE]
+      case .SettingsMode, SETTINGS
      case .SelectMenu, SELECTMENU
      case .MainMenu, MAINMENU
      case .PauseMenu, PAUSEMENU
      case .SelestMode, SELECTMODE
      case .GameMode, GAME
+.SettingsMode:
+    cmp [fromMainMenu], 1
+    jne @F
+    mov  [GAME_MODE], MAINMENU
+    ret
+@@:
+    mov  [GAME_MODE], PAUSEMENU
+    ret
 .SelectMenu:
   mov [GAME_MODE], MAINMENU
   mov eax,  menuButtons

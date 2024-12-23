@@ -10,7 +10,7 @@ settingsMessage db "SETTINGS",0
 
 timeGameMessage db "TIME", 0
 botGameMessage db "BOT", 0
-driveAtarGameMessage db "DRIVEATAR", 0
+driveAtarGameMessage db "DUEL", 0
 
 firstModeMessage db "30", 0
 secongModeMessage db "60", 0
@@ -19,7 +19,16 @@ thirdModeMessage db "120", 0
 logoMessage db "SLOT CAR RACING", 0
 
 finalMessage db "YOU COMPLETED   LAPS", 0
+finalBotMessage db "BOT COMPLETED   LAPS", 0
 restartMessage db "PRESS R TO RESTART", 0
+
+gameOverMessage db "YOU LOST", 0
+winMessage db "YOU WON!",0
+tieMessage db "IT'S TIE",0
+
+instructionMessage1 db "A to drive forward.", 0
+instructionMessage2 db "R to respawn.", 0
+instructionMessage3 db "ESC to return to the menu.", 0
 
 activeButton dd 0
 

@@ -1,4 +1,4 @@
-cameraPosition  Vector3         10.0, 100.0, 10.0
+cameraPosition  Vector3         1.0, 100.0, 0.0
 targetPosition  Vector3         0.0, 0.0, 0.0
 upVector        Vector3         0.0, 1.0, 0.0
 cameraFront     Vector3         0.0, 0.0, 0.0

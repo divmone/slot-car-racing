@@ -6,9 +6,9 @@ proc Draw
   
     invoke glBindFramebuffer, GL_FRAMEBUFFER, [depthMapFBO]
         invoke glClear, GL_DEPTH_BUFFER_BIT
-         invoke glUseProgram, [depthShader]
-         invoke glUniformMatrix4fv, [lightSpaceMatrixLocation2], 1, GL_FALSE, lightSpaceMatrix 
-         invoke glActiveTexture, GL_TEXTURE0
+        invoke glUseProgram, [depthShader]
+        invoke glUniformMatrix4fv, [lightSpaceMatrixLocation2], 1, GL_FALSE, lightSpaceMatrix 
+        invoke glActiveTexture, GL_TEXTURE0
     invoke glBindTexture, GL_TEXTURE_2D, [depthMap]
     stdcall RenderScene, [depthShader]
     invoke glBindFramebuffer, GL_FRAMEBUFFER, 0
@@ -29,17 +29,53 @@ proc Draw
     invoke glBindTexture, GL_TEXTURE_2D, [depthMap]
     stdcall RenderScene, [program]
 
+  
+        ;stdcall Sprite.Draw, R1, ORANGE_COLOR
+    ret
+endp
+
+proc DrawHUD
     invoke glUseProgram, [program2D]
     invoke glEnable, GL_ALPHA_TEST
     invoke glClear, GL_DEPTH_BUFFER_BIT
     invoke glUniformMatrix4fv, [projectionLocation2D], 1, GL_FALSE, projection2D
         stdcall Sprite.DrawText, R2, [lapCountStr], -9.0, 9.0, WHITE_COLOR, 1.0
         stdcall Sprite.DrawText, R2, [globalTimerStr], -3.0, 9.0, WHITE_COLOR, 1.0
-
+        cmp [isBotGame], 2
+        jne @F
+        stdcall Sprite.DrawText, R2, [lapCountStr2], 8.0, 9.0, WHITE_COLOR, 1.0
+@@:        
         invoke glDisable, GL_ALPHA_TEST
-        ;stdcall Sprite.Draw, R1, ORANGE_COLOR
     ret
 endp
+
+proc DrawBotHUD
+    invoke glUseProgram, [program2D]
+    invoke glEnable, GL_ALPHA_TEST
+    invoke glClear, GL_DEPTH_BUFFER_BIT
+    invoke glUniformMatrix4fv, [projectionLocation2D], 1, GL_FALSE, projection2D
+        stdcall Sprite.DrawText, R2, [lapCountStr], -9.0, 9.0, WHITE_COLOR, 1.0
+        stdcall Sprite.DrawText, R2, [globalTimerStr], -3.0, 9.0, WHITE_COLOR, 1.0
+        stdcall Sprite.DrawText, R2, [lapCountStr2], 8.0, 9.0, WHITE_COLOR, 1.0  
+        invoke glDisable, GL_ALPHA_TEST
+    ret
+endp
+
+proc DrawSettings
+    invoke glUseProgram, [program2D]
+    invoke glEnable, GL_ALPHA_TEST
+    invoke glClear, GL_DEPTH_BUFFER_BIT
+    invoke glUniformMatrix4fv, [projectionLocation2D], 1, GL_FALSE, projection2D
+       
+        stdcall Sprite.DrawText, R3, instructionMessage1, -8.0, 6.0, WHITE_COLOR, 0.6
+        stdcall Sprite.DrawText, R3, instructionMessage2, -8.0, 3.0, WHITE_COLOR, 0.6
+        stdcall Sprite.DrawText, R3, instructionMessage3, -8.0, 0.0, WHITE_COLOR, 0.6
+        invoke glDisable, GL_ALPHA_TEST
+        stdcall Sprite.Draw, settingsRect, BLACK_COLOR
+    ret
+endp
+
+
 
 
 proc DrawMenu uses esi, buttons
@@ -112,6 +148,23 @@ proc DrawEndGame
     invoke glUniformMatrix4fv, [projectionLocation2D], 1, GL_FALSE, projection2D
     stdcall Sprite.DrawText, R2, finalMessage, -10.0, 0.0, WHITE_COLOR, 1.0
     stdcall Sprite.DrawText, R2, [lapCountStr], 3.5, 0.0, WHITE_COLOR, 1.0
+    stdcall Sprite.DrawText, R3, restartMessage, -9.0, -9.0, WHITE_COLOR, 0.7
+  
+    invoke glDisable, GL_ALPHA_TEST
+    ret
+endp
+
+proc DrawEndBotGame
+invoke glUseProgram, [program2D]
+    invoke glEnable, GL_ALPHA_TEST
+    invoke glClear, GL_DEPTH_BUFFER_BIT
+    invoke glUniformMatrix4fv, [projectionLocation2D], 1, GL_FALSE, projection2D
+    
+    stdcall Sprite.DrawText, R2, [winnerMessage], -6.0, 5.0, WHITE_COLOR, 1.0
+    stdcall Sprite.DrawText, R2, finalMessage, -10.0, 0.0, WHITE_COLOR, 1.0
+    stdcall Sprite.DrawText, R2, [lapCountStr], 3.5, 0.0, WHITE_COLOR, 1.0
+    stdcall Sprite.DrawText, R2, finalBotMessage, -10.0, -3.0, WHITE_COLOR, 1.0
+    stdcall Sprite.DrawText, R2, [lapCountStr2], 3.5, -3.0, WHITE_COLOR, 1.0
     stdcall Sprite.DrawText, R3, restartMessage, -9.0, -9.0, WHITE_COLOR, 0.7
     invoke glDisable, GL_ALPHA_TEST
     ret

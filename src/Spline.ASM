@@ -220,6 +220,10 @@ proc Spline.CurveBezier2 uses esi, p1, p2, p3, p4, result, f
                 tt dd ?
                 ttt dd ?
                 tempVector Vector4 
+                 t1 Vector3
+                t2 Vector3
+                t3 Vector3
+                t4 Vector3
         
         endl
 
@@ -242,21 +246,33 @@ proc Spline.CurveBezier2 uses esi, p1, p2, p3, p4, result, f
 
         stdcall Vector3.SMultiplyMatrix, esi, splineMatrix, splineVector 
 
-        memcpy t1, [p1], 12
-        memcpy t2, [p2], 12
-        memcpy t3, [p3], 12
-        memcpy t4, [p4], 12
+        lea eax, [t1]
+        memcpy eax, [p1], 12
+        lea eax, [t2]
+        memcpy eax, [p2], 12
+        lea eax, [t3]
+        memcpy eax, [p3], 12
+        lea eax, [t4]
+        memcpy eax, [p4], 12
 
-        stdcall Vector3.CrossValue, t1, [splineVector.x]
-        stdcall Vector3.CrossValue, t2, [splineVector.y]
-        stdcall Vector3.CrossValue, t3, [splineVector.z]
-        stdcall Vector3.CrossValue, t4, [splineVector.w]
+        lea eax, [t1]
+        stdcall Vector3.CrossValue, eax, [splineVector.x]
+        lea eax, [t2]
+        stdcall Vector3.CrossValue, eax, [splineVector.y]
+        lea eax, [t3]
+        stdcall Vector3.CrossValue, eax, [splineVector.z]
+        lea eax, [t4]
+        stdcall Vector3.CrossValue, eax, [splineVector.w]
 
         mov esi, [result]
-        stdcall Vector3.Copy, esi, t1
-        stdcall Vector3.Add, esi, t2
-        stdcall Vector3.Add, esi, t3
-        stdcall Vector3.Add, esi, t4
+        lea eax, [t1]
+        stdcall Vector3.Copy, esi, eax
+        lea eax, [t2]
+        stdcall Vector3.Add, esi, eax
+        lea eax, [t3]
+        stdcall Vector3.Add, esi, eax
+        lea eax, [t4]
+        stdcall Vector3.Add, esi, eax
 
         ret
 endp
@@ -593,6 +609,10 @@ proc Spline.GetCurveBezierDerivate uses esi, p1, p2, p3, p4, result, f
                 two dd 2.0
                 three dd 3.0
                 tempVector Vector4 
+                t1 Vector3
+                t2 Vector3
+                t3 Vector3
+                t4 Vector3
         endl
 
         fld [f]
@@ -615,21 +635,33 @@ proc Spline.GetCurveBezierDerivate uses esi, p1, p2, p3, p4, result, f
 
         stdcall Vector3.SMultiplyMatrix, esi, splineMatrix, splineVector 
 
-        memcpy t1, [p1], 12
-        memcpy t2, [p2], 12
-        memcpy t3, [p3], 12
-        memcpy t4, [p4], 12
+        lea eax, [t1]
+        memcpy eax, [p1], 12
+        lea eax, [t2]
+        memcpy eax, [p2], 12
+        lea eax, [t3]
+        memcpy eax, [p3], 12
+        lea eax, [t4]
+        memcpy eax, [p4], 12
 
-        stdcall Vector3.CrossValue, t1, [splineVector.x]
-        stdcall Vector3.CrossValue, t2, [splineVector.y]
-        stdcall Vector3.CrossValue, t3, [splineVector.z]
-        stdcall Vector3.CrossValue, t4, [splineVector.w]
+        lea eax, [t1]
+        stdcall Vector3.CrossValue, eax, [splineVector.x]
+        lea eax, [t2]
+        stdcall Vector3.CrossValue, eax, [splineVector.y]
+        lea eax, [t3]
+        stdcall Vector3.CrossValue, eax, [splineVector.z]
+        lea eax, [t4]
+        stdcall Vector3.CrossValue, eax, [splineVector.w]
 
         mov esi, [result]
-        stdcall Vector3.Copy, esi, t1
-        stdcall Vector3.Add, esi, t2
-        stdcall Vector3.Add, esi, t3
-        stdcall Vector3.Add, esi, t4
+        lea eax, [t1]
+        stdcall Vector3.Copy, esi, eax
+        lea eax, [t2]
+        stdcall Vector3.Add, esi, eax
+        lea eax, [t3]
+        stdcall Vector3.Add, esi, eax
+        lea eax, [t4]
+        stdcall Vector3.Add, esi, eax
 
         ret
 endp
@@ -640,6 +672,7 @@ proc Spline.GetCurveBezierAcceleration uses esi, p1, p2, p3, p4, result, f
                 two dd 2.0
                 six dd 6.0
                 tempVector Vector4 
+
         endl
 
         lea esi, [tempVector]
@@ -654,6 +687,7 @@ proc Spline.GetCurveBezierAcceleration uses esi, p1, p2, p3, p4, result, f
         fstp dword[esi + Vector4.w]
 
         stdcall Vector3.SMultiplyMatrix, esi, splineMatrix, splineVector 
+
 
         memcpy t1, [p1], 12
         memcpy t2, [p2], 12
@@ -713,28 +747,6 @@ proc Spline.GetRotation uses esi edi,\
 
 
         stdcall Quaternion.CreateFromAxisAngle, [objPtr], 0.0, 1.0, 0.0, [esi + Object.tempAngle]
-        
-        ; lea esi, [point]
-        
-        ; fld dword [esi + 4] 
-        ; fchs
-        ; fld dword [esi + 8]  
-        ; fpatan
-        ; fmul [toDegree]
-        ; fldpi
-        ; fdivr st0, st1
-        ; fstp st1
-        ; ;fadd [ninety]
-        ; fchs
-        ; fstp [angle]
-        ; mov eax, [angle]
-        ; mov [tempAngle2], eax
-        ; stdcall Quaternion.CreateFromAxisAngle, testObj, 1.0, 0.0, 0.0, [angle]
-
-        ; mov esi, [objPtr]
-        ; add esi, Object.q
-        ; stdcall Quaternion.Multiply, testObj.q, esi
-
 .skip:        
       ret
 endp

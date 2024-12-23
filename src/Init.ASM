@@ -5,6 +5,7 @@ proc Init uses esi
                 vbo dd ?
                 value dd 11.4
         endl
+        ;   invoke CreateThread, 0, 0, Audio.FoneMusicOn, 0, 0, 0
         stdcall Glext.LoadFunctions
         invoke  GetProcessHeap
         mov     [hHeap], eax
@@ -45,8 +46,14 @@ proc Init uses esi
         fidiv   [clientRect.bottom]   
         fstp    [aspect]
 
+        invoke CreateMutex, 0, 0, 0 
+        mov [mutex], eax
+        
         invoke CreateThread, 0, 0, IntToStrThread, 0, 0, 0
         invoke CreateThread, 0, 0, PhysicsThread, 0, 0, 0
+        ;invoke CreateThread, 0, 0, BotPhysicsThread, 0, 0, 0
+
+       
 
         stdcall Glext.LoadFunctions
         stdcall Glext.CreateShader, depthVShaderFile, depthFShaderFile 
@@ -61,7 +68,6 @@ proc Init uses esi
         stdcall Glext.CreateShaders 
         stdcall Glext.CreateShaders2D  
 
-      
         ;invoke  PlaySound, musicPath, NULL,0x0008 or 0x00020000 or 0x0001
         
         stdcall Object.Create, car, fileName, textPath
@@ -176,8 +182,9 @@ proc Init uses esi
         stdcall Object.SetPosition, splashRect, 0.0, 0.0, 0.0
         
         stdcall Rectangle.Create, carRect, -10.0, 0.0, 1.0, 1.0
-        
-        
+        stdcall Rectangle.Create, settingsRect, -8.0, 0.0, 16.0, 9.0
+        stdcall Object.SetPosition, settingsRect, 0.0, 0.0, 0.0
+        ;stdcall Rectangle.Create, isCommingSoonRect, -8.0, 8.0, 8.0, 8.0
 
         stdcall Texture.CreateRGBA, carTexture, 512, 512
         mov [carRect.texture], eax
@@ -186,12 +193,16 @@ proc Init uses esi
         mov [R1.texture], eax 
         mov [R2.texture], eax 
         mov [R3.texture], eax
+       
         
 
         stdcall Texture.Create, splashTexture
-        mov [splashRect.texture], eax
-        
 
+        mov [splashRect.texture], eax
+
+        stdcall Texture.Create, buttonTexture
+        mov [settingsRect.texture], eax
+        
         stdcall Button.Create, startButton, -9.0, -4.0, startMessage, BLACK_COLOR, GRAY_COLOR
         stdcall Button.Create, settingsButton, -9.0, -6.0, settingsMessage, BLACK_COLOR, GRAY_COLOR
         stdcall Button.Create, exitButton, -9.0, -8.0, exitMessage, BLACK_COLOR, GRAY_COLOR
@@ -229,9 +240,9 @@ proc Init uses esi
         mov [road.useInstancing], 1
         
         stdcall UI.SetActiveButton, menuButtons,0
-
+        ;stdcall  Audio.FoneMusicOn
         invoke CreateThread, 0, 0, SplashTimerThread, 0, 0, 0
-        
+     
         ret
 endp
 
@@ -265,14 +276,21 @@ proc PhysicsThread, lpParam
     jmp .loop
 endp
 
+
+  
+
 proc IntToStrThread, lpParam
 
 .loop:
       invoke Sleep, 1
       stdcall IntToStr, [car.lapCount]
       mov [lapCountStr], eax
+      
       stdcall IntToStr, [globalTimer]
       mov [globalTimerStr], eax
+      
+      stdcall IntToStr, [car2.lapCount]
+      mov [lapCountStr2], eax
 
       cmp [EXIT], 1
       jne .loop
@@ -289,9 +307,61 @@ proc DecrementThread, lpParam
     jg .threadLoop           
     mov [GAME_MODE], ENDGAME
     mov [car.acceleration], 0
+    cmp [isBotGame], 2
+    jne @F
+    mov eax, [car2.lapCount]
+    cmp [car.lapCount], eax
+    je .tie
+    cmp [car.lapCount], eax
+    ja .car1win
+    mov [winner], 1
+    mov eax, gameOverMessage
+    mov [winnerMessage], eax
+    jmp .l
+.car1win:
+    mov [winner], 0
+    mov eax, winMessage
+    mov [winnerMessage], eax
+    jmp .l
+.tie:
+    mov [winner],  2
+    mov eax, tieMessage
+    mov [winnerMessage], eax
+    jmp .l
+   
+.l:
+
+    mov [GAME_MODE], ENDBOTGAME
+    mov [isBotGame], 0
+    mov [car2.speed], 0
+    mov [car2.acceleration], 0
+    mov [car2.positionOnSpline], 0
+    stdcall Object.SetPosition, car2, 0.0, 0.0, 0.0
+@@:
+
     invoke ExitThread, 0
 endp
 
+
+proc BotPhysicsThread
+    cmp [car2.isCrashed], 1
+    jne @f
+    dec [crashCount]
+    cmp [crashCount], 0
+    jne @F
+    stdcall Object.Respawn, car2
+    mov [crashCount], 60
+@@:
+    stdcall	 GetRandomNumber, 1, 10
+    mov [car2.acceleration], eax
+    fild [car2.acceleration]
+    fdiv [botStop]
+    fstp [car2.acceleration]
+    stdcall Object.CheckLap, car2
+    mov [car2.lapCount], eax
+    stdcall Physics.Update, 0.07, cubeSpline, car2   
+    ret
+endp
 
 proc SplashTimerThread, lpParam
 .threadLoop:

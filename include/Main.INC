@@ -35,6 +35,7 @@ entry   WinMain
         include         "Physics.inc"
         include         "2D.inc"
         include         "UI.inc"
+        include         "Audio.inc"
 
   
 macro switch value

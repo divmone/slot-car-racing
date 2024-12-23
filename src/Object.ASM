@@ -54,6 +54,7 @@ proc Object.Create uses esi edi ,\
 
     stdcall Mesh.Generate, [objPtr], [resultT], [addressV], [addressI], [iCount]
     
+    
     invoke HeapFree, [hHeap], 0, [addressI]
     invoke HeapFree, [hHeap], 0, [addressV]
 
@@ -88,7 +89,7 @@ proc Object.Create uses esi edi ,\
     mov [esi + Object.q.w], 0.0
 
 
-    
+    invoke HeapFree, [hHeap], 0, [resultT]
     ret
 endp
 
@@ -389,13 +390,13 @@ proc Object.CheckLap uses esi, objPtr
         laps dd 0 
     endl
 
-
+    mov esi, [objPtr]
     fstcw [oldState]    
     mov ax, [oldState]  
     or ax, 0c00h        
     mov [newState], ax  
     fldcw [newState]    
-    fld [car.positionOnSpline] 
+    fld [esi + Object.positionOnSpline] 
     fdiv [cubeSpline.time]
     fistp [laps]      
     fldcw [oldState] 

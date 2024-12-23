@@ -83,7 +83,7 @@
         trackPointPosition2 Vector3 0.0, 0.0, 0.0
         trackPointPosition3 Vector3 0.0, 0.0, 0.0
         trackPointPosition4 Vector3 0.0, 0.0, 0.0
-
+        botStop dd 100.0
 ; cameraPosition1 Vector3         0.0, 0.0, 90.0
 ; cameraDirPrev1  Vector3         60.66, 0.0, 90.0
 ; cameraDirNext1  Vector3        -120.66, 0.0, 90.0
@@ -276,10 +276,12 @@ rotationPoint2Next Vector4 0.0, 1.0, 0.0, 0.0
         hThread    dd 0                
         dwThreadId dd 0  
         lapCountStr dd ?
+        lapCountStr2 dd ?
         globalTimerStr dd  ? 
         EXIT dd 0   
         activeMenu dd menuButtons
         isGameEnd dd 0
+        crashCount dd 60
          interface hrum,\
           SetSettings,\
           GetSettings ,\
@@ -356,6 +358,10 @@ rotationPoint2Next Vector4 0.0, 1.0, 0.0, 0.0
                    
         pName       db 's.wav',0   
         zPlay hrum
+        winner dd 0
+        winnerLaps dd ?
+        winnerMessage dd ?
+        fromMainMenu dd 0
 
         include         "Init.asm"
         include         "Mesh.asm"
@@ -382,6 +388,7 @@ rotationPoint2Next Vector4 0.0, 1.0, 0.0, 0.0
         include         "Physics.asm"
         include         "2D.asm"
         include         "Button.asm"
+        include         "Audio.asm"
 
    
 
@@ -443,6 +450,9 @@ proc WindowProc uses ebx,\
     jmp .ReturnZero
 .Paint:
     switch [GAME_MODE]
+    case .RenderSettings, SETTINGS
+    case .RenderEnd2PGame, END2PGAME
+    case .RenderEndBotGame, ENDBOTGAME
     case .RenderSplashScreen, SPLASHSCREEN
     case .RenderMainMenu  , MAINMENU
     case .RenderMainMenu, SELECTMENU
@@ -451,12 +461,18 @@ proc WindowProc uses ebx,\
     case .RenderGame, GAME
     case .RenderEndGame, ENDGAME
     
-
+.RenderSettings:
+    stdcall Draw
+    stdcall DrawSettings
+    jmp .RenderCommon
+.RenderEnd2PGame:
+    jmp .ReturnZero
 .RenderSplashScreen:
     stdcall DrawSplashScreen
     jmp .RenderCommon
 .RenderGame:
     stdcall Draw
+    stdcall DrawHUD
     jmp .RenderCommon
 .RenderMainMenu:
     stdcall UI.DrawMainMenu, [activeMenu]
@@ -465,12 +481,24 @@ proc WindowProc uses ebx,\
     stdcall Draw
     stdcall DrawMenu, [activeMenu]
     jmp .RenderCommon
+.RenderEndBotGame:
+    stdcall Draw
+    stdcall DrawEndBotGame
+    jmp .RenderCommon
 .RenderEndGame:
     stdcall Draw
     stdcall DrawEndGame
     ;stdcall DrawMenu, [activeMenu]
-.RenderCommon:
+.RenderCommon: 
+
     invoke SwapBuffers, [hdc]
+
+    cmp [isBotGame], 2
+    jne .ReturnZero
+    stdcall BotPhysicsThread
+
+    ; invoke HeapFree, [hHeap], ebx, [lapCountStr]
+    ; invoke HeapFree, [hHeap], ebx, [lapCountStr2]
     jmp .ReturnZero
 
 .KeyDown:
@@ -540,6 +568,7 @@ proc WindowProc uses ebx,\
     switch [GAME_MODE]
     case .1, GAME
     case .2, ENDGAME
+    case .2, ENDBOTGAME
 .1:
     stdcall Object.Respawn, car
     jmp .ReturnZero
@@ -559,6 +588,8 @@ proc WindowProc uses ebx,\
     jmp     .ReturnZero
 .Speed:
     cmp [GAME_MODE], ENDGAME
+    je .ReturnZero
+    cmp [GAME_MODE], ENDBOTGAME
     je .ReturnZero
     stdcall Object.SetAcceleration, car
     jmp     .ReturnZero
