@@ -490,29 +490,22 @@ proc WindowProc uses ebx,\
     stdcall DrawEndGame
     ;stdcall DrawMenu, [activeMenu]
 .RenderCommon: 
-
     invoke SwapBuffers, [hdc]
-
+    stdcall Object.CheckLap, car
+    mov [car.lapCount], eax
+    stdcall Physics.Update, 0.07, cubeSpline, car
     cmp [isBotGame], 2
     jne .ReturnZero
     stdcall BotPhysicsThread
-
-    ; invoke HeapFree, [hHeap], ebx, [lapCountStr]
-    ; invoke HeapFree, [hHeap], ebx, [lapCountStr2]
     jmp .ReturnZero
 
 .KeyDown:
     switch [wParam]
-        case .Destroy, 'P'
         case .GoToMenu, VK_ESCAPE
         case .IncActiveButton, VK_DOWN
         case .DecActiveButton, VK_UP
-        case .ChangeCameraMode, VK_W
-        case .SelectDrawMode, 31h
         case .Speed, VK_A
-        case .Speed2, VK_L
         case .Respawn1, VK_R
-        case .Respawn2, VK_U
         case .Enter, VK_RETURN
     jmp     .ReturnZero
 .Enter:
@@ -578,14 +571,6 @@ proc WindowProc uses ebx,\
     mov [activeMenu], eax
     stdcall Object.Respawn, car
     jmp .ReturnZero
-.Respawn2:
-    stdcall Object.Respawn, car2
-    jmp .ReturnZero
-.Speed2:
-    cmp [GAME_MODE], ENDGAME
-    je .ReturnZero
-    stdcall Object.SetAcceleration, car2
-    jmp     .ReturnZero
 .Speed:
     cmp [GAME_MODE], ENDGAME
     je .ReturnZero
@@ -599,42 +584,11 @@ proc WindowProc uses ebx,\
     stdcall UI.Pause
     stdcall UI.SetActiveButton, [activeMenu], 0
     jmp     .ReturnZero
-.ChangeCameraMode:  ;W
-    cmp [CAMERA_MODE], 0
-    je @F
-    mov [CAMERA_MODE], 0
-    stdcall Vector3.Copy, tempCameraVector, cameraPosition
-    stdcall Vector3.Copy, targetPosition, tVector
-    jmp     .ReturnZero
-@@:
-    mov [CAMERA_MODE], 1
-    jmp     .ReturnZero
-.MouseWheel:
-    mov     eax, [wParam]
-    test    eax, 0x80000000
-    jne     .Negative
-    stdcall Vector3.Add,  lightPosition, tVector
-    jmp     .ReturnZero    
-.Negative:
-    stdcall Vector3.Sub,  lightPosition, tVector
-    jmp     .ReturnZero    
-.SelectDrawMode:
-    cmp [drawingMode], 1
-    je  .SetFour
-    mov [drawingMode], 1
-    jmp @F    
-.SetFour:
-    mov [drawingMode], 4
-
-@@:
-    jmp .ReturnZero
-
 .Destroy:
     invoke HeapDestroy, [hHeap]
     invoke CloseHandle, [logFile]
     invoke ExitProcess, ebx
     mov [EXIT], 1
-
 .ReturnZero:
     xor     eax, eax
 

@@ -71,11 +71,11 @@ macro malloc [arg]
 }  
 
         true            =       1
-        false           =       0
+        false           =       0       
 
         COLOR_DEPTH     =       24
         PFD_FLAGS       =       PFD_SUPPORT_OPENGL or PFD_DOUBLEBUFFER or PFD_DRAW_TO_WINDOW
-        POP_IT          =       WS_VISIBLE or WS_MAXIMIZE or WS_POPUP
+        POP_IT          =       WS_VISIBLE or WS_MAXIMIZE
 
         wndClass        WNDCLASS                0, WindowProc, 0, 0, 0, 0, 0, 0, 0, className
         pfd             PIXELFORMATDESCRIPTOR   sizeof.PIXELFORMATDESCRIPTOR, 1, PFD_FLAGS, PFD_TYPE_RGBA, COLOR_DEPTH,\

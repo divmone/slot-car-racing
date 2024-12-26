@@ -5,7 +5,7 @@ proc Init uses esi
                 vbo dd ?
                 value dd 11.4
         endl
-        ;   invoke CreateThread, 0, 0, Audio.FoneMusicOn, 0, 0, 0
+        invoke CreateThread, 0, 0, Audio.FoneMusicOn, 0, 0, 0
         stdcall Glext.LoadFunctions
         invoke  GetProcessHeap
         mov     [hHeap], eax
@@ -50,7 +50,7 @@ proc Init uses esi
         mov [mutex], eax
         
         invoke CreateThread, 0, 0, IntToStrThread, 0, 0, 0
-        invoke CreateThread, 0, 0, PhysicsThread, 0, 0, 0
+        ;invoke CreateThread, 0, 0, PhysicsThread, 0, 0, 0
         ;invoke CreateThread, 0, 0, BotPhysicsThread, 0, 0, 0
 
        
@@ -269,11 +269,9 @@ proc PhysicsThread, lpParam
 ;invoke PlaySound, musicPath2, NULL, 1
 .loop: 
     invoke Sleep, 1
-    stdcall Object.CheckLap, car
-    mov [car.lapCount], eax
-    stdcall Physics.Update, 0.07, cubeSpline, car
+  
      
-    jmp .loop
+    ret
 endp
 
 

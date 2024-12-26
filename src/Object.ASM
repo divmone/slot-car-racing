@@ -401,5 +401,6 @@ proc Object.CheckLap uses esi, objPtr
     fistp [laps]      
     fldcw [oldState] 
     mov eax, [laps]
+    mov [esi + Object.lapCount], eax
     ret
 endp

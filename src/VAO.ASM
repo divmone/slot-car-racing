@@ -17,7 +17,6 @@ proc VAO.Init uses edi esi ebx,\
         lea eax, [vertexVBO]
         stdcall  VBO.Create, eax, sizeof.Vertex, Mesh.vertices, [mesh]
 
-        
         invoke glEnableVertexAttribArray, 0
     
         invoke glVertexAttribPointer, 0, 3, GL_FLOAT, GL_FALSE, 0, 0

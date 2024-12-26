@@ -163,10 +163,6 @@ proc Physics.Update uses esi ebx, deltaTime, spline, objPtr
         fstp [tempAngle4]
  .l1:       
         stdcall Quaternion.CreateFromAxisAngle, [objPtr], 0.0, 1.0, 0.0, [tempAngle4]
-        
-        ;stdcall Quaternion.CreateFromAxisAngle, testObj, 0.0, 0.0, 1.0, [tempAngle4]
-        ;stdcall Quaternion.Multiply, testObj.q, car.q, car.q
- 
         lea eax, [esi + Object.transform.position]
         stdcall Vector3.Add, eax,  ebx
         mov [esi + Object.isFreeFall], 1

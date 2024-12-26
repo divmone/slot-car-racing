@@ -744,43 +744,44 @@ endp
 proc Matrix.Multiply4x4 uses ebx esi, matrix1, matrix2, matrix_res 
 
    locals
-     temp    dd     ?
+     temp    dd     ?        ; Объявление временной переменной для хранения промежуточных результатов
    endl
 
-   mov edx, [matrix_res]
-   mov ecx, [matrix1]
+   ; Устанавливаем указатели на входные и выходные матрицы
+   mov edx, [matrix_res]      
+   mov ecx, [matrix1]         
    
-   mov esi, 0
-   gf_MatrixMultiply4x4.LoopA1:
-       mov edi, 0
-       gf_MatrixMultiply4x4.LoopA2:
-           mov [temp], 0.0
-           mov ebx, 0
-           gf_MatrixMultiply4x4.LoopA3:
-               fld dword[ecx + ebx]
+   mov esi, 0                  ; Инициализация счетчика для строк первой матрицы
+   .LoopA1:
+       mov edi, 0              ; Инициализация счетчика для столбцов второй матрицы
+       .LoopA2:
+           mov [temp], 0.0     ; Обнуляем временную переменную для хранения суммы произведений
+           mov ebx, 0          ; Инициализация счетчика для элементов строки первой матрицы
+           .LoopA3:
+               fld dword[ecx + ebx]   ; Загружаем элемент из первой матрицы
                push ecx edx
-               mov ecx, [matrix2]
-               add ecx, edi
-               fmul dword[ecx + ebx * 4]  
-               pop edx ecx
-               fadd dword[temp]
-               fstp dword[temp]
-           add ebx, 4
-           cmp ebx, 4 * 4
-           jnz gf_MatrixMultiply4x4.LoopA3
+               mov ecx, [matrix2]     
+               add ecx, edi       
+               fmul dword[ecx + ebx * 4]  ; Умножаем элементы матриц
+               pop edx ecx           
+               fadd dword[temp]     
+               fstp dword[temp]     
+           add ebx, 4               ; Переходим к следующему элементу строки первой матрицы
+           cmp ebx, 4 * 4          
+           jnz .LoopA3             
            
-           mov eax, [temp]
-           mov [edx + edi], eax
-       add edi, 4
-       cmp edi, 4 * 4
-       jnz gf_MatrixMultiply4x4.LoopA2
-   add esi, 16
-   add edx, 16
-   add ecx, 16
-   cmp esi, 16 * 4
-   jnz gf_MatrixMultiply4x4.LoopA1
+           mov eax, [temp]          ; Загружаем результат суммы произведений в eax
+           mov [edx + edi], eax     ; Записываем результат в выходную матрицу (matrix_res)
+       add edi, 4                   ; Переходим к следующему столбцу
+       cmp edi, 4 * 4               ; Проверка завершения обработки всех столбцов
+       jnz .LoopA2                  ; Если не все столбцы обработаны, продолжаем обработку
+   add esi, 16                      ; Переходим к следующей строке первой матрицы
+   add edx, 16                       ; Переходим к следующей строке выходной матрицы
+   add ecx, 16                       ; Переходим к следующей строке второй матрицы
+   cmp esi, 16 * 4                   ; Проверка завершения обработки всех строк первой матрицы
+   jnz .LoopA1                       ; Если не все строки обработаны, продолжаем обработку
 
-  ret
+  ret                               ; Завершаем процедуру
 endp
 
 proc Matrix.CreateModel uses esi edi, objPtr

@@ -216,45 +216,49 @@ endp
 
 proc Spline.CurveBezier2 uses esi, p1, p2, p3, p4, result, f
         locals 
-                t dd ?
-                tt dd ?
-                ttt dd ?
-                tempVector Vector4 
-                 t1 Vector3
-                t2 Vector3
-                t3 Vector3
-                t4 Vector3
-        
+                t dd ?                ; Временной параметр t
+                tt dd ?               ; Квадрат времени t
+                ttt dd ?              ; Куб времени t
+                tempVector Vector4    ; Временный вектор для хранения параметров t
+                t1 Vector3            ; Промежуточный результат для p1
+                t2 Vector3            ; Промежуточный результат для p2
+                t3 Vector3            ; Промежуточный результат для p3
+                t4 Vector3            ; Промежуточный результат для p4
         endl
 
-        fld [f]
-        fst [t]
-        fmul [f]
-        fst [tt]
-        fmul [f]
-        fstp [ttt]
+        ; Вычисление параметров t, t^2 и t^3
+        fld [f]                 ; Загрузить f в стек FPU
+        fst [t]                 ; t = f
+        fmul [f]                ; t^2
+        fst [tt]                ; tt = f^2
+        fmul [f]                ; t^3
+        fstp [ttt]              ; ttt = f^3
 
+        ; Подготовка вектора параметров (1, t, t^2, t^3)
         lea esi, [tempVector]
         fld1
-        fstp dword[esi + Vector4.x]
+        fstp dword[esi + Vector4.x] ; tempVector.x = 1
         fld [t]
-        fstp dword[esi + Vector4.y]
+        fstp dword[esi + Vector4.y] ; tempVector.y = t
         fld [tt]
-        fstp dword[esi + Vector4.z]
+        fstp dword[esi + Vector4.z] ; tempVector.z = t^2
         fld [ttt]
-        fstp dword[esi + Vector4.w]
+        fstp dword[esi + Vector4.w] ; tempVector.w = t^3
 
+        ; Умножение параметров на матрицу сплайна
         stdcall Vector3.SMultiplyMatrix, esi, splineMatrix, splineVector 
 
+        ; Копирование контрольных точек в промежуточные векторы
         lea eax, [t1]
-        memcpy eax, [p1], 12
+        stdcall Vector3.Copy, eax, [p1]
         lea eax, [t2]
-        memcpy eax, [p2], 12
+        stdcall Vector3.Copy, eax, [p2]
         lea eax, [t3]
-        memcpy eax, [p3], 12
+        stdcall Vector3.Copy, eax, [p3]
         lea eax, [t4]
-        memcpy eax, [p4], 12
+        stdcall Vector3.Copy, eax, [p4]
 
+        ; Вычисление вклада каждой точки с учетом весов из splineVector
         lea eax, [t1]
         stdcall Vector3.CrossValue, eax, [splineVector.x]
         lea eax, [t2]
@@ -264,6 +268,7 @@ proc Spline.CurveBezier2 uses esi, p1, p2, p3, p4, result, f
         lea eax, [t4]
         stdcall Vector3.CrossValue, eax, [splineVector.w]
 
+        ; Суммирование вкладов контрольных точек для получения результата
         mov esi, [result]
         lea eax, [t1]
         stdcall Vector3.Copy, esi, eax

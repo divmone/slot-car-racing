@@ -20,30 +20,15 @@ proc Glext.LoadFunctions uses esi edi
 .Return:
         ret
 endp   
+
 proc Glext.CreateShaders
 
         stdcall Glext.LoadShader, vshaderFile, GL_VERTEX_SHADER
         mov     [vertexShader], eax
-
-        stdcall Log, SHADER_LOADED_SUCCESSFULLY, SHADER_LOADED_SUCCESSFULLY.size 
-        cmp     eax, 0
-        je      .Error
-
-
         stdcall Glext.LoadShader, fshaderFile, GL_FRAGMENT_SHADER
         mov     [fragmentShader], eax
-
-        stdcall Log, SHADER_LOADED_SUCCESSFULLY, SHADER_LOADED_SUCCESSFULLY.size 
-        cmp     eax, ebx
-        je      .Error
-
- 
-
         stdcall Glext.CreateProgram,  [vertexShader], [fragmentShader]
         mov     [program], eax
-
-        cmp     eax, ebx
-        je      .Error
 
         invoke   glGetUniformLocation , [program], viewPosName
         mov [viewPosLocation], eax
@@ -89,16 +74,7 @@ proc Glext.CreateShaders
       ;  invoke  WriteConsole, [hStdOut], okMessage, 20, 0, ebx
 
   
-        jmp     .Return
-
-
-.Error:
-        ;stdcall Log, SHADER_LOADED_FAILED, SHADER_LOADED_FAILED.size 
-        mov     [program], ebx
-
-.Return:
          
-                
         ret
 endp
 
@@ -289,37 +265,25 @@ endp
 proc Glext.LoadShader,\
      fileName, shaderType
 
-        locals
-                buffer          dd      ?
-                shader          dd      ?
-                compiled        dd      ?
-        endl
+    locals
+            buffer          dd      ?
+            shader          dd      ?
+            compiled        dd      ?
+    endl
 
-        stdcall File.LoadContent, [fileName]
-        mov     [buffer], eax
+    stdcall File.LoadContent, [fileName]
+    mov     [buffer], eax
 
-        invoke  glCreateShader, [shaderType]
-        mov     [shader], eax
-        lea     eax, [buffer]
-        invoke  glShaderSource, [shader], 1, eax, ebx
-        invoke  glCompileShader, [shader]
+    invoke  glCreateShader, [shaderType]
+    mov     [shader], eax
+    lea     eax, [buffer]
+    invoke  glShaderSource, [shader], 1, eax, 0
+    invoke  glCompileShader, [shader]
 
-        invoke  HeapFree, [hHeap], ebx, [buffer]
+    invoke  HeapFree, [hHeap], 0, [buffer]
 
-        lea     eax, [compiled]
-        invoke  glGetShaderiv, [shader], GL_COMPILE_STATUS, eax
-
-        cmp     [compiled], ebx
-        je      @F
-
-        mov     eax, [shader]
-        jmp     .Return
-
-@@:
-        mov     eax, ebx
-
-.Return:
-        ret
+    mov     eax, [shader]
+    ret
 endp
 
 proc CreateShader\
