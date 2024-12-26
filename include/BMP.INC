@@ -39,4 +39,3 @@ struct BMP
         biClrImportant      dd    ?
         pArray        dd          ?
 ends
-

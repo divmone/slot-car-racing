@@ -29,10 +29,9 @@ proc BMP.LoadFromFile uses edi esi ebx,\
 
     mov eax, [ebx + BMP.bfOffBits]
     add ebx, eax
-
+   
     memcpy [BMPBuffer], ebx, [BMPBufferSize]
-    
-    stdcall Log, BMP_LOADED_SUCCESSFULLY, BMP_LOADED_SUCCESSFULLY.size
+
     mov eax, [BMPBuffer]
     mov ecx, [h]
     mov edx, [w]

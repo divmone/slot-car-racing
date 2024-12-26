@@ -93,7 +93,6 @@ proc Mesh.Generate uses ebx esi edi,\
         
         mov eax, [addressT]
         mov [edi + Mesh.texCoords], eax
-
         ret
 endp
 

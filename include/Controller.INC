@@ -21,3 +21,6 @@ define VK_T 54h
 define VK_U 55h
 define VK_V 56h
 define VK_W 57h
+define VK_X 58h
+define VK_Y 59h
+define VK_Z 60h

@@ -11,3 +11,6 @@ struct Spline
         cycle           dd      ?
         time            dd      ?
 ends
+
+
+splineVector Vector4

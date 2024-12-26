@@ -1,83 +1,87 @@
 proc File.LoadContent uses edi,\
-     fileName;, fileLength
+    fileName;, fileLength
 
-        locals
-                hFile   dd      ?
-                length  dd      ?
-                read    dd      ?
-                pBuffer dd      ?
-        endl
+    locals
+            hFile   dd      ?
+            length  dd      ?
+            read    dd      ?
+            pBuffer dd      ?
+    endl
 
-        invoke  CreateFile, [fileName], GENERIC_READ, ebx, ebx, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, ebx
-        mov     [hFile], eax
+    invoke  CreateFile, [fileName], GENERIC_READ, ebx, ebx, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, ebx
+    mov     [hFile], eax
 
-        invoke  GetFileSize, [hFile], ebx
-        inc     eax
-        mov     [length], eax
-        ;malloc 1, 8
-        invoke  HeapAlloc, [hHeap], 8, [length]
-        mov     [pBuffer], eax
+    invoke  GetFileSize, [hFile], ebx
+    inc     eax
+    mov     [length], eax
+    ;malloc 1, 8
+    invoke  HeapAlloc, [hHeap], 8, [length]
+    mov     [pBuffer], eax
 
-        lea     edi, [read]
-        invoke  ReadFile, [hFile], [pBuffer], [length], edi, ebx
+    lea     edi, [read]
+    invoke  ReadFile, [hFile], [pBuffer], [length], edi, ebx
 
-        invoke  CloseHandle, [hFile]
+    invoke  CloseHandle, [hFile]
 
-        mov     eax, [pBuffer]
-       
-        ret
+    mov     eax, [pBuffer]
+    
+    ret
 endp
 
 proc File.GetSize uses edi,\
-        fileName
-        
-        locals
-                hFile   dd      ? 
-        endl
+    fileName
+    
+    locals
+            hFile   dd      ? 
+            size dd ?
+    endl
 
-        invoke  CreateFile, [fileName], GENERIC_READ, ebx, ebx, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, ebx
-        mov     [hFile], eax
+    invoke  CreateFile, [fileName], GENERIC_READ, ebx, ebx, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, ebx
+    mov     [hFile], eax
 
-        invoke  GetFileSize, [hFile], ebx
-        inc     eax
+    invoke  GetFileSize, [hFile], ebx
+    inc     eax
+    mov [size], eax
 
+    invoke  CloseHandle, [hFile]
+    mov eax, [size]
     ret
 endp
 
 proc File.Create uses edi ,\
-        fileName
-        
-        locals
-                hFile   dd      ?
-        endl
+    fileName
+    
+    locals
+            hFile   dd      ?
+    endl
 
-        invoke  CreateFile, [fileName], GENERIC_WRITE, 0, 0, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0
-        mov [hFile], eax
-        cmp     eax, INVALID_HANDLE_VALUE
-        je      .Error
-        
-        stdcall Log, FILE_CREATED_SUCCESSFULLY, FILE_CREATED_SUCCESSFULLY.size
+    invoke  CreateFile, [fileName], GENERIC_WRITE, 0, 0, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0
+    mov [hFile], eax
+    cmp     eax, INVALID_HANDLE_VALUE
+    je      .Error
+    
+    stdcall Log, FILE_CREATED_SUCCESSFULLY, FILE_CREATED_SUCCESSFULLY.size
 
-        mov eax, [hFile]
-        ret
+    mov eax, [hFile]
+    ret
 .Error:
-        stdcall Log, FILE_CREATION_FAILED , FILE_CREATION_FAILED.size
-        mov eax, [hFile]
-        ret
+    stdcall Log, FILE_CREATION_FAILED , FILE_CREATION_FAILED.size
+    mov eax, [hFile]
+    ret
 endp
 
 proc File.WriteContent uses edi ,\
-        fileName, buffer, length
+    fileName, buffer, length
 
-        locals
-                hFile   dd      ?
-                pBuffer dd      ?
-        endl
+    locals
+            hFile   dd      ?
+            pBuffer dd      ?
+    endl
 
-        invoke  CreateFile, [fileName], GENERIC_READ, ebx, ebx, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, ebx
-        mov     [hFile], eax
+    invoke  CreateFile, [fileName], GENERIC_READ, ebx, ebx, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, ebx
+    mov     [hFile], eax
 
-        invoke  WriteFile, [hFile], [buffer], [length], edi, ebx
+    invoke  WriteFile, [hFile], [buffer], [length], edi, ebx
 
-        ret
+    ret
 endp

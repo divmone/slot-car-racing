@@ -1,0 +1,12 @@
+isBotGame dd 0
+define ISCOMMINGSOON 10
+define SETTINGS 9
+define END2PGAME 8
+define ENDBOTGAME 7
+define SPLASHSCREEN 6
+define ENDGAME 5
+define SELECTMODE 4
+define SELECTMENU 3
+define MAINMENU 2
+define PAUSEMENU 1
+define GAME 0

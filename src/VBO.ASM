@@ -19,6 +19,6 @@ proc VBO.Create uses esi edi ebx,\
 
     add esi, [offset]
     invoke glBufferData, GL_ARRAY_BUFFER, [size], [esi], GL_STATIC_DRAW
-
+  
     ret
 endp

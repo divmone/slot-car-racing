@@ -17,7 +17,14 @@ struct Matrix4x4
         m44     dd      ?
 ends
 
-view            Matrix4x4           
+view1            Matrix4x4     1.0,0.0,0.0,0.0,\
+                                           0.0,1.0,0.0,0.0,\
+                                           0.0,0.0,1.0,0.0,\
+                                           0.0,0.0,0.0,1.0
+view            Matrix4x4     1.0,0.0,0.0,0.0,\
+                                           0.0,1.0,0.0,0.0,\
+                                           0.0,0.0,1.0,0.0,\
+                                           0.0,0.0,0.0,1.0      
         model           Matrix4x4         
 
 
@@ -43,7 +50,41 @@ view            Matrix4x4
 
         projection      Matrix4x4  
 
-        tempMatrix      Matrix4x4        
+
+        tempMatrix      Matrix4x4 
+        tempMatrix2      Matrix4x4
+        tempMatrix3      Matrix4x4
+        tempMatrix4      Matrix4x4  
+
+        model2D      Matrix4x4             1.0,0.0,0.0,1.0,\
+                                           0.0,1.0,0.0,1.0,\
+                                           0.0,0.0,1.0,1.0,\
+                                           0.0,0.0,0.0,1.0
+
+        projection2D Matrix4x4    1.0,0.0,0.0,0.0,\
+                                           0.0,1.0,0.0,0.0,\
+                                           0.0,0.0,1.0,0.0,\
+                                           0.0,0.0,0.0,1.0
+
+        splineMatrix Matrix4x4              1.0, 0.0, 0.0, 0.0,\
+                                            -3.0, 3.0, 0.0, 0.0,\
+                                            3.0, -6.0, 3.0, 0.0,\
+                                            -1.0, 3.0, -3.0, 1.0
 
 
+        lightSpaceMatrix Matrix4x4 1.0,0.0,0.0,0.0,\
+                                           0.0,1.0,0.0,0.0,\
+                                           0.0,0.0,1.0,0.0,\
+                                           0.0,0.0,0.0,1.0
+        lightProjection Matrix4x4 1.0,0.0,0.0,0.0,\
+                                           0.0,1.0,0.0,0.0,\
+                                           0.0,0.0,1.0,0.0,\
+                                           0.0,0.0,0.0,1.0
 
+        unitMatrix Matrix4x4            1.0,0.0,0.0,0.0,\
+                                        0.0,1.0,0.0,0.0,\
+                                        0.0,0.0,1.0,0.0,\
+                                        0.0,0.0,0.0,1.0
+        pMatrix Matrix4x4
+
+        currentMatrix Matrix4x4

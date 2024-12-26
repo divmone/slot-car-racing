@@ -65,6 +65,61 @@ proc Matrix.Projection uses edi,\
         ret
 endp  
 
+proc Matrix.Ortho uses esi edi,\
+             matrix, left, right, bottom, top, zNear, zFar
+
+  locals
+    two dd 2.0
+    mtwo dd -2.0
+    mone dd -1.0
+  endl
+
+  mov esi, [matrix]
+
+  fld [right]
+  fsub [left]
+  fdivr [two]
+  fstp dword[esi + Matrix4x4.m11]
+
+  fld [top]
+  fsub [bottom]
+  fdivr [two]
+  fstp dword[esi + Matrix4x4.m22]
+
+  fld [zFar]
+  fsub [zNear]
+  fdivr [mtwo]
+  fstp dword[esi + Matrix4x4.m33]
+
+  fld1
+  fstp dword[esi + Matrix4x4.m44]
+
+  fld [right]
+  fadd [left]
+  fld [right]
+  fsub [left]
+  fdivp
+  fmul [mone]
+  fstp dword[esi + Matrix4x4.m14]
+
+  fld [top]
+  fadd [bottom]
+  fld [top]
+  fsub [bottom]
+  fdivp
+  fmul [mone]
+  fstp dword[esi + Matrix4x4.m24]
+
+  fld [zFar]
+  fadd [zNear]
+  fld [zFar]
+  fsub [zNear]
+  fdivp
+  fmul [mone]
+  fstp dword[esi + Matrix4x4.m34]
+
+  ret
+endp
 
 proc Matrix.LookAt uses esi edi ebx,\
      camera, target, up
@@ -162,11 +217,202 @@ proc Matrix.LookAt uses esi edi ebx,\
         push    [temp]
         invoke  glTranslatef
 
-        invoke  glRotatef, 135.0, 0.0, 1.0, 0.0
+        ;invoke  glRotatef, 135.0, 0.0, 1.0, 0.0
         invoke glGetFloatv, GL_MODELVIEW_MATRIX, view
 
         ret
-endp         
+endp    
+
+
+proc Matrix.LookAt2 uses esi edi ebx,\
+     camera, target, up, matrix
+
+    locals
+        temp dd ?
+        f Vector3
+        u Vector3
+        s Vector3                   
+    endl
+
+    lea eax, [f]
+    stdcall Vector3.Copy, eax, [target]
+    
+    lea eax, [f]
+    stdcall Vector3.Sub, eax, [camera]
+
+    lea eax, [f]
+    stdcall Vector3.Normalize, eax
+
+    lea eax, [u]
+    stdcall Vector3.Copy, eax, [up]
+
+    lea eax, [u]
+    stdcall Vector3.Normalize, eax
+
+    lea eax, [s]
+    lea ecx, [f]
+    lea edx, [u]
+    stdcall Vector3.Cross, ecx, edx, eax
+
+    lea eax, [s]
+    stdcall Vector3.Normalize, eax
+
+    lea eax, [s]
+    lea ecx, [f]
+    lea edx, [u]
+    stdcall Vector3.Cross, eax, ecx, edx
+
+    ; mov     edi, [matrix]
+    ; mov     eax, 0.0
+    ; mov     ecx, 16
+    ; rep     stosd
+
+    mov esi, [matrix]
+    mov eax, [s.x]
+    mov [esi + Matrix4x4.m11], eax
+    mov eax, [s.y]
+    mov [esi + Matrix4x4.m21], eax
+    mov eax, [s.z]
+    mov [esi + Matrix4x4.m31], eax
+
+    mov eax, [u.x]
+    mov [esi + Matrix4x4.m12], eax
+    mov eax, [u.y]
+    mov [esi + Matrix4x4.m22], eax
+    mov eax, [u.z]
+    mov [esi + Matrix4x4.m32], eax
+
+    fld [f.x]
+    fchs
+    fstp [esi + Matrix4x4.m13]
+    fld [f.y]
+    fchs
+    fstp [esi + Matrix4x4.m23]
+    fld [f.z]
+    fchs
+    fstp [esi + Matrix4x4.m33]
+
+    lea eax, [s]
+    stdcall Vector3.Dup, eax, [camera]
+    mov [temp], eax
+    fld [temp]
+    fchs
+    fstp [esi + Matrix4x4.m41]
+
+    lea eax, [u]
+    stdcall Vector3.Dup, eax, [camera]
+    mov [temp], eax
+    fld [temp]
+    fchs
+    fstp [esi + Matrix4x4.m42]
+
+
+    lea eax, [f]
+    stdcall Vector3.Dup, eax, [camera]
+    mov [esi + Matrix4x4.m43], eax
+
+    mov [esi + Matrix4x4.m44], 1.0
+    
+    
+    ret
+endp    
+
+; gluLookAt(GLdouble eyex, GLdouble eyey, GLdouble eyez, GLdouble centerx,
+; 	  GLdouble centery, GLdouble centerz, GLdouble upx, GLdouble upy,
+; 	  GLdouble upz)
+; {
+;     float forward[3], side[3], up[3];
+;     GLfloat m[4][4];
+
+;     forward[0] = centerx - eyex;
+;     forward[1] = centery - eyey;
+;     forward[2] = centerz - eyez;
+
+;     up[0] = upx;
+;     up[1] = upy;
+;     up[2] = upz;
+
+;     normalize(forward);
+
+;     /* Side = forward x up */
+;     cross(forward, up, side);
+;     normalize(side);
+
+;     /* Recompute up as: up = side x forward */
+;     cross(side, forward, up);
+
+;     __gluMakeIdentityf(&m[0][0]);
+;     m[0][0] = side[0];
+;     m[1][0] = side[1];
+;     m[2][0] = side[2];
+
+;     m[0][1] = up[0];
+;     m[1][1] = up[1];
+;     m[2][1] = up[2];
+
+;     m[0][2] = -forward[0];
+;     m[1][2] = -forward[1];
+;     m[2][2] = -forward[2];
+
+;     glMultMatrixf(&m[0][0]);
+;     glTranslated(-eyex, -eyey, -eyez);
+; }
+; mat4x4 lookAt(vec3  const & eye, vec3  const & center, vec3  const & up)
+; {
+;     vec3  f = normalize(center - eye);
+;     vec3  u = normalize(up);
+;     vec3  s = normalize(cross(f, u));
+;     u = cross(s, f);
+
+;     mat4x4 Result(1);
+;     Result[0][0] = s.x;
+;     Result[1][0] = s.y;
+;     Result[2][0] = s.z;
+
+;     Result[0][1] = u.x;
+;     Result[1][1] = u.y;
+;     Result[2][1] = u.z;
+
+;     Result[0][2] =-f.x;
+;     Result[1][2] =-f.y;
+;     Result[2][2] =-f.z;
+;     Result[3][0] =-dot(s, eye);
+;     Result[3][1] =-dot(u, eye);
+;     Result[3][2] = dot(f, eye);
+;     return Result;
+; }
+; glm::mat4 calculate_lookAt_matrix(glm::vec3 position, glm::vec3 target, glm::vec3 worldUp)
+; {
+;     // 1. Position = known
+;     // 2. Calculate cameraDirection
+;     glm::vec3 zaxis = glm::normalize(position - target);
+
+;     // 3. Get positive right axis vector
+;     glm::vec3 xaxis = glm::normalize(glm::cross(glm::normalize(worldUp), zaxis));
+;     // 4. Calculate camera up vector
+;     
+        ;glm::vec3 yaxis = glm::cross(zaxis, xaxis);
+
+;     // Create translation and rotation matrix
+;     // In glm we access elements as mat[col][row] due to column-major layout
+;     glm::mat4 translation; // Identity matrix by default
+;     translation[3][0] = -position.x; // Third column, first row
+;     translation[3][1] = -position.y;
+;     translation[3][2] = -position.z;
+;     glm::mat4 rotation;
+;     rotation[0][0] = xaxis.x; // First column, first row
+;     rotation[1][0] = xaxis.y;
+;     rotation[2][0] = xaxis.z;
+;     rotation[0][1] = yaxis.x; // First column, second row
+;     rotation[1][1] = yaxis.y;
+;     rotation[2][1] = yaxis.z;
+;     rotation[0][2] = zaxis.x; // First column, third row
+;     rotation[1][2] = zaxis.y;
+;     rotation[2][2] = zaxis.z; 
+
+;     // Return lookAt matrix as combination of translation and rotation matrix
+;     return rotation * translation; // Remember to read from right to left (first translation then rotation)
+; }
 
 proc Matrix.GetAxis  uses esi edi ebx,\
      camera, target, up, xAx, yAx, zAx
@@ -277,7 +523,7 @@ proc Matrix.Rotate uses edi ,\
         ret
 endp
 
-proc Matrix.CreateModel uses esi edi, pos, turnC, scaleC
+proc Matrix.CreateModel2 uses esi edi, pos, turnC, scaleC
 
     stdcall Matrix.CreatePosition, [pos]
     stdcall Matrix.CreateScale, [scaleC]
@@ -348,7 +594,7 @@ proc Matrix.CreatePosition uses esi edi, posV, positionM
 endp
 
 
-proc Matrix.CreateTurn uses esi edi , turnV
+proc Matrix.CreateTurn uses esi edi , objPtr, turnV
 
     locals
        a  dd  ?
@@ -357,7 +603,7 @@ proc Matrix.CreateTurn uses esi edi , turnV
        PiDegree dd 180.0
     endl
     mov esi, [turnV]
-
+    mov edi ,[objPtr]
     fldpi
     fmul  dword [esi]
     fdiv  [PiDegree]
@@ -379,7 +625,7 @@ proc Matrix.CreateTurn uses esi edi , turnV
     fld  [c]
     fcos
     fmulp
-    fstp  dword[turn + 0]
+    fstp  dword[edi + 0]
 
     fld  [c]
     fsin
@@ -387,11 +633,11 @@ proc Matrix.CreateTurn uses esi edi , turnV
     fcos
     fmulp
     fchs
-    fstp  dword[turn + 4]
+    fstp  dword[edi + 4]
 
     fld  [b]
     fsin
-    fstp  dword[turn + 8]
+    fstp  dword[edi + 8]
 
     fld  [a]
     fsin
@@ -407,7 +653,7 @@ proc Matrix.CreateTurn uses esi edi , turnV
     fcos
     fmulp
     faddp
-    fstp  dword[turn + 16]
+    fstp  dword[edi + 16]
 
     fld  [a]
     fcos
@@ -423,7 +669,7 @@ proc Matrix.CreateTurn uses esi edi , turnV
     fsin
     fmulp
     fsubp
-    fstp  dword[turn + 20]
+    fstp  dword[edi + 20]
 
     fld  [a]
     fsin
@@ -431,7 +677,7 @@ proc Matrix.CreateTurn uses esi edi , turnV
     fcos
     fmulp
     fchs
-    fstp  dword[turn + 24]
+    fstp  dword[edi + 24]
 
     fld  [a]
     fsin
@@ -447,7 +693,7 @@ proc Matrix.CreateTurn uses esi edi , turnV
     fcos
     fmulp
     fsubp
-    fstp  dword[turn + 32]
+    fstp  dword[edi + 32]
 
     fld  [a]
     fsin
@@ -463,17 +709,17 @@ proc Matrix.CreateTurn uses esi edi , turnV
     fcos
     fmulp
     faddp
-    fstp dword [turn + 36]
+    fstp dword [edi + 36]
 
     fld  [a]
     fcos
     fld  [b]
     fcos
     fmulp
-    fstp  dword[turn + 40]
+    fstp  dword[edi + 40]
 
     fld1
-    fstp dword[turn + 60]
+    fstp dword[edi + 60]
   ret
 endp
 
@@ -495,44 +741,79 @@ proc Matrix.CreateScale uses esi edi, scaleC, scaleM
   ret
 endp
 
-proc Matrix.Multiply4x4 uses ebx ecx edx, matrix1, matrix2, matrix_res 
+proc Matrix.Multiply4x4 uses ebx esi, matrix1, matrix2, matrix_res 
 
    locals
-     temp    dd     ?
+     temp    dd     ?        ; Объявление временной переменной для хранения промежуточных результатов
    endl
 
-   mov edx, [matrix_res]
-   mov ecx, [matrix1]
+   ; Устанавливаем указатели на входные и выходные матрицы
+   mov edx, [matrix_res]      
+   mov ecx, [matrix1]         
    
-   mov esi, 0
-   gf_MatrixMultiply4x4.LoopA1:
-       mov edi, 0
-       gf_MatrixMultiply4x4.LoopA2:
-           mov [temp], 0.0
-           mov ebx, 0
-           gf_MatrixMultiply4x4.LoopA3:
-               fld dword[ecx + ebx]
+   mov esi, 0                  ; Инициализация счетчика для строк первой матрицы
+   .LoopA1:
+       mov edi, 0              ; Инициализация счетчика для столбцов второй матрицы
+       .LoopA2:
+           mov [temp], 0.0     ; Обнуляем временную переменную для хранения суммы произведений
+           mov ebx, 0          ; Инициализация счетчика для элементов строки первой матрицы
+           .LoopA3:
+               fld dword[ecx + ebx]   ; Загружаем элемент из первой матрицы
                push ecx edx
-               mov ecx, [matrix2]
-               add ecx, edi
-               fmul dword[ecx + ebx * 4]  
-               pop edx ecx
-               fadd dword[temp]
-               fstp dword[temp]
-           add ebx, 4
-           cmp ebx, 4 * 4
-           jnz gf_MatrixMultiply4x4.LoopA3
+               mov ecx, [matrix2]     
+               add ecx, edi       
+               fmul dword[ecx + ebx * 4]  ; Умножаем элементы матриц
+               pop edx ecx           
+               fadd dword[temp]     
+               fstp dword[temp]     
+           add ebx, 4               ; Переходим к следующему элементу строки первой матрицы
+           cmp ebx, 4 * 4          
+           jnz .LoopA3             
            
-           mov eax, [temp]
-           mov [edx + edi], eax
-       add edi, 4
-       cmp edi, 4 * 4
-       jnz gf_MatrixMultiply4x4.LoopA2
-   add esi, 16
-   add edx, 16
-   add ecx, 16
-   cmp esi, 16 * 4
-   jnz gf_MatrixMultiply4x4.LoopA1
+           mov eax, [temp]          ; Загружаем результат суммы произведений в eax
+           mov [edx + edi], eax     ; Записываем результат в выходную матрицу (matrix_res)
+       add edi, 4                   ; Переходим к следующему столбцу
+       cmp edi, 4 * 4               ; Проверка завершения обработки всех столбцов
+       jnz .LoopA2                  ; Если не все столбцы обработаны, продолжаем обработку
+   add esi, 16                      ; Переходим к следующей строке первой матрицы
+   add edx, 16                       ; Переходим к следующей строке выходной матрицы
+   add ecx, 16                       ; Переходим к следующей строке второй матрицы
+   cmp esi, 16 * 4                   ; Проверка завершения обработки всех строк первой матрицы
+   jnz .LoopA1                       ; Если не все строки обработаны, продолжаем обработку
 
-  ret
+  ret                               ; Завершаем процедуру
+endp
+
+proc Matrix.CreateModel uses esi edi, objPtr
+    mov esi, [objPtr]
+    add esi, Object.transform.position
+    stdcall Matrix.CreatePosition, esi, position 
+
+    mov esi, [objPtr]
+    add esi, Object.transform.scale
+    stdcall Matrix.CreateScale, esi, scale
+
+
+    ;stdcall Quaternion.CreateFromAxisAngle, [objPtr], 0.0, 1.0, 0.0, 90.0
+
+    
+    stdcall Quaternion.CreateMatrix, [objPtr], turn
+    
+    ; mov esi, [objPtr]
+    ; add esi, Object.transform.rotation
+    ; stdcall Matrix.CreateTurn, turn, esi
+
+    stdcall Matrix.Multiply4x4, scale, turn, model 
+    stdcall Matrix.Multiply4x4, model, position, model 
+
+    mov edi, [objPtr]
+    add edi, Object.matrix
+    mov esi, model
+    mov ecx, 16
+    rep movsd
+
+
+
+
+    ret
 endp
